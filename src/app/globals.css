@@ -1,0 +1,408 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   מערכת העיצוב
+   ----------------------------------------------------------------------------
+   כל ערך כאן הוא טוקן. אין צבע, רדיוס או צל שנכתב ישירות ברכיב —
+   זה מה שמאפשר למנהל לשנות את ערכת הצבעים מלוח הבקרה (ההגדרות נכתבות
+   כמשתני CSS על <html> ודורסות את מה שכאן) בלי דיפלוי.
+   ============================================================================ */
+
+@theme {
+  /* --- מותג ---------------------------------------------------------------
+     סולם נבנה סביב #0B3B75 (ראשי) ו-#174EA6 (משני). הגוונים הבהירים
+     נוטים לציאן קלות ולא לאפור, כדי שרקעים בהירים יישארו "כחולים"
+     ולא ייראו דהויים.                                                        */
+  --color-brand-50:  #EEF4FC;
+  --color-brand-100: #D7E6F8;
+  --color-brand-200: #AECCF1;
+  --color-brand-300: #7FADE7;
+  --color-brand-400: #4A87D6;
+  --color-brand-500: #2563BE;
+  --color-brand-600: #174EA6;  /* משני */
+  --color-brand-700: #10428C;
+  --color-brand-800: #0B3B75;  /* ראשי */
+  --color-brand-900: #082B57;
+  --color-brand-950: #05192F;
+
+  /* --- מבטא ---------------------------------------------------------------
+     זהב. שמור לפעולה הראשית ולתגי "מומלץ" בלבד. ברגע שהוא מופיע
+     בשלושה מקומות באותו מסך הוא מפסיק להיות מבטא.                            */
+  --color-accent-50:  #FFF9E6;
+  --color-accent-100: #FFEFBF;
+  --color-accent-200: #FFE28C;
+  --color-accent-300: #FFD24F;
+  --color-accent-400: #FFC107;
+  --color-accent-500: #EDAF00;
+  --color-accent-600: #C48F00;
+  --color-accent-700: #8F6800;
+
+  /* --- ניטרליים ------------------------------------------------------------
+     לא אפור טהור. יש בהם טיפה כחול כדי שיישבו נכון ליד צבעי המותג.          */
+  --color-ink-50:  #F7F9FC;   /* רקע האתר */
+  --color-ink-100: #EFF3F9;
+  --color-ink-200: #E1E8F1;
+  --color-ink-300: #C9D4E3;
+  --color-ink-400: #94A3B8;
+  --color-ink-500: #64748B;
+  --color-ink-600: #475569;
+  --color-ink-700: #334155;
+  --color-ink-800: #1E293B;
+  --color-ink-900: #0F172A;
+  --color-ink-950: #060B16;
+
+  /* --- מצבים -------------------------------------------------------------- */
+  --color-success-50:  #ECFDF5;
+  --color-success-500: #10B981;
+  --color-success-700: #047857;
+  --color-warning-50:  #FFFBEB;
+  --color-warning-500: #F59E0B;
+  --color-warning-700: #B45309;
+  --color-danger-50:   #FEF2F2;
+  --color-danger-500:  #EF4444;
+  --color-danger-700:  #B91C1C;
+
+  /* --- טיפוגרפיה ----------------------------------------------------------
+     Heebo לעברית, Inter ללטינית. Heebo ראשון — רוב התוכן עברי, והדפדפן
+     נופל ל-Inter רק לתווים ש-Heebo לא מכסה.                                  */
+  --font-sans:    var(--font-heebo), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-heebo), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  /* סולם טיפוגרפי ביחס 1.2 (minor third) — מספיק כדי ליצור היררכיה
+     ברורה בלי שכותרת H1 תשתלט על המסך.                                       */
+  --text-2xs:  0.6875rem;
+  --text-xs:   0.75rem;
+  --text-sm:   0.8125rem;
+  --text-base: 0.9375rem;
+  --text-md:   1rem;
+  --text-lg:   1.125rem;
+  --text-xl:   1.375rem;
+  --text-2xl:  1.75rem;
+  --text-3xl:  2.125rem;
+  --text-4xl:  2.75rem;
+  --text-5xl:  3.5rem;
+  --text-6xl:  4.5rem;
+
+  /* --- רדיוסים ------------------------------------------------------------ */
+  --radius-xs:  6px;
+  --radius-sm:  10px;
+  --radius-md:  14px;
+  --radius-lg:  20px;
+  --radius-xl:  28px;
+  --radius-2xl: 36px;
+
+  /* --- צללים --------------------------------------------------------------
+     שכבתיים ובגוון כחול, לא שחור. צל שחור על רקע כחלחל נראה מלוכלך.
+     כל רמה = צל קרוב חד + צל רחוק רך, כמו אור אמיתי.                         */
+  --shadow-xs:    0 1px 2px 0 rgb(11 59 117 / 0.05);
+  --shadow-sm:    0 1px 3px 0 rgb(11 59 117 / 0.07), 0 1px 2px -1px rgb(11 59 117 / 0.05);
+  --shadow-md:    0 4px 12px -2px rgb(11 59 117 / 0.08), 0 2px 4px -2px rgb(11 59 117 / 0.05);
+  --shadow-lg:    0 12px 28px -6px rgb(11 59 117 / 0.12), 0 4px 10px -4px rgb(11 59 117 / 0.06);
+  --shadow-xl:    0 24px 48px -12px rgb(11 59 117 / 0.18), 0 8px 16px -8px rgb(11 59 117 / 0.08);
+  --shadow-2xl:   0 40px 80px -20px rgb(11 59 117 / 0.25);
+  --shadow-glow:  0 0 0 1px rgb(255 193 7 / 0.35), 0 8px 32px -8px rgb(255 193 7 / 0.45);
+  --shadow-inner-t: inset 0 1px 0 0 rgb(255 255 255 / 0.6);
+
+  /* --- תנועה --------------------------------------------------------------
+     עקומות ולא ברירת המחדל של הדפדפן. ease-out-quint לכניסות (מהיר
+     ואז מתמתן — מרגיש מיידי), spring לאינטראקציות שצריכות "משקל".            */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --duration-fast:   150ms;
+  --duration-normal: 260ms;
+  --duration-slow:   420ms;
+  --duration-slower: 700ms;
+
+  /* --- פריסה -------------------------------------------------------------- */
+  --spacing-header: 76px;
+  --container-page: 1280px;
+  --container-wide: 1480px;
+}
+
+
+/* ============================================================================
+   בסיס
+   ============================================================================ */
+
+@layer base {
+  :root {
+    --page-bg: var(--color-ink-50);
+    --page-fg: var(--color-ink-900);
+    --surface: #ffffff;
+    --surface-muted: var(--color-ink-100);
+    --border-subtle: var(--color-ink-200);
+
+    /* מקדם גודל גופן — סרגל הנגישות משנה אותו. כל הסולם נגזר ממנו. */
+    --font-scale: 1;
+
+    color-scheme: light;
+  }
+
+  html {
+    font-size: calc(16px * var(--font-scale));
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    /* גלילה חלקה שלא "קופצת" מתחת לניווט הדביק */
+    scroll-padding-top: calc(var(--spacing-header) + 24px);
+  }
+
+  body {
+    background: var(--page-bg);
+    color: var(--page-fg);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* מונע קפיצה אופקית מאלמנטים מונפשים שחורגים מהמסך */
+    overflow-x: clip;
+  }
+
+  /* כותרות: צפופות יותר ככל שהן גדולות. כותרת ענקית עם line-height
+     של טקסט רץ נראית מפורקת.                                                */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  h1 { letter-spacing: -0.03em; }
+
+  p { text-wrap: pretty; }
+
+  /* טבעת פוקוס אחידה. גלויה תמיד למקלדת, אף פעם לא מוסתרת —
+     זו דרישת WCAG 2.4.7 ואחת התקלות הנפוצות ביותר.                          */
+  :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 3px solid var(--color-accent-400);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  ::selection {
+    background: var(--color-brand-800);
+    color: #fff;
+  }
+
+  /* פס גלילה מעוצב — פרט קטן שמבדיל אתר מוקפד מתבנית */
+  @supports (scrollbar-width: thin) {
+    * { scrollbar-width: thin; scrollbar-color: var(--color-ink-300) transparent; }
+  }
+
+  img, video { max-width: 100%; height: auto; }
+}
+
+
+/* ============================================================================
+   מצבי נגישות
+   ----------------------------------------------------------------------------
+   מופעלים על ידי סרגל הנגישות, שמוסיף data-attributes ל-<html>.
+   ============================================================================ */
+
+/* עצירת אנימציות — גם ידנית מהסרגל וגם לפי העדפת המערכת */
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion="on"]) *,
+  html:not([data-motion="on"]) *::before,
+  html:not([data-motion="on"]) *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+html[data-motion="off"] *,
+html[data-motion="off"] *::before,
+html[data-motion="off"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* ניגודיות גבוהה */
+html[data-contrast="high"] {
+  --page-bg: #ffffff;
+  --page-fg: #000000;
+  --surface: #ffffff;
+  --border-subtle: #000000;
+}
+html[data-contrast="high"] :where(p, span, li, td, dd, dt) { color: #000; }
+html[data-contrast="high"] :where(a, button) { text-decoration-thickness: 2px; }
+
+/* היפוך צבעים */
+html[data-contrast="invert"] {
+  filter: invert(1) hue-rotate(180deg);
+}
+html[data-contrast="invert"] img,
+html[data-contrast="invert"] video {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* גווני אפור */
+html[data-contrast="grayscale"] { filter: grayscale(1); }
+
+/* הדגשת קישורים */
+html[data-links="highlight"] a {
+  text-decoration: underline !important;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 2px;
+  background: var(--color-accent-100);
+  box-shadow: 0 0 0 2px var(--color-accent-100);
+  border-radius: 2px;
+}
+
+/* גופן ידידותי לדיסלקציה.
+   Heebo לא מגיע בגרסת דיסלקציה, ולכן במקום גופן ייעודי אנחנו מגדילים
+   מרווח אותיות, מרווח מילים וגובה שורה — שלושת הגורמים שמחקרי קריאות
+   מצביעים עליהם כמשפיעים ביותר, וזה עובד גם בעברית.                        */
+html[data-dyslexia="on"] body {
+  letter-spacing: 0.06em;
+  word-spacing: 0.18em;
+  line-height: 2;
+  font-weight: 500;
+}
+html[data-dyslexia="on"] :where(h1, h2, h3, h4) { letter-spacing: 0.02em; }
+
+/* סמן גדול */
+html[data-cursor="big"], html[data-cursor="big"] * {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'><path d='M6 2l30 18-13 3 8 15-6 3-8-15L6 34z' fill='%230B3B75' stroke='white' stroke-width='2'/></svg>") 4 2, auto;
+}
+
+
+/* ============================================================================
+   כלי עזר של המערכת
+   ============================================================================ */
+
+@layer utilities {
+  /* דילוג לתוכן — הקישור הראשון בעמוד, מוסתר עד פוקוס */
+  .skip-link {
+    position: absolute;
+    inset-inline-start: 50%;
+    top: -100px;
+    transform: translateX(50%);
+    z-index: 200;
+    transition: top var(--duration-fast) var(--ease-out-quint);
+  }
+  .skip-link:focus { top: 12px; }
+
+  /* זכוכית. backdrop-filter יקר — משתמשים בו רק על אלמנטים דביקים
+     שממילא נמצאים בשכבה נפרדת (will-change/transform).                      */
+  .glass {
+    background: rgb(255 255 255 / 0.72);
+    backdrop-filter: blur(18px) saturate(180%);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+    border: 1px solid rgb(255 255 255 / 0.6);
+  }
+  .glass-dark {
+    background: rgb(8 43 87 / 0.55);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid rgb(255 255 255 / 0.12);
+  }
+
+  /* טקסט בגרדיאנט */
+  .text-gradient {
+    background: linear-gradient(135deg, var(--color-brand-800), var(--color-brand-500) 55%, var(--color-brand-400));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .text-gradient-gold {
+    background: linear-gradient(135deg, var(--color-accent-300), var(--color-accent-500));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* מסגרת בגרדיאנט: שתי שכבות רקע עם שני origin-ים שונים.
+     עדיף על פסאודו-אלמנט — שורד border-radius בלי artifacts.                */
+  .border-gradient {
+    border: 1px solid transparent;
+    background:
+      linear-gradient(var(--surface), var(--surface)) padding-box,
+      linear-gradient(135deg, var(--color-brand-200), var(--color-accent-200)) border-box;
+  }
+
+  /* הסתרה ויזואלית — נשאר לקוראי מסך */
+  .sr-only-focusable:not(:focus):not(:focus-within) {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  /* מיסוך דהייה בקצה רצועות גלילה אופקיות */
+  .fade-edges-x {
+    mask-image: linear-gradient(to left, transparent, black 3%, black 97%, transparent);
+  }
+
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* רקע רשת עדין לסקציות */
+  .bg-grid {
+    background-image:
+      linear-gradient(to left, rgb(11 59 117 / 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(11 59 117 / 0.045) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  .bg-dots {
+    background-image: radial-gradient(rgb(11 59 117 / 0.09) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+}
+
+
+/* ============================================================================
+   אנימציות מפתח
+   ============================================================================ */
+
+@keyframes shimmer {
+  100% { transform: translateX(-100%); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50%      { transform: translate3d(0, -22px, 0) rotate(2.5deg); }
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(0.9); opacity: 0.7; }
+  70%  { transform: scale(1.35); opacity: 0; }
+  100% { transform: scale(1.35); opacity: 0; }
+}
+
+@keyframes marquee-rtl {
+  from { transform: translateX(0); }
+  to   { transform: translateX(50%); }
+}
+
+/* שלד טעינה. הנצנוץ נע מימין לשמאל בהתאם לכיוון הקריאה. */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-ink-200);
+  border-radius: var(--radius-sm);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(100%);
+  background: linear-gradient(
+    to left,
+    transparent,
+    rgb(255 255 255 / 0.65),
+    transparent
+  );
+  animation: shimmer 1.6s infinite;
+}
+
+.animate-float-slow { animation: float-slow 9s ease-in-out infinite; }
