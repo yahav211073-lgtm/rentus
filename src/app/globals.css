@@ -10,20 +10,20 @@
 
 @theme {
   /* --- מותג ---------------------------------------------------------------
-     סולם נבנה סביב #0B3B75 (ראשי) ו-#174EA6 (משני). הגוונים הבהירים
-     נוטים לציאן קלות ולא לאפור, כדי שרקעים בהירים יישארו "כחולים"
-     ולא ייראו דהויים.                                                        */
-  --color-brand-50:  #EEF4FC;
-  --color-brand-100: #D7E6F8;
-  --color-brand-200: #AECCF1;
-  --color-brand-300: #7FADE7;
-  --color-brand-400: #4A87D6;
-  --color-brand-500: #2563BE;
-  --color-brand-600: #174EA6;  /* משני */
-  --color-brand-700: #10428C;
-  --color-brand-800: #0B3B75;  /* ראשי */
-  --color-brand-900: #082B57;
-  --color-brand-950: #05192F;
+     סולם "שמיים" — כחול-שמים חי (#0D63D6) ולא נייבי מושחל. גם ברמות
+     הכהות (900/950) הצבע נשאר כחול רווי ולא נופל לשחור-כחלחל, כי
+     הבקשה המפורשת הייתה אתר בהיר עם אנרגיה, לא אתר כהה עם הבהוב כחול.          */
+  --color-brand-50:  #EAF5FF;
+  --color-brand-100: #D2EAFF;
+  --color-brand-200: #A6D4FF;
+  --color-brand-300: #70B8FF;
+  --color-brand-400: #3D98FF;
+  --color-brand-500: #1379F0;
+  --color-brand-600: #0D63D6;  /* משני */
+  --color-brand-700: #0B52B0;
+  --color-brand-800: #0A4590;  /* ראשי */
+  --color-brand-900: #0C3872;
+  --color-brand-950: #082A57;
 
   /* --- מבטא ---------------------------------------------------------------
      זהב. שמור לפעולה הראשית ולתגי "מומלץ" בלבד. ברגע שהוא מופיע
@@ -94,12 +94,12 @@
   /* --- צללים --------------------------------------------------------------
      שכבתיים ובגוון כחול, לא שחור. צל שחור על רקע כחלחל נראה מלוכלך.
      כל רמה = צל קרוב חד + צל רחוק רך, כמו אור אמיתי.                         */
-  --shadow-xs:    0 1px 2px 0 rgb(11 59 117 / 0.05);
-  --shadow-sm:    0 1px 3px 0 rgb(11 59 117 / 0.07), 0 1px 2px -1px rgb(11 59 117 / 0.05);
-  --shadow-md:    0 4px 12px -2px rgb(11 59 117 / 0.08), 0 2px 4px -2px rgb(11 59 117 / 0.05);
-  --shadow-lg:    0 12px 28px -6px rgb(11 59 117 / 0.12), 0 4px 10px -4px rgb(11 59 117 / 0.06);
-  --shadow-xl:    0 24px 48px -12px rgb(11 59 117 / 0.18), 0 8px 16px -8px rgb(11 59 117 / 0.08);
-  --shadow-2xl:   0 40px 80px -20px rgb(11 59 117 / 0.25);
+  --shadow-xs:    0 1px 2px 0 rgb(10 69 144 / 0.05);
+  --shadow-sm:    0 1px 3px 0 rgb(10 69 144 / 0.07), 0 1px 2px -1px rgb(10 69 144 / 0.05);
+  --shadow-md:    0 4px 12px -2px rgb(10 69 144 / 0.08), 0 2px 4px -2px rgb(10 69 144 / 0.05);
+  --shadow-lg:    0 12px 28px -6px rgb(10 69 144 / 0.12), 0 4px 10px -4px rgb(10 69 144 / 0.06);
+  --shadow-xl:    0 24px 48px -12px rgb(10 69 144 / 0.18), 0 8px 16px -8px rgb(10 69 144 / 0.08);
+  --shadow-2xl:   0 40px 80px -20px rgb(10 69 144 / 0.25);
   --shadow-glow:  0 0 0 1px rgb(255 193 7 / 0.35), 0 8px 32px -8px rgb(255 193 7 / 0.45);
   --shadow-inner-t: inset 0 1px 0 0 rgb(255 255 255 / 0.6);
 
@@ -269,7 +269,7 @@ html[data-dyslexia="on"] :where(h1, h2, h3, h4) { letter-spacing: 0.02em; }
 
 /* סמן גדול */
 html[data-cursor="big"], html[data-cursor="big"] * {
-  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'><path d='M6 2l30 18-13 3 8 15-6 3-8-15L6 34z' fill='%230B3B75' stroke='white' stroke-width='2'/></svg>") 4 2, auto;
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'><path d='M6 2l30 18-13 3 8 15-6 3-8-15L6 34z' fill='%230A4590' stroke='white' stroke-width='2'/></svg>") 4 2, auto;
 }
 
 
@@ -348,13 +348,13 @@ html[data-cursor="big"], html[data-cursor="big"] * {
   /* רקע רשת עדין לסקציות */
   .bg-grid {
     background-image:
-      linear-gradient(to left, rgb(11 59 117 / 0.045) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(11 59 117 / 0.045) 1px, transparent 1px);
+      linear-gradient(to left, rgb(10 69 144 / 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(10 69 144 / 0.045) 1px, transparent 1px);
     background-size: 56px 56px;
   }
 
   .bg-dots {
-    background-image: radial-gradient(rgb(11 59 117 / 0.09) 1px, transparent 1px);
+    background-image: radial-gradient(rgb(10 69 144 / 0.09) 1px, transparent 1px);
     background-size: 22px 22px;
   }
 }

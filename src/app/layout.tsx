@@ -4,9 +4,27 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AccessibilityToolbar } from "@/components/a11y/AccessibilityToolbar";
 import { PopupManager } from "@/components/ads/PopupManager";
-import { seedPopups } from "@/data/seed";
+import { SideBanner } from "@/components/ads/SideBanner";
 import { env } from "@/lib/env";
+import { getCurrentUser } from "@/lib/auth";
+import { getActiveAds } from "@/lib/repo/ads";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import "./globals.css";
+
+/**
+ * האם המשתמש בעל עסק, לצורך מיקוד פרסום (audience: "business_owners").
+ * לא נשענים על profiles.role — יש טריגר שנועל שינוי role למנהלים
+ * בלבד (ראו admin/users/actions.ts), ולכן "בעל עסק" בפועל הוא מי
+ * שבבעלותו שורה בטבלת businesses, לא ערך תפקיד שאף אחד לא מעדכן.
+ */
+async function checkIsBusinessOwner(userId: string | undefined): Promise<boolean> {
+  if (!userId) return false;
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return false;
+  const { count } = await supabase
+    .from("businesses").select("id", { count: "exact", head: true }).eq("owner_id", userId);
+  return (count ?? 0) > 0;
+}
 
 /**
  * Heebo לעברית, Inter ללטינית.
@@ -61,15 +79,18 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#0B3B75" },
-    { media: "(prefers-color-scheme: dark)", color: "#05192F" },
+    { media: "(prefers-color-scheme: light)", color: "#0A4590" },
+    { media: "(prefers-color-scheme: dark)", color: "#082A57" },
   ],
   width: "device-width",
   initialScale: 1,
   // לא maximumScale — נעילת זום היא כשל נגישות (WCAG 1.4.4)
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const [user, ads] = await Promise.all([getCurrentUser(), getActiveAds()]);
+  const isBusinessOwner = await checkIsBusinessOwner(user?.id);
+
   return (
     <html lang="he" dir="rtl" className={`${heebo.variable} ${inter.variable}`}>
       <head>
@@ -109,17 +130,23 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           דילוג לתוכן הראשי
         </a>
 
-        <Header />
+        <Header user={user} />
         <main id="main" className="flex-1">{children}</main>
         <Footer />
 
         <AccessibilityToolbar />
         {/*
-          הפופאפים והבאנרים מוזנים כאן מתוכן ההדגמה. בגרסה המחוברת
-          הם נטענים בשרת מטבלאות popup_banners / banners, כך שאין
-          הבהוב של תוכן שיווקי לפני שכללי המיקוד הוכרעו.
+          הפופאפים והבאנרים נטענים בשרת מ-banners/popup_banners לפי
+          is_active, כדי שאין הבהוב של תוכן שיווקי לפני שכללי המיקוד
+          העדינים (נתיב/מכשיר) שהם client-only מוכרעים.
         */}
-        <PopupManager popups={seedPopups} />
+        <PopupManager
+          popups={ads.popups}
+          isLoggedIn={Boolean(user)}
+          isBusinessOwner={isBusinessOwner}
+        />
+        <SideBanner banners={ads.banners} side="start" isLoggedIn={Boolean(user)} isBusinessOwner={isBusinessOwner} />
+        <SideBanner banners={ads.banners} side="end" isLoggedIn={Boolean(user)} isBusinessOwner={isBusinessOwner} />
       </body>
     </html>
   );

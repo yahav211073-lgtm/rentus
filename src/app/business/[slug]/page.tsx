@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import {
   BadgeCheck, Clock, Globe, Mail, MapPin, MessageCircle, Phone, Share2,
 } from "lucide-react";
-import { seedBusinessDetail, seedBusinesses, seedReviews } from "@/data/seed";
+import { getApprovedReviews, getBusinessBySlug, getRelatedBusinesses } from "@/lib/repo/businesses";
 import type { Business } from "@/types/domain";
 import { CoverArt } from "@/components/ui/CoverArt";
 import { Badge } from "@/components/ui/Badge";
@@ -12,11 +12,13 @@ import { Rating } from "@/components/ui/Rating";
 import { ButtonLink } from "@/components/ui/Button";
 import { LeadForm } from "@/components/business/LeadForm";
 import { ReviewList } from "@/components/business/ReviewList";
+import { WriteReviewForm } from "@/components/business/WriteReviewForm";
 import { OpeningHours } from "@/components/business/OpeningHours";
 import { BusinessCard } from "@/components/business/BusinessCard";
 import { Reveal } from "@/components/motion/Reveal";
 import { env } from "@/lib/env";
 import { formatNumber, toWhatsAppNumber } from "@/lib/utils";
+import { BusinessMap } from "@/components/business/BusinessMapLazy";
 
 /**
  * עמוד פרופיל עסק.
@@ -32,14 +34,9 @@ import { formatNumber, toWhatsAppNumber } from "@/lib/utils";
 
 type Params = Promise<{ slug: string }>;
 
-/** בגרסה המחוברת: שאילתה לפי slug מ-Supabase. */
-async function getBusiness(slug: string): Promise<Business | null> {
-  return slug === seedBusinessDetail.slug ? seedBusinessDetail : null;
-}
-
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug } = await params;
-  const b = await getBusiness(slug);
+  const b = await getBusinessBySlug(slug);
   if (!b) return { title: "העסק לא נמצא" };
 
   const location = b.city ? ` ב${b.city.name}` : "";
@@ -64,13 +61,13 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 
 export default async function BusinessPage({ params }: { params: Params }) {
   const { slug } = await params;
-  const b = await getBusiness(slug);
+  const b = await getBusinessBySlug(slug);
   if (!b) notFound();
 
-  const reviews = seedReviews.filter((r) => r.businessId === b.id);
-  const related = seedBusinesses
-    .filter((x) => x.slug !== b.slug && x.primaryCategory?.slug === b.primaryCategory?.slug)
-    .slice(0, 4);
+  const [reviews, related] = await Promise.all([
+    getApprovedReviews(b.id),
+    getRelatedBusinesses(b, 4),
+  ]);
 
   return (
     <>
@@ -217,6 +214,7 @@ export default async function BusinessPage({ params }: { params: Params }) {
             )}
 
             <ReviewList reviews={reviews} businessName={b.name} ratingAvg={b.ratingAvg} reviewCount={b.reviewCount} />
+            <WriteReviewForm businessId={b.id} businessName={b.name} />
           </div>
 
           {/* עמודה דביקה */}
@@ -255,6 +253,12 @@ export default async function BusinessPage({ params }: { params: Params }) {
                   </ContactRow>
                 )}
               </ul>
+
+              {b.latitude != null && b.longitude != null && (
+                <div className="mt-4">
+                  <BusinessMap latitude={b.latitude} longitude={b.longitude} name={b.name} address={b.address} />
+                </div>
+              )}
 
               <ShareRow name={b.name} />
             </Panel>

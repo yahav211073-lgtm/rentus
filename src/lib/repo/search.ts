@@ -1,6 +1,7 @@
 import type { BusinessCard, SearchFilters, SearchResult, SortOption } from "@/types/domain";
 import { seedBusinesses, seedCategories, seedCities, seedTags } from "@/data/seed";
 import { isSupabaseConfigured } from "@/lib/env";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 /**
  * שכבת החיפוש.
@@ -145,11 +146,153 @@ function buildFacets(items: BusinessCard[]) {
   };
 }
 
+const CARD_SELECT = `
+  id, slug, name, tagline, logo_url, cover_url,
+  rating_avg, review_count, is_verified, is_featured, is_sponsored,
+  tier, price_range, phone, whatsapp,
+  city:cities(name, slug),
+  business_categories(is_primary, categories(name, slug)),
+  business_tags(tags(name, slug))
+`;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Row = any;
+
+function mapCard(row: Row): BusinessCard {
+  const primaryLink: Row =
+    row.business_categories?.find((c: Row) => c.is_primary) ?? row.business_categories?.[0];
+
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    tagline: row.tagline,
+    logoUrl: row.logo_url,
+    coverUrl: row.cover_url,
+    ratingAvg: Number(row.rating_avg ?? 0),
+    reviewCount: row.review_count ?? 0,
+    isVerified: row.is_verified,
+    isFeatured: row.is_featured,
+    isSponsored: row.is_sponsored,
+    tier: row.tier,
+    priceRange: row.price_range,
+    phone: row.phone,
+    whatsapp: row.whatsapp,
+    city: row.city ? { name: row.city.name, slug: row.city.slug } : null,
+    primaryCategory: primaryLink
+      ? { name: primaryLink.categories.name, slug: primaryLink.categories.slug }
+      : null,
+    tags: (row.business_tags ?? []).map((t: Row) => ({ name: t.tags.name, slug: t.tags.slug })),
+  };
+}
+
+const SORT_COLUMN: Record<SortOption, string | null> = {
+  relevance: null, // בלי q נופל ל-rating, עם q הסינון עצמו כבר עשה את העבודה
+  rating: "rating_avg",
+  reviews: "review_count",
+  newest: "created_at",
+  name: "name",
+  distance: "name", // דורש מיקום — ממומש עם המפה, בינתיים נופל לשם
+};
+
+async function searchBusinessesSupabase(filters: SearchFilters): Promise<SearchResult> {
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) {
+    return { items: [], total: 0, page: 1, pageSize: PAGE_SIZE, facets: { categories: [], cities: [], tags: [] } };
+  }
+
+  // עמודות ישירות על businesses (city_id) מסוננות ישירות. שיוך קטגוריה
+  // הוא רבים-לרבים דרך business_categories, בלי FK ישיר על businesses —
+  // פותרים לרשימת business_id דרך שאילתה נפרדת ולא embed-filter, כדי
+  // לא להסתבך עם !inner מול עסקים בלי עיר/קטגוריה.
+  let cityId: string | null = null;
+  if (filters.city) {
+    const { data: city } = await supabase
+      .from("cities").select("id").eq("slug", filters.city).maybeSingle();
+    cityId = city?.id ?? "__none__"; // עיר לא קיימת → אפס תוצאות, לא כל התוצאות
+  }
+
+  let matchingBusinessIds: string[] | null = null;
+  if (filters.category) {
+    const { data: cat } = await supabase
+      .from("categories").select("id").eq("slug", filters.category).maybeSingle();
+    if (cat) {
+      const { data: children } = await supabase
+        .from("categories").select("id").eq("parent_id", cat.id);
+      const categoryIds = [cat.id, ...(children ?? []).map((c) => c.id)];
+      const { data: links } = await supabase
+        .from("business_categories").select("business_id").in("category_id", categoryIds);
+      matchingBusinessIds = [...new Set((links ?? []).map((l) => l.business_id))];
+    } else {
+      matchingBusinessIds = [];
+    }
+  }
+
+  if (matchingBusinessIds?.length === 0) {
+    return { items: [], total: 0, page: Math.max(1, filters.page ?? 1), pageSize: PAGE_SIZE, facets: { categories: [], cities: [], tags: [] } };
+  }
+
+  let query = supabase
+    .from("businesses")
+    .select(CARD_SELECT, { count: "exact" })
+    .eq("status", "published");
+
+  if (filters.q) {
+    query = query.textSearch("search_vector", filters.q, { type: "websearch", config: "simple" });
+  }
+  if (cityId) {
+    query = query.eq("city_id", cityId);
+  }
+  if (matchingBusinessIds) {
+    query = query.in("id", matchingBusinessIds);
+  }
+  if (filters.minRating) {
+    query = query.gte("rating_avg", filters.minRating);
+  }
+  if (filters.verifiedOnly) {
+    query = query.eq("is_verified", true);
+  }
+  if (filters.priceRange?.length) {
+    query = query.in("price_range", filters.priceRange);
+  }
+
+  // ממומנים קודם, ותוך כך — עמודת המיון שנבחרה. תמיד אמת פוסטגרס
+  // ולא באפליקציה, כדי שהעימוד (range) יתאים לסדר בפועל.
+  query = query.order("is_sponsored", { ascending: false });
+  const sortCol = SORT_COLUMN[filters.sort ?? "relevance"];
+  if (sortCol) {
+    query = query.order(sortCol, { ascending: filters.sort === "name" });
+  } else {
+    query = query.order("rating_avg", { ascending: false }).order("review_count", { ascending: false });
+  }
+
+  const page = Math.max(1, filters.page ?? 1);
+  const start = (page - 1) * PAGE_SIZE;
+  query = query.range(start, start + PAGE_SIZE - 1);
+
+  const [{ data, count }, { data: facetsData }] = await Promise.all([
+    query,
+    supabase.rpc("search_business_facets", {
+      p_query: filters.q ?? null,
+      p_city: filters.city ?? null,
+      p_min_rating: filters.minRating ?? null,
+      p_verified_only: filters.verifiedOnly ?? false,
+      p_price_range: filters.priceRange?.length ? filters.priceRange : null,
+    }),
+  ]);
+
+  return {
+    items: (data ?? []).map(mapCard),
+    total: count ?? 0,
+    page,
+    pageSize: PAGE_SIZE,
+    facets: facetsData ?? { categories: [], cities: [], tags: [] },
+  };
+}
+
 export async function searchBusinesses(filters: SearchFilters): Promise<SearchResult> {
   if (isSupabaseConfigured) {
-    // TODO: מימוש SQL — websearch_to_tsquery על search_vector,
-    // מסננים כ-where, ו-facets דרך פונקציית RPC אחת כדי לא לבצע
-    // שאילתת ספירה נפרדת לכל מסנן.
+    return searchBusinessesSupabase(filters);
   }
 
   const filtered = applyFilters(seedBusinesses, filters);

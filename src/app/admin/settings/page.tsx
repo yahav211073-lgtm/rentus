@@ -1,0 +1,40 @@
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { SettingsForm } from "@/components/admin/SettingsForm";
+
+export const metadata = { title: "הגדרות אתר", robots: { index: false, follow: false } };
+
+export default async function AdminSettingsPage() {
+  const supabase = await createSupabaseServerClient();
+  const { data: rows } = await supabase!
+    .from("settings")
+    .select("key, value")
+    .in("key", ["brand.identity", "brand.colors", "contact.details", "social.links"]);
+
+  const byKey = Object.fromEntries((rows ?? []).map((r) => [r.key, r.value as Record<string, string>]));
+
+  return (
+    <div>
+      <h1 className="mb-6 font-display text-2xl font-extrabold text-ink-900">הגדרות אתר</h1>
+      <SettingsForm
+        brandIdentity={{
+          name: byKey["brand.identity"]?.name ?? "",
+          tagline: byKey["brand.identity"]?.tagline ?? "",
+          logoUrl: byKey["brand.identity"]?.logoUrl ?? null,
+        }}
+        brandColors={{
+          primary: byKey["brand.colors"]?.primary ?? "#0A4590",
+          secondary: byKey["brand.colors"]?.secondary ?? "#0D63D6",
+          accent: byKey["brand.colors"]?.accent ?? "#FFC107",
+          background: byKey["brand.colors"]?.background ?? "#F7F9FC",
+        }}
+        contactDetails={{
+          phone: byKey["contact.details"]?.phone ?? "",
+          email: byKey["contact.details"]?.email ?? "",
+          address: byKey["contact.details"]?.address ?? "",
+          whatsapp: byKey["contact.details"]?.whatsapp ?? "",
+        }}
+        socialLinks={byKey["social.links"] ?? {}}
+      />
+    </div>
+  );
+}

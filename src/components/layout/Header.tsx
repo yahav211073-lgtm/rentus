@@ -5,13 +5,20 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
-  ChevronDown, Menu, Search, Store, User, X, Sparkles,
+  ChevronDown, LayoutDashboard, LogOut, Menu, Search, Store, User, X, Sparkles,
 } from "lucide-react";
 import { seedCategories } from "@/data/seed";
-import { ButtonLink } from "@/components/ui/Button";
+import { Button, ButtonLink } from "@/components/ui/Button";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { useScrolledPast } from "@/lib/hooks/browser-state";
 import { cn } from "@/lib/utils";
+import type { CurrentUser } from "@/lib/auth";
+
+const STAFF_ROLES = ["admin", "moderator", "editor"];
+
+function dashboardHrefFor(role: string) {
+  return STAFF_ROLES.includes(role) ? "/admin" : "/business/dashboard";
+}
 
 /**
  * ניווט עליון.
@@ -33,7 +40,7 @@ const NAV_LINKS = [
   { label: "אודות", href: "/about" },
 ];
 
-export function Header() {
+export function Header({ user }: { user: CurrentUser | null }) {
   // useSyncExternalStore ולא useEffect+setState: הערך נכון כבר
   // ברינדור הראשון בלקוח, בלי רינדור מדורג. ראו browser-state.ts.
   const scrolled = useScrolledPast(24);
@@ -216,18 +223,47 @@ export function Header() {
               <Search className="h-5 w-5" />
             </Link>
 
-            <Link
-              href="/login"
-              className={cn(
-                "hidden items-center gap-1.5 rounded-xs px-3 py-2 text-base font-semibold transition-colors sm:inline-flex",
-                scrolled
-                  ? "text-ink-700 hover:bg-ink-100"
-                  : "text-white/90 hover:bg-white/10 hover:text-white",
-              )}
-            >
-              <User className="h-4 w-4" />
-              כניסה
-            </Link>
+            {user ? (
+              <div className="hidden items-center gap-1 sm:flex">
+                <Link
+                  href={dashboardHrefFor(user.role)}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-xs px-3 py-2 text-base font-semibold transition-colors",
+                    scrolled
+                      ? "text-ink-700 hover:bg-ink-100"
+                      : "text-white/90 hover:bg-white/10 hover:text-white",
+                  )}
+                >
+                  <LayoutDashboard className="h-4 w-4" />
+                  {user.fullName ?? "האזור האישי"}
+                </Link>
+                <form action="/api/auth/signout" method="post">
+                  <button
+                    type="submit"
+                    aria-label="התנתקות"
+                    className={cn(
+                      "grid h-10 w-10 place-items-center rounded-xs transition-colors",
+                      scrolled ? "text-ink-500 hover:bg-ink-100" : "text-white/80 hover:bg-white/10",
+                    )}
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </button>
+                </form>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className={cn(
+                  "hidden items-center gap-1.5 rounded-xs px-3 py-2 text-base font-semibold transition-colors sm:inline-flex",
+                  scrolled
+                    ? "text-ink-700 hover:bg-ink-100"
+                    : "text-white/90 hover:bg-white/10 hover:text-white",
+                )}
+              >
+                <User className="h-4 w-4" />
+                כניסה
+              </Link>
+            )}
 
             <ButtonLink
               href="/business/register"
@@ -255,7 +291,7 @@ export function Header() {
         </div>
       </header>
 
-      <MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} />
+      <MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} user={user} />
     </>
   );
 }
@@ -264,7 +300,9 @@ export function Header() {
    תפריט מובייל
    ============================================================================ */
 
-function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
+function MobileMenu({
+  open, onClose, user,
+}: { open: boolean; onClose: () => void; user: CurrentUser | null }) {
   const reduced = useReducedMotion();
 
   return (
@@ -358,9 +396,22 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
               <ButtonLink href="/business/register" variant="accent" size="lg" fullWidth>
                 רישום עסק חינם
               </ButtonLink>
-              <ButtonLink href="/login" variant="secondary" size="lg" fullWidth>
-                כניסה לחשבון
-              </ButtonLink>
+              {user ? (
+                <>
+                  <ButtonLink href={dashboardHrefFor(user.role)} variant="secondary" size="lg" fullWidth>
+                    {user.fullName ?? "האזור האישי"}
+                  </ButtonLink>
+                  <form action="/api/auth/signout" method="post">
+                    <Button type="submit" variant="ghost" size="lg" fullWidth icon={<LogOut className="h-4.5 w-4.5" />}>
+                      התנתקות
+                    </Button>
+                  </form>
+                </>
+              ) : (
+                <ButtonLink href="/login" variant="secondary" size="lg" fullWidth>
+                  כניסה לחשבון
+                </ButtonLink>
+              )}
             </div>
           </motion.div>
         </>

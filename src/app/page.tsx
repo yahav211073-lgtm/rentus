@@ -10,8 +10,9 @@ import { Testimonials } from "@/components/home/Testimonials";
 import { FaqSection } from "@/components/home/FaqSection";
 import { BlogSection } from "@/components/home/BlogSection";
 import { Newsletter } from "@/components/home/Newsletter";
-import { seedBusinesses, seedFaq } from "@/data/seed";
+import { seedFaq } from "@/data/seed";
 import { env } from "@/lib/env";
+import { getHomeBusinessSlices } from "@/lib/repo/businesses";
 
 export const metadata: Metadata = {
   title: "אינדקס — כל העסקים בישראל במקום אחד",
@@ -33,11 +34,8 @@ export const metadata: Metadata = {
  * החלפת הרקע היא מה שמונע מעמוד באורך הזה להרגיש כמו גלילה אחת
  * ארוכה של אותו דבר.
  */
-export default function HomePage() {
-  const featured = seedBusinesses.filter((b) => b.isFeatured);
-  const sponsored = seedBusinesses.filter((b) => b.isSponsored);
-  const popular = [...seedBusinesses].sort((a, b) => b.reviewCount - a.reviewCount).slice(0, 8);
-  const latest = [...seedBusinesses].reverse().slice(0, 8);
+export default async function HomePage() {
+  const { featured, sponsored, popular, latest } = await getHomeBusinessSlices();
 
   return (
     <>
