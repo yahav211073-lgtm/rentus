@@ -47,7 +47,16 @@ export function Hero() {
     >
       {/* --- רקע --- */}
       <motion.div style={{ y: bgY }} className="absolute inset-0 -z-20" aria-hidden="true">
-        <div className="absolute inset-0 bg-gradient-to-br from-brand-950 via-brand-800 to-brand-600" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://images.unsplash.com/photo-1675376616537-c8aa9ddc9977?w=1920&q=80&auto=format&fit=crop"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        {/* כהות על גבי התמונה — שכבה אחת אחידה ועוד גרדיאנט כיווני, כדי
+            שהטקסט הלבן יישאר קריא בכל אזור בלי להשחית לגמרי את התמונה. */}
+        <div className="absolute inset-0 bg-brand-950/55" />
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/45 to-brand-950/60" />
         {/* שכבת עומק: שני זוהרים רדיאליים בעוצמות שונות */}
         <div
           className="absolute inset-0"
@@ -194,7 +203,7 @@ export function Hero() {
               className="group flex shrink-0 flex-col items-center gap-2.5 rounded-lg border border-white/12 bg-white/8 px-5 py-4 backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-accent-400/45 hover:bg-white/14 sm:min-w-[128px]"
             >
               <span
-                className="grid h-11 w-11 place-items-center rounded-[13px] transition-transform duration-300 group-hover:scale-110"
+                className="grid h-11 w-11 place-items-center rounded-sm transition-transform duration-300 group-hover:scale-110"
                 style={{ background: `${cat.accentColor}26`, color: "#fff" }}
               >
                 <CategoryIcon name={cat.icon} className="h-5 w-5" strokeWidth={2.1} />

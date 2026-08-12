@@ -39,7 +39,7 @@ export function StatsBand() {
           {seedStats.map((stat) => (
             <RevealItem key={stat.id}>
               <div className="group relative h-full overflow-hidden rounded-lg border border-white/10 bg-white/[0.06] p-6 text-center backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:border-accent-400/35 hover:bg-white/[0.1] sm:p-8">
-                <span className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-[14px] bg-accent-400/12 text-accent-400 transition-transform duration-300 group-hover:scale-110">
+                <span className="mx-auto mb-4 grid h-12 w-12 place-items-center rounded-sm bg-accent-400/12 text-accent-400 transition-transform duration-300 group-hover:scale-110">
                   <CategoryIcon name={stat.icon} className="h-5.5 w-5.5" strokeWidth={2.1} />
                 </span>
                 <p className="font-display text-3xl font-extrabold text-white sm:text-4xl">

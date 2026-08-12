@@ -301,7 +301,7 @@ export function SearchBar({ variant = "hero", className, defaultQuery = "" }: Pr
                       )}
                     >
                       <span className={cn(
-                        "grid h-8 w-8 shrink-0 place-items-center rounded-[9px]",
+                        "grid h-8 w-8 shrink-0 place-items-center rounded-sm",
                         s.type === "business" ? "bg-brand-100 text-brand-700"
                           : s.type === "category" ? "bg-accent-100 text-accent-700"
                           : "bg-ink-100 text-ink-500",

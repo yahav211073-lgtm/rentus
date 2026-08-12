@@ -63,7 +63,7 @@ export function Footer() {
           {/* מותג */}
           <div>
             <Link href="/" className="mb-5 inline-flex items-center gap-2.5">
-              <span className="relative grid h-10 w-10 place-items-center rounded-[12px] bg-gradient-to-br from-brand-500 to-brand-700">
+              <span className="relative grid h-10 w-10 place-items-center rounded-sm bg-gradient-to-br from-brand-500 to-brand-700">
                 <Store className="h-5 w-5 text-white" strokeWidth={2.4} />
                 <span className="absolute -bottom-0.5 -left-0.5 h-2.5 w-2.5 rounded-full bg-accent-400 ring-2 ring-brand-950" />
               </span>

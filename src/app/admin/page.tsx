@@ -51,7 +51,7 @@ export default async function AdminDashboardPage() {
             href={c.href}
             className="rounded-lg border border-ink-200/70 bg-white p-5 transition-shadow hover:shadow-md"
           >
-            <div className={`mb-3 grid h-10 w-10 place-items-center rounded-[10px] ${
+            <div className={`mb-3 grid h-10 w-10 place-items-center rounded-sm ${
               c.tone === "warning" ? "bg-warning-50 text-warning-500"
               : c.tone === "success" ? "bg-success-50 text-success-500"
               : "bg-brand-50 text-brand-700"

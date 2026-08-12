@@ -91,7 +91,7 @@ export function Header({ user }: { user: CurrentUser | null }) {
         >
           {/* לוגו */}
           <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="לעמוד הבית">
-            <span className="relative grid h-9 w-9 place-items-center rounded-[11px] bg-gradient-to-br from-brand-700 to-brand-900 shadow-[0_4px_12px_-2px_rgba(11,59,117,0.5)]">
+            <span className="relative grid h-9 w-9 place-items-center rounded-sm bg-gradient-to-br from-brand-700 to-brand-900 shadow-[0_4px_12px_-2px_rgba(11,59,117,0.5)]">
               <Store className="h-4.5 w-4.5 text-white" strokeWidth={2.4} />
               <span className="absolute -bottom-0.5 -left-0.5 h-2.5 w-2.5 rounded-full bg-accent-400 ring-2 ring-white" />
             </span>
@@ -154,7 +154,7 @@ export function Header({ user }: { user: CurrentUser | null }) {
                             className="group mb-1.5 flex items-center gap-2 rounded-xs p-1.5 transition-colors hover:bg-brand-50"
                           >
                             <span
-                              className="grid h-8 w-8 shrink-0 place-items-center rounded-[9px] transition-transform group-hover:scale-110"
+                              className="grid h-8 w-8 shrink-0 place-items-center rounded-sm transition-transform group-hover:scale-110"
                               style={{ background: `${cat.accentColor}14`, color: cat.accentColor ?? undefined }}
                             >
                               <CategoryIcon name={cat.icon} className="h-4 w-4" />
@@ -362,7 +362,7 @@ function MobileMenu({
                       className="flex items-center gap-3 rounded-sm p-3 transition-colors hover:bg-brand-50"
                     >
                       <span
-                        className="grid h-10 w-10 shrink-0 place-items-center rounded-[11px]"
+                        className="grid h-10 w-10 shrink-0 place-items-center rounded-sm"
                         style={{ background: `${cat.accentColor}14`, color: cat.accentColor ?? undefined }}
                       >
                         <CategoryIcon name={cat.icon} className="h-5 w-5" />

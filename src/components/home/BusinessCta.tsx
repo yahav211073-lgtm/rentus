@@ -78,7 +78,7 @@ export function BusinessCta() {
             {BENEFITS.map(({ Icon, title, body }) => (
               <RevealItem key={title}>
                 <div className="group flex gap-4 rounded-lg border border-ink-200/70 bg-ink-50/60 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:bg-white hover:shadow-[0_20px_44px_-18px_rgba(11,59,117,0.22)] sm:p-6">
-                  <span className="grid h-12 w-12 shrink-0 place-items-center rounded-[14px] bg-brand-800 text-white transition-transform duration-300 group-hover:scale-110">
+                  <span className="grid h-12 w-12 shrink-0 place-items-center rounded-sm bg-brand-800 text-white transition-transform duration-300 group-hover:scale-110">
                     <Icon className="h-5.5 w-5.5" strokeWidth={2.1} />
                   </span>
                   <div>
