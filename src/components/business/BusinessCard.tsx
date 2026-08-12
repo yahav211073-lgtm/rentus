@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { BadgeCheck, MapPin, MessageCircle, Phone, ArrowLeft } from "lucide-react";
+import { BadgeCheck, Globe, MapPin, MessageCircle, Phone, ArrowLeft } from "lucide-react";
+import { InstagramIcon } from "@/components/ui/icons";
 import { motion } from "framer-motion";
 import type { BusinessCard as BusinessCardType } from "@/types/domain";
 import { CoverArt } from "@/components/ui/CoverArt";
@@ -174,6 +175,52 @@ export function BusinessCard({ business: b, emphasis = false, className }: Props
             <ArrowLeft className="h-3.5 w-3.5" />
           </span>
         </div>
+
+        {/* שורת יצירת קשר — אתר/אינסטגרם/וואטסאפ/טלפון, כמו בכרטיסי הרפרנס */}
+        {(b.website || b.social?.instagram || b.whatsapp || b.phone) && (
+          <div className="flex items-center gap-1.5 border-t border-ink-100 pt-3">
+            {b.website && (
+              <a
+                href={b.website} target="_blank" rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                aria-label={`אתר האינטרנט של ${b.name}`}
+                className="relative z-20 grid h-8 w-8 place-items-center bg-ink-50 text-ink-500 transition-colors hover:bg-brand-800 hover:text-white"
+              >
+                <Globe className="h-4 w-4" strokeWidth={2} />
+              </a>
+            )}
+            {b.social?.instagram && (
+              <a
+                href={b.social.instagram} target="_blank" rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                aria-label={`האינסטגרם של ${b.name}`}
+                className="relative z-20 grid h-8 w-8 place-items-center bg-ink-50 text-ink-500 transition-colors hover:bg-[#E1306C] hover:text-white"
+              >
+                <InstagramIcon className="h-4 w-4" strokeWidth={2} />
+              </a>
+            )}
+            {b.whatsapp && (
+              <a
+                href={`https://wa.me/${toWhatsAppNumber(b.whatsapp)}`} target="_blank" rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                aria-label={`וואטסאפ ל${b.name}`}
+                className="relative z-20 grid h-8 w-8 place-items-center bg-ink-50 text-ink-500 transition-colors hover:bg-[#25D366] hover:text-white"
+              >
+                <MessageCircle className="h-4 w-4" strokeWidth={2} />
+              </a>
+            )}
+            {b.phone && (
+              <a
+                href={`tel:${b.phone}`}
+                onClick={(e) => e.stopPropagation()}
+                aria-label={`התקשרות ל${b.name}`}
+                className="relative z-20 grid h-8 w-8 place-items-center bg-ink-50 text-ink-500 transition-colors hover:bg-brand-800 hover:text-white"
+              >
+                <Phone className="h-4 w-4" strokeWidth={2} />
+              </a>
+            )}
+          </div>
+        )}
       </div>
     </motion.article>
   );

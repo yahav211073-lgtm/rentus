@@ -101,7 +101,7 @@ export const seedCategories: Category[] = [
   },
   {
     id: "cat6", slug: "mishpati", name: "משפט וכספים", icon: "Scale",
-    accentColor: "#0A4590", isFeatured: true, businessCount: 587,
+    accentColor: "#0C1D40", isFeatured: true, businessCount: 587,
     description: "עורכי דין, רואי חשבון, יועצי משכנתאות וביטוח",
     children: [
       { id: "cat6a", slug: "orchei-din", name: "עורכי דין", icon: "Gavel", businessCount: 284 },

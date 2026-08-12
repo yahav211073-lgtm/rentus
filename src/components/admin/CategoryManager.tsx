@@ -1,13 +1,13 @@
 "use client";
 
-import { useTransition } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { useState, useTransition } from "react";
+import { ImageIcon, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import {
-  createCategory, createCity, deleteCategory, deleteCity, toggleCategoryActive,
+  createCategory, createCity, deleteCategory, deleteCity, toggleCategoryActive, updateCategoryImage,
 } from "@/app/admin/categories/actions";
 
-interface CategoryRow { id: string; name: string; parentId: string | null; isActive: boolean }
+interface CategoryRow { id: string; name: string; parentId: string | null; isActive: boolean; imageUrl: string | null }
 interface CityRow { id: string; name: string }
 
 export function CategoryManager({ categories, cities }: { categories: CategoryRow[]; cities: CityRow[] }) {
@@ -27,19 +27,27 @@ export function CategoryManager({ categories, cities }: { categories: CategoryRo
       <section className="rounded-lg border border-ink-200/70 bg-white p-6">
         <h2 className="mb-4 font-display text-base font-bold text-ink-900">קטגוריות</h2>
 
-        <form action={submitCategory} className="mb-5 flex flex-wrap gap-2">
-          <input
-            name="name" placeholder="שם קטגוריה חדשה" required
-            className="h-10 min-w-0 flex-1 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400"
-          />
-          <select
-            name="parentId"
-            className="h-10 rounded-sm border border-ink-200 bg-white px-2 text-sm outline-none focus:border-brand-400"
-          >
-            <option value="">קטגוריית-על</option>
-            {parents.map((p) => <option key={p.id} value={p.id}>תת של {p.name}</option>)}
-          </select>
-          <Button type="submit" variant="primary" size="md" loading={pending} icon={<Plus className="h-4 w-4" />}>הוספה</Button>
+        <form action={submitCategory} className="mb-5 grid gap-2">
+          <div className="flex flex-wrap gap-2">
+            <input
+              name="name" placeholder="שם קטגוריה חדשה" required
+              className="h-10 min-w-0 flex-1 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400"
+            />
+            <select
+              name="parentId"
+              className="h-10 rounded-sm border border-ink-200 bg-white px-2 text-sm outline-none focus:border-brand-400"
+            >
+              <option value="">קטגוריית-על</option>
+              {parents.map((p) => <option key={p.id} value={p.id}>תת של {p.name}</option>)}
+            </select>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <input
+              name="imageUrl" placeholder="כתובת תמונה (URL, לא חובה)"
+              className="h-10 min-w-0 flex-1 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400"
+            />
+            <Button type="submit" variant="primary" size="md" loading={pending} icon={<Plus className="h-4 w-4" />}>הוספה</Button>
+          </div>
         </form>
 
         <ul className="space-y-1">
@@ -99,31 +107,69 @@ function CategoryItem({
   startTransition: (fn: () => Promise<void> | void) => void;
   nested?: boolean;
 }) {
+  const [editingImage, setEditingImage] = useState(false);
+  const [imageUrl, setImageUrl] = useState(row.imageUrl ?? "");
+
   return (
-    <div className={`flex items-center justify-between rounded-xs px-2.5 py-2 text-sm hover:bg-ink-50 ${nested ? "text-ink-600" : "font-bold text-ink-800"}`}>
-      <label className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          checked={row.isActive}
-          disabled={pending}
-          onChange={(e) => startTransition(async () => { await toggleCategoryActive(row.id, e.target.checked); })}
-          className="h-3.5 w-3.5 accent-brand-700"
-        />
-        {row.name}
-        {!row.isActive && <span className="text-2xs text-ink-400">(מוסתר)</span>}
-      </label>
-      <button
-        type="button"
-        disabled={pending}
-        onClick={() => {
-          if (confirm(`למחוק את ${row.name}? זה ישפיע על כל עסק שמשויך אליה.`)) {
-            startTransition(async () => { await deleteCategory(row.id); });
-          }
-        }}
-        className="text-ink-300 transition-colors hover:text-danger-500"
-      >
-        <Trash2 className="h-3.5 w-3.5" />
-      </button>
+    <div className="rounded-xs hover:bg-ink-50">
+      <div className={`flex items-center justify-between px-2.5 py-2 text-sm ${nested ? "text-ink-600" : "font-bold text-ink-800"}`}>
+        <label className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={row.isActive}
+            disabled={pending}
+            onChange={(e) => startTransition(async () => { await toggleCategoryActive(row.id, e.target.checked); })}
+            className="h-3.5 w-3.5 accent-brand-700"
+          />
+          {row.name}
+          {!row.isActive && <span className="text-2xs text-ink-400">(מוסתר)</span>}
+          {row.imageUrl && <span className="text-2xs text-success-500">(עם תמונה)</span>}
+        </label>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setEditingImage((v) => !v)}
+            className="text-ink-300 transition-colors hover:text-brand-700"
+            aria-label="עריכת תמונת קטגוריה"
+          >
+            <ImageIcon className="h-3.5 w-3.5" />
+          </button>
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => {
+              if (confirm(`למחוק את ${row.name}? זה ישפיע על כל עסק שמשויך אליה.`)) {
+                startTransition(async () => { await deleteCategory(row.id); });
+              }
+            }}
+            className="text-ink-300 transition-colors hover:text-danger-500"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      </div>
+
+      {editingImage && (
+        <div className="flex gap-1.5 px-2.5 pb-2.5">
+          <input
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            placeholder="כתובת תמונה (URL)"
+            className="h-8 min-w-0 flex-1 rounded-sm border border-ink-200 px-2 text-xs outline-none focus:border-brand-400"
+          />
+          <button
+            type="button"
+            disabled={pending}
+            onClick={() => startTransition(async () => {
+              await updateCategoryImage(row.id, imageUrl);
+              setEditingImage(false);
+            })}
+            className="rounded-sm bg-brand-800 px-3 text-xs font-bold text-white hover:bg-brand-700"
+          >
+            שמירה
+          </button>
+        </div>
+      )}
     </div>
   );
 }

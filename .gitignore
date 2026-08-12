@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# claude code skill scaffolding (not part of the app)
+.claude/skills/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

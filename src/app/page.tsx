@@ -5,7 +5,6 @@ import { CategoryShowcase } from "@/components/home/CategoryShowcase";
 import { Section, SectionHeading } from "@/components/home/Section";
 import { BusinessRail } from "@/components/home/BusinessRail";
 import { StatsBand } from "@/components/home/StatsBand";
-import { BusinessCta } from "@/components/home/BusinessCta";
 import { Testimonials } from "@/components/home/Testimonials";
 import { FaqSection } from "@/components/home/FaqSection";
 import { BlogSection } from "@/components/home/BlogSection";
@@ -68,7 +67,6 @@ export default async function HomePage() {
       </Section>
 
       <StatsBand />
-      <BusinessCta />
 
       {/* ממומנים */}
       <Section className="bg-ink-50">

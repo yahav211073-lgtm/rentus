@@ -22,8 +22,8 @@ export default async function AdminSettingsPage() {
           logoUrl: byKey["brand.identity"]?.logoUrl ?? null,
         }}
         brandColors={{
-          primary: byKey["brand.colors"]?.primary ?? "#0A4590",
-          secondary: byKey["brand.colors"]?.secondary ?? "#0D63D6",
+          primary: byKey["brand.colors"]?.primary ?? "#0C1D40",
+          secondary: byKey["brand.colors"]?.secondary ?? "#1D3B78",
           accent: byKey["brand.colors"]?.accent ?? "#FFC107",
           background: byKey["brand.colors"]?.background ?? "#F7F9FC",
         }}

@@ -153,7 +153,7 @@ export type BusinessCard = Pick<
   Business,
   | "id" | "slug" | "name" | "tagline" | "logoUrl" | "coverUrl"
   | "ratingAvg" | "reviewCount" | "isVerified" | "isFeatured" | "isSponsored"
-  | "tier" | "priceRange" | "phone" | "whatsapp"
+  | "tier" | "priceRange" | "phone" | "whatsapp" | "website" | "social"
 > & {
   city?: Pick<City, "name" | "slug"> | null;
   primaryCategory?: Pick<Category, "name" | "slug"> | null;

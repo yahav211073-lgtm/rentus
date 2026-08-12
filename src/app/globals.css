@@ -10,20 +10,20 @@
 
 @theme {
   /* --- מותג ---------------------------------------------------------------
-     סולם "שמיים" — כחול-שמים חי (#0D63D6) ולא נייבי מושחל. גם ברמות
-     הכהות (900/950) הצבע נשאר כחול רווי ולא נופל לשחור-כחלחל, כי
-     הבקשה המפורשת הייתה אתר בהיר עם אנרגיה, לא אתר כהה עם הבהוב כחול.          */
-  --color-brand-50:  #EAF5FF;
-  --color-brand-100: #D2EAFF;
-  --color-brand-200: #A6D4FF;
-  --color-brand-300: #70B8FF;
-  --color-brand-400: #3D98FF;
-  --color-brand-500: #1379F0;
-  --color-brand-600: #0D63D6;  /* משני */
-  --color-brand-700: #0B52B0;
-  --color-brand-800: #0A4590;  /* ראשי */
-  --color-brand-900: #0C3872;
-  --color-brand-950: #082A57;
+     נייבי כהה-עמוק כמו הרפרנס (Rentus): הדר/הירו כמעט שחור-כחול,
+     לא כחול-שמים בהיר. הבקשה המפורשת השתנתה — התאמה מדויקת לתמונת
+     הרפרנס גוברת על ההחלטה הקודמת של כחול בהיר.                              */
+  --color-brand-50:  #EEF2FA;
+  --color-brand-100: #D6E0F1;
+  --color-brand-200: #AFC1DE;
+  --color-brand-300: #7C97C9;
+  --color-brand-400: #4A6FB2;
+  --color-brand-500: #2A4F97;
+  --color-brand-600: #1D3B78;  /* משני */
+  --color-brand-700: #142B5C;
+  --color-brand-800: #0C1D40;  /* ראשי */
+  --color-brand-900: #08132C;
+  --color-brand-950: #050C1C;
 
   /* --- מבטא ---------------------------------------------------------------
      זהב. שמור לפעולה הראשית ולתגי "מומלץ" בלבד. ברגע שהוא מופיע
@@ -83,23 +83,25 @@
   --text-5xl:  3.5rem;
   --text-6xl:  4.5rem;
 
-  /* --- רדיוסים ------------------------------------------------------------ */
-  --radius-xs:  6px;
-  --radius-sm:  10px;
-  --radius-md:  14px;
-  --radius-lg:  20px;
-  --radius-xl:  28px;
-  --radius-2xl: 36px;
+  /* --- רדיוסים ------------------------------------------------------------
+     חדות, לא עגולות — לפי הרפרנס. כמעט מרובע, לא לגמרי 0 כדי שקצוות
+     תמונה לא ייראו שבורים בפיקסל.                                            */
+  --radius-xs:  2px;
+  --radius-sm:  3px;
+  --radius-md:  4px;
+  --radius-lg:  4px;
+  --radius-xl:  6px;
+  --radius-2xl: 6px;
 
   /* --- צללים --------------------------------------------------------------
      שכבתיים ובגוון כחול, לא שחור. צל שחור על רקע כחלחל נראה מלוכלך.
      כל רמה = צל קרוב חד + צל רחוק רך, כמו אור אמיתי.                         */
-  --shadow-xs:    0 1px 2px 0 rgb(10 69 144 / 0.05);
-  --shadow-sm:    0 1px 3px 0 rgb(10 69 144 / 0.07), 0 1px 2px -1px rgb(10 69 144 / 0.05);
-  --shadow-md:    0 4px 12px -2px rgb(10 69 144 / 0.08), 0 2px 4px -2px rgb(10 69 144 / 0.05);
-  --shadow-lg:    0 12px 28px -6px rgb(10 69 144 / 0.12), 0 4px 10px -4px rgb(10 69 144 / 0.06);
-  --shadow-xl:    0 24px 48px -12px rgb(10 69 144 / 0.18), 0 8px 16px -8px rgb(10 69 144 / 0.08);
-  --shadow-2xl:   0 40px 80px -20px rgb(10 69 144 / 0.25);
+  --shadow-xs:    0 1px 2px 0 rgb(12 29 64 / 0.05);
+  --shadow-sm:    0 1px 3px 0 rgb(12 29 64 / 0.07), 0 1px 2px -1px rgb(12 29 64 / 0.05);
+  --shadow-md:    0 4px 12px -2px rgb(12 29 64 / 0.08), 0 2px 4px -2px rgb(12 29 64 / 0.05);
+  --shadow-lg:    0 12px 28px -6px rgb(12 29 64 / 0.12), 0 4px 10px -4px rgb(12 29 64 / 0.06);
+  --shadow-xl:    0 24px 48px -12px rgb(12 29 64 / 0.18), 0 8px 16px -8px rgb(12 29 64 / 0.08);
+  --shadow-2xl:   0 40px 80px -20px rgb(12 29 64 / 0.25);
   --shadow-glow:  0 0 0 1px rgb(255 193 7 / 0.35), 0 8px 32px -8px rgb(255 193 7 / 0.45);
   --shadow-inner-t: inset 0 1px 0 0 rgb(255 255 255 / 0.6);
 
@@ -269,7 +271,7 @@ html[data-dyslexia="on"] :where(h1, h2, h3, h4) { letter-spacing: 0.02em; }
 
 /* סמן גדול */
 html[data-cursor="big"], html[data-cursor="big"] * {
-  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'><path d='M6 2l30 18-13 3 8 15-6 3-8-15L6 34z' fill='%230A4590' stroke='white' stroke-width='2'/></svg>") 4 2, auto;
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 48 48'><path d='M6 2l30 18-13 3 8 15-6 3-8-15L6 34z' fill='%230C1D40' stroke='white' stroke-width='2'/></svg>") 4 2, auto;
 }
 
 
@@ -348,13 +350,13 @@ html[data-cursor="big"], html[data-cursor="big"] * {
   /* רקע רשת עדין לסקציות */
   .bg-grid {
     background-image:
-      linear-gradient(to left, rgb(10 69 144 / 0.045) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(10 69 144 / 0.045) 1px, transparent 1px);
+      linear-gradient(to left, rgb(12 29 64 / 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(12 29 64 / 0.045) 1px, transparent 1px);
     background-size: 56px 56px;
   }
 
   .bg-dots {
-    background-image: radial-gradient(rgb(10 69 144 / 0.09) 1px, transparent 1px);
+    background-image: radial-gradient(rgb(12 29 64 / 0.09) 1px, transparent 1px);
     background-size: 22px 22px;
   }
 }
