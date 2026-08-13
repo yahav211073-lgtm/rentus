@@ -6,7 +6,9 @@ import { useRef } from "react";
 import { BadgeCheck, ShieldCheck, TrendingUp } from "lucide-react";
 import { SearchBar } from "@/components/search/SearchBar";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
-import { seedCategories, seedTrendingSearches } from "@/data/seed";
+import { seedTrendingSearches } from "@/data/seed";
+import type { Category } from "@/types/domain";
+import type { SimpleCity } from "@/lib/repo/taxonomy";
 
 /**
  * ההירו.
@@ -29,7 +31,7 @@ const TRUST_POINTS = [
   { Icon: TrendingUp, label: "38,000 פניות בחודש" },
 ];
 
-export function Hero() {
+export function Hero({ categories, cities }: { categories: Category[]; cities: SimpleCity[] }) {
   const ref = useRef<HTMLElement>(null);
   const reduced = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
@@ -151,7 +153,7 @@ export function Hero() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.75, delay: reduced ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
           >
-            <SearchBar variant="hero" />
+            <SearchBar variant="hero" categories={categories} cities={cities} />
           </motion.div>
 
           {/* חיפושים חמים */}
@@ -196,7 +198,7 @@ export function Hero() {
           transition={{ duration: 0.7, delay: reduced ? 0 : 1.1, ease: [0.22, 1, 0.36, 1] }}
           className="mt-14 flex gap-3 overflow-x-auto pb-2 no-scrollbar fade-edges-x sm:justify-center sm:flex-wrap sm:overflow-visible"
         >
-          {seedCategories.slice(0, 8).map((cat) => (
+          {categories.slice(0, 8).map((cat) => (
             <Link
               key={cat.id}
               href={`/category/${cat.slug}`}

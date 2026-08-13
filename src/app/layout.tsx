@@ -9,6 +9,7 @@ import { env } from "@/lib/env";
 import { getCurrentUser } from "@/lib/auth";
 import { getActiveAds } from "@/lib/repo/ads";
 import { getBrandSettings } from "@/lib/repo/branding";
+import { getCategoriesWithCounts } from "@/lib/repo/categories";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import "./globals.css";
 
@@ -94,7 +95,9 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [user, ads, brand] = await Promise.all([getCurrentUser(), getActiveAds(), getBrandSettings()]);
+  const [user, ads, brand, categories] = await Promise.all([
+    getCurrentUser(), getActiveAds(), getBrandSettings(), getCategoriesWithCounts(),
+  ]);
   const isBusinessOwner = await checkIsBusinessOwner(user?.id);
 
   // צבעי מותג מ-settings דורסים את הטוקנים בדף עצמו — זו הדרך
@@ -147,7 +150,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           דילוג לתוכן הראשי
         </a>
 
-        <Header user={user} brandName={brand.name} logoUrl={brand.logoUrl} />
+        <Header user={user} brandName={brand.name} logoUrl={brand.logoUrl} categories={categories} />
         <main id="main" className="flex-1">{children}</main>
         <Footer brandName={brand.name} />
 

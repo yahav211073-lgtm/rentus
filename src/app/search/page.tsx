@@ -8,7 +8,7 @@ import { SortSelect } from "@/components/search/SortSelect";
 import { BusinessCard } from "@/components/business/BusinessCard";
 import { RevealItem, RevealStagger } from "@/components/motion/Reveal";
 import { ButtonLink } from "@/components/ui/Button";
-import { seedCategories, seedCities } from "@/data/seed";
+import { getFlatCategories, getCities } from "@/lib/repo/taxonomy";
 import { formatNumber } from "@/lib/utils";
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;
@@ -27,11 +27,13 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
   const parts: string[] = [];
   if (f.q) parts.push(`"${f.q}"`);
   if (f.category) {
-    const cat = seedCategories.flatMap((c) => [c, ...(c.children ?? [])]).find((c) => c.slug === f.category);
+    const categories = await getFlatCategories();
+    const cat = categories.find((c) => c.slug === f.category);
     if (cat) parts.push(cat.name);
   }
   if (f.city) {
-    const city = seedCities.find((c) => c.slug === f.city);
+    const cities = await getCities();
+    const city = cities.find((c) => c.slug === f.city);
     if (city) parts.push(`ב${city.name}`);
   }
 
@@ -49,7 +51,11 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
 export default async function SearchPage({ searchParams }: { searchParams: SearchParams }) {
   const raw = await searchParams;
   const filters = parseSearchParams(raw);
-  const result = await searchBusinesses(filters);
+  const [result, categories, cities] = await Promise.all([
+    searchBusinesses(filters),
+    getFlatCategories(),
+    getCities(),
+  ]);
 
   const totalPages = Math.ceil(result.total / PAGE_SIZE);
 
@@ -62,13 +68,13 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
           <h1 className="mb-5 font-display text-2xl font-extrabold text-white sm:text-3xl">
             {filters.q ? <>תוצאות עבור &laquo;{filters.q}&raquo;</> : "חיפוש עסקים"}
           </h1>
-          <SearchBar variant="compact" defaultQuery={filters.q ?? ""} />
+          <SearchBar variant="compact" defaultQuery={filters.q ?? ""} categories={categories} cities={cities} />
         </div>
       </div>
 
       <div className="mx-auto max-w-[1480px] px-4 pt-8 sm:px-6 lg:px-8">
         <div className="flex gap-7">
-          <FilterRail facets={result.facets} total={result.total} />
+          <FilterRail facets={result.facets} total={result.total} categories={categories} cities={cities} />
 
           <div className="min-w-0 flex-1">
             {/* שורת סיכום ומיון */}
@@ -83,7 +89,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
             </div>
 
             {result.items.length === 0 ? (
-              <EmptyState query={filters.q} />
+              <EmptyState query={filters.q} categories={categories} />
             ) : (
               <>
                 <RevealStagger className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
@@ -112,7 +118,8 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
  * לא "לא נמצאו תוצאות" ותו לא. מצב ריק טוב מציע דרך החוצה —
  * כאן: הסרת מסננים, וקטגוריות פופולריות ללחיצה.
  */
-function EmptyState({ query }: { query?: string }) {
+function EmptyState({ query, categories }: { query?: string; categories: { slug: string; name: string; parentId: string | null }[] }) {
+  const topLevel = categories.filter((c) => !c.parentId);
   return (
     <div className="rounded-lg border border-dashed border-ink-300 bg-white p-10 text-center sm:p-16">
       <span className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-full bg-ink-100 text-ink-400">
@@ -128,7 +135,7 @@ function EmptyState({ query }: { query?: string }) {
       </p>
 
       <div className="mb-8 flex flex-wrap justify-center gap-2">
-        {seedCategories.slice(0, 5).map((c) => (
+        {topLevel.slice(0, 5).map((c) => (
           <Link
             key={c.slug}
             href={`/category/${c.slug}`}

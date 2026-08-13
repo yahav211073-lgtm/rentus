@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Mail, MapPin, Phone, Store } from "lucide-react";
-import { seedCategories, seedCities } from "@/data/seed";
+import { getCategoriesWithCounts } from "@/lib/repo/categories";
+import { getCities } from "@/lib/repo/taxonomy";
 
 /**
  * פוטר.
@@ -44,9 +45,10 @@ const SOCIAL = [
   },
 ];
 
-export function Footer({ brandName }: { brandName: string }) {
-  const popularCities = seedCities.filter((c) => c.isPopular).slice(0, 8);
-  const topCategories = seedCategories.slice(0, 8);
+export async function Footer({ brandName }: { brandName: string }) {
+  const [categories, cities] = await Promise.all([getCategoriesWithCounts(), getCities()]);
+  const topCategories = categories.slice(0, 8);
+  const popularCities = cities.slice(0, 8);
 
   return (
     <footer className="relative mt-24 overflow-hidden bg-brand-950 text-white/75">

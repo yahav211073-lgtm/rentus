@@ -7,12 +7,13 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import {
   ChevronDown, LayoutDashboard, LogOut, Menu, Search, Store, User, X, Sparkles,
 } from "lucide-react";
-import { seedCategories } from "@/data/seed";
+
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { useScrolledPast } from "@/lib/hooks/browser-state";
 import { cn } from "@/lib/utils";
 import type { CurrentUser } from "@/lib/auth";
+import type { Category } from "@/types/domain";
 
 const STAFF_ROLES = ["admin", "moderator", "editor"];
 
@@ -41,8 +42,8 @@ const NAV_LINKS = [
 ];
 
 export function Header({
-  user, brandName, logoUrl,
-}: { user: CurrentUser | null; brandName: string; logoUrl?: string | null }) {
+  user, brandName, logoUrl, categories,
+}: { user: CurrentUser | null; brandName: string; logoUrl?: string | null; categories: Category[] }) {
   // useSyncExternalStore ולא useEffect+setState: הערך נכון כבר
   // ברינדור הראשון בלקוח, בלי רינדור מדורג. ראו browser-state.ts.
   const scrolled = useScrolledPast(24);
@@ -148,7 +149,7 @@ export function Header({
                     style={{ insetInlineStart: 0 }}
                   >
                     <div className="grid grid-cols-4 gap-x-5 gap-y-1">
-                      {seedCategories.map((cat) => (
+                      {categories.map((cat) => (
                         <div key={cat.id} className="py-1.5">
                           <Link
                             href={`/category/${cat.slug}`}
@@ -292,7 +293,7 @@ export function Header({
         </div>
       </header>
 
-      <MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} user={user} />
+      <MobileMenu open={mobileOpen} onClose={() => setMobileOpen(false)} user={user} categories={categories} />
     </>
   );
 }
@@ -302,8 +303,8 @@ export function Header({
    ============================================================================ */
 
 function MobileMenu({
-  open, onClose, user,
-}: { open: boolean; onClose: () => void; user: CurrentUser | null }) {
+  open, onClose, user, categories,
+}: { open: boolean; onClose: () => void; user: CurrentUser | null; categories: Category[] }) {
   const reduced = useReducedMotion();
 
   return (
@@ -350,7 +351,7 @@ function MobileMenu({
                 variants={{ show: { transition: { staggerChildren: reduced ? 0 : 0.045 } } }}
                 className="space-y-1"
               >
-                {seedCategories.map((cat) => (
+                {categories.map((cat) => (
                   <motion.li
                     key={cat.id}
                     variants={{

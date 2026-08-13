@@ -4,11 +4,19 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Building2, ChevronDown, Clock, MapPin, Search, TrendingUp, X } from "lucide-react";
-import { seedBusinesses, seedCategories, seedCities, seedTrendingSearches } from "@/data/seed";
+import { seedBusinesses, seedTrendingSearches } from "@/data/seed";
 import { Button } from "@/components/ui/Button";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { useStoredJson, writeStored } from "@/lib/hooks/browser-state";
 import { cn } from "@/lib/utils";
+import type { SimpleCity } from "@/lib/repo/taxonomy";
+
+/** תואם גם ל-Category (מהעץ) וגם ל-FlatCategory — כל מה שצריך כאן הוא שלושה שדות. */
+interface SearchCategory {
+  slug: string;
+  name: string;
+  parentId?: string | null;
+}
 
 /**
  * שורת החיפוש הראשית.
@@ -45,9 +53,13 @@ interface Props {
   variant?: "hero" | "compact";
   className?: string;
   defaultQuery?: string;
+  categories?: SearchCategory[];
+  cities?: SimpleCity[];
 }
 
-export function SearchBar({ variant = "hero", className, defaultQuery = "" }: Props) {
+export function SearchBar({
+  variant = "hero", className, defaultQuery = "", categories = [], cities = [],
+}: Props) {
   const router = useRouter();
   const reduced = useReducedMotion();
 
@@ -95,19 +107,17 @@ export function SearchBar({ variant = "hero", className, defaultQuery = "" }: Pr
       if (out.length >= 4) break;
     }
 
-    const allCats = seedCategories.flatMap((c) => [c, ...(c.children ?? [])]);
-    for (const c of allCats) {
+    for (const c of categories) {
       if (match(c.name)) {
         out.push({
           type: "category", label: c.name,
-          sub: c.businessCount ? `${c.businessCount} עסקים` : undefined,
-          href: `/category/${c.slug}`, icon: c.icon,
+          href: `/category/${c.slug}`,
         });
       }
       if (out.length >= 8) break;
     }
 
-    for (const c of seedCities) {
+    for (const c of cities) {
       if (match(c.name)) {
         out.push({ type: "city", label: c.name, sub: "עיר", href: `/search?city=${c.slug}` });
       }
@@ -115,7 +125,7 @@ export function SearchBar({ variant = "hero", className, defaultQuery = "" }: Pr
     }
 
     return out.slice(0, 8);
-  }, [query]);
+  }, [query, categories, cities]);
 
   const showEmptyState = open && query.trim().length === 0;
   const items = showEmptyState ? [] : suggestions;
@@ -215,7 +225,7 @@ export function SearchBar({ variant = "hero", className, defaultQuery = "" }: Pr
           onChange={setCity}
           label="בכל הארץ"
           ariaLabel="בחירת עיר"
-          options={seedCities.map((c) => ({ value: c.slug, label: c.name }))}
+          options={cities.map((c) => ({ value: c.slug, label: c.name }))}
         />
 
         <Divider />
@@ -227,7 +237,7 @@ export function SearchBar({ variant = "hero", className, defaultQuery = "" }: Pr
           onChange={setCategory}
           label="כל הקטגוריות"
           ariaLabel="בחירת קטגוריה"
-          options={seedCategories.map((c) => ({ value: c.slug, label: c.name }))}
+          options={categories.map((c) => ({ value: c.slug, label: c.parentId ? `— ${c.name}` : c.name }))}
         />
 
         <Button type="submit" variant="accent" size={isHero ? "lg" : "md"} className="md:min-w-[132px]">

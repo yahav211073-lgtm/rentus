@@ -10,6 +10,8 @@ import { env } from "@/lib/env";
 import { getHomeBusinessSlices } from "@/lib/repo/businesses";
 import { getActiveAds } from "@/lib/repo/ads";
 import { getBrandSettings } from "@/lib/repo/branding";
+import { getCategoriesWithCounts } from "@/lib/repo/categories";
+import { getCities } from "@/lib/repo/taxonomy";
 
 /**
  * עמוד הבית — נטו עסקים.
@@ -29,10 +31,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const [{ featured, sponsored, popular, latest }, ads, brand] = await Promise.all([
+  const [{ featured, sponsored, popular, latest }, ads, brand, categories, cities] = await Promise.all([
     getHomeBusinessSlices(),
     getActiveAds(),
     getBrandSettings(),
+    getCategoriesWithCounts(),
+    getCities(),
   ]);
 
   const bannerStart = ads.banners.find((b) => b.placementKey === "side_start");
@@ -42,7 +46,7 @@ export default async function HomePage() {
     <>
       <JsonLd brandName={brand.name} />
 
-      <Hero />
+      <Hero categories={categories} cities={cities} />
       <CategoryShowcase />
 
       {/* מומלצים — עם באנרים בזרימת העמוד, כמו בהדמיה. במובייל הבאנרים

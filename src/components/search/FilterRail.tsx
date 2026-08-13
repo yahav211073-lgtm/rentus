@@ -5,9 +5,10 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { BadgeCheck, RotateCcw, SlidersHorizontal, Star, X } from "lucide-react";
 import type { SearchResult } from "@/types/domain";
-import { seedCategories, seedCities, seedTags } from "@/data/seed";
+import { seedTags } from "@/data/seed";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import type { FlatCategory, SimpleCity } from "@/lib/repo/taxonomy";
 
 /**
  * מסננים.
@@ -27,6 +28,8 @@ import { cn } from "@/lib/utils";
 interface Props {
   facets: SearchResult["facets"];
   total: number;
+  categories: FlatCategory[];
+  cities: SimpleCity[];
 }
 
 const RATING_OPTIONS = [4.5, 4, 3.5];
@@ -37,7 +40,7 @@ const PRICE_OPTIONS = [
   { value: 4, label: "₪₪₪₪" },
 ];
 
-export function FilterRail({ facets, total }: Props) {
+export function FilterRail({ facets, total, categories, cities }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -92,10 +95,10 @@ export function FilterRail({ facets, total }: Props) {
             checked={!activeCategory}
             onSelect={() => setParam("category", null)}
           />
-          {seedCategories.map((c) => (
+          {categories.map((c) => (
             <RadioRow
               key={c.slug}
-              label={c.name}
+              label={c.parentId ? `— ${c.name}` : c.name}
               count={facets?.categories.find((f) => f.slug === c.slug)?.count}
               checked={activeCategory === c.slug}
               onSelect={() => setParam("category", c.slug)}
@@ -111,7 +114,7 @@ export function FilterRail({ facets, total }: Props) {
             checked={!activeCity}
             onSelect={() => setParam("city", null)}
           />
-          {seedCities.map((c) => (
+          {cities.map((c) => (
             <RadioRow
               key={c.slug}
               label={c.name}

@@ -52,7 +52,7 @@ export function SectionHeading({
         <div className={cn("max-w-2xl", align === "center" && "text-center")}>
           {eyebrow && (
             <span className={cn(
-              "mb-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-2xs font-bold uppercase tracking-wider",
+              "mb-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-2xs font-bold tracking-wider",
               dark ? "bg-white/10 text-accent-300" : "bg-brand-50 text-brand-700",
             )}>
               <span className={cn("h-1.5 w-1.5 rounded-full", dark ? "bg-accent-400" : "bg-brand-500")} />
