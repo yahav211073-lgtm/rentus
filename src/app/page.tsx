@@ -46,7 +46,7 @@ export default async function HomePage() {
     <>
       <JsonLd brandName={brand.name} />
 
-      <Hero categories={categories} cities={cities} />
+      <Hero categories={categories} cities={cities} brandName={brand.name} />
       <CategoryShowcase />
 
       {/* מומלצים — עם באנרים בזרימת העמוד, כמו בהדמיה. במובייל הבאנרים
