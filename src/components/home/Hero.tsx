@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, BadgeCheck, ShieldCheck, TrendingUp } from "lucide-react";
+import { BadgeCheck, ShieldCheck, TrendingUp } from "lucide-react";
 import { SearchBar } from "@/components/search/SearchBar";
 import { seedTrendingSearches } from "@/data/seed";
 import type { Category } from "@/types/domain";
@@ -45,7 +45,7 @@ export function Hero({
       />
 
       <div className="relative mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
-        <div className="grid items-center gap-8 lg:grid-cols-[1fr_300px]">
+        <div className="grid items-center gap-8">
           {/* --- תוכן ראשי --- */}
           <div>
             <motion.div
@@ -115,33 +115,6 @@ export function Hero({
               ))}
             </motion.ul>
           </div>
-
-          {/* --- כרטיס קידום צדדי --- */}
-          <motion.div
-            initial={{ opacity: 0, y: reduced ? 0 : 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="hidden lg:block"
-          >
-            <Link
-              href="/business/register"
-              className="group block rounded-lg bg-gradient-to-br from-accent-400 to-accent-500 p-5 shadow-[0_20px_45px_-14px_rgba(0,0,0,0.5)] transition-transform duration-300 hover:-translate-y-1"
-            >
-              <span className="mb-3 grid h-11 w-11 place-items-center rounded-sm bg-brand-950/15">
-                <TrendingUp className="h-5.5 w-5.5 text-brand-950" strokeWidth={2.2} />
-              </span>
-              <p className="mb-1.5 font-display text-lg font-extrabold leading-tight text-brand-950">
-                בעל עסק להשכרה?
-              </p>
-              <p className="mb-4 text-sm leading-relaxed text-brand-950/75">
-                רישום פרופיל בסיסי חינם — הלקוחות כבר מחפשים אתכם.
-              </p>
-              <span className="inline-flex items-center gap-1.5 text-sm font-bold text-brand-950">
-                לפרטים
-                <ArrowLeft className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1" />
-              </span>
-            </Link>
-          </motion.div>
         </div>
       </div>
     </section>

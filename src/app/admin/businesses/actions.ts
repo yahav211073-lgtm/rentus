@@ -121,18 +121,30 @@ export interface NewBusinessInput {
   whatsapp: string | null;
   email: string | null;
   categoryId: string | null;
+  coverFile: File;
 }
 
 /**
  * הוספת עסק ישירות מהניהול — הזרימה שבה מנהל מדבר עם לקוח (טלפון
  * שהגיע מפנייה) ובונה לו את הפרופיל בעצמו. נוצר כבר "פורסם", בלי
  * owner_id — כשבעל העסק ירצה חשבון, מקשרים אותו ידנית מ-/admin/users.
+ * תמונת שער היא שדה חובה, כמו בהרשמה העצמית.
  */
 export async function createBusinessAdmin(input: NewBusinessInput) {
   await requireStaff();
   const supabase = createSupabaseAdminClient();
 
   const slug = `${input.name.replace(/\s+/g, "-").toLowerCase()}-${Math.random().toString(36).slice(2, 7)}`;
+
+  const ext = input.coverFile.name.split(".").pop() || "jpg";
+  const path = `admin/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error: uploadError } = await supabase!.storage
+    .from("business-images")
+    .upload(path, input.coverFile, { contentType: input.coverFile.type });
+
+  if (uploadError) return { ok: false, error: "העלאת התמונה נכשלה." };
+
+  const { data: { publicUrl } } = supabase!.storage.from("business-images").getPublicUrl(path);
 
   const { data: business, error } = await supabase!
     .from("businesses")
@@ -147,6 +159,7 @@ export async function createBusinessAdmin(input: NewBusinessInput) {
       email: input.email,
       status: "published",
       is_verified: true,
+      cover_url: publicUrl,
     })
     .select("id, slug")
     .single();

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { BadgeCheck, Globe, MapPin, MessageCircle, Phone, ArrowLeft } from "lucide-react";
-import { InstagramIcon } from "@/components/ui/icons";
+import { FacebookIcon, InstagramIcon } from "@/components/ui/icons";
 import { motion } from "framer-motion";
 import type { BusinessCard as BusinessCardType } from "@/types/domain";
 import { CoverArt } from "@/components/ui/CoverArt";
@@ -176,8 +176,8 @@ export function BusinessCard({ business: b, emphasis = false, className }: Props
           </span>
         </div>
 
-        {/* שורת יצירת קשר — אתר/אינסטגרם/וואטסאפ/טלפון, כמו בכרטיסי הרפרנס */}
-        {(b.website || b.social?.instagram || b.whatsapp || b.phone) && (
+        {/* שורת יצירת קשר — אתר/אינסטגרם/וואטסאפ/פייסבוק/טלפון, כמו בכרטיסי הרפרנס */}
+        {(b.website || b.social?.instagram || b.social?.facebook || b.whatsapp || b.phone) && (
           <div className="flex items-center gap-1.5 border-t border-ink-100 pt-3">
             {b.website && (
               <a
@@ -197,6 +197,16 @@ export function BusinessCard({ business: b, emphasis = false, className }: Props
                 className="relative z-20 grid h-8 w-8 place-items-center bg-ink-50 text-ink-500 transition-colors hover:bg-[#E1306C] hover:text-white"
               >
                 <InstagramIcon className="h-4 w-4" strokeWidth={2} />
+              </a>
+            )}
+            {b.social?.facebook && (
+              <a
+                href={b.social.facebook} target="_blank" rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                aria-label={`הפייסבוק של ${b.name}`}
+                className="relative z-20 grid h-8 w-8 place-items-center bg-ink-50 text-ink-500 transition-colors hover:bg-[#1877F2] hover:text-white"
+              >
+                <FacebookIcon className="h-4 w-4" strokeWidth={2} />
               </a>
             )}
             {b.whatsapp && (

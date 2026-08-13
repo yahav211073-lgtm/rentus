@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Save } from "lucide-react";
+import { CheckCircle2, ImagePlus, Save } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { createBusinessAdmin } from "@/app/admin/businesses/actions";
 import type { FlatCategory } from "@/lib/repo/taxonomy";
@@ -11,11 +11,18 @@ export function NewBusinessForm({ categories }: { categories: FlatCategory[] }) 
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState("");
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const val = (k: string) => (fd.get(k) ? String(fd.get(k)) : null);
+    const coverFile = fd.get("cover") as File | null;
+
+    if (!coverFile || coverFile.size === 0) {
+      setError("תמונת שער היא שדה חובה.");
+      return;
+    }
 
     startTransition(async () => {
       setError("");
@@ -28,6 +35,7 @@ export function NewBusinessForm({ categories }: { categories: FlatCategory[] }) 
         whatsapp: val("whatsapp"),
         email: val("email"),
         categoryId: val("category"),
+        coverFile,
       });
       if (result.ok) {
         router.push(`/admin/businesses/${result.businessId}`);
@@ -42,6 +50,33 @@ export function NewBusinessForm({ categories }: { categories: FlatCategory[] }) 
       <p className="mb-2 text-sm text-ink-500">
         הטופס הזה יוצר עסק שמפורסם באתר מיד. שימוש טיפוסי: התקשרתם עם לקוח שפנה, ואתם בונים לו את הפרופיל.
       </p>
+
+      <div>
+        <label htmlFor="new-cover" className="mb-1.5 block text-xs font-bold text-ink-600">
+          תמונת שער <span className="text-danger-500">*</span>
+        </label>
+        <label
+          htmlFor="new-cover"
+          className="flex h-36 cursor-pointer flex-col items-center justify-center gap-2 border-2 border-dashed border-ink-200 bg-ink-50 text-ink-400 transition-colors hover:border-brand-300 hover:bg-brand-50"
+          style={coverPreview ? { backgroundImage: `url(${coverPreview})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
+        >
+          {!coverPreview && (
+            <>
+              <ImagePlus className="h-6 w-6" />
+              <span className="text-sm font-semibold">העלאת תמונת שער</span>
+            </>
+          )}
+        </label>
+        <input
+          id="new-cover" name="cover" type="file" accept="image/*" required
+          className="sr-only"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            setCoverPreview(file ? URL.createObjectURL(file) : null);
+          }}
+        />
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
         <Field name="name" label="שם העסק" required />
         <Field name="tagline" label="שורת תיאור קצרה" />

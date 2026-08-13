@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { Mail, MapPin, Phone, Store } from "lucide-react";
+import { Mail, MapPin, MessageCircle, Phone, Store } from "lucide-react";
 import { getCategoriesWithCounts } from "@/lib/repo/categories";
+import { getContactDetails } from "@/lib/repo/settings";
 import { getCities } from "@/lib/repo/taxonomy";
+import { toWhatsAppNumber } from "@/lib/utils";
 
 /**
  * פוטר.
@@ -46,7 +48,9 @@ const SOCIAL = [
 ];
 
 export async function Footer({ brandName }: { brandName: string }) {
-  const [categories, cities] = await Promise.all([getCategoriesWithCounts(), getCities()]);
+  const [categories, cities, contact] = await Promise.all([
+    getCategoriesWithCounts(), getCities(), getContactDetails(),
+  ]);
   const topCategories = categories.slice(0, 8);
   const popularCities = cities.slice(0, 8);
 
@@ -78,21 +82,37 @@ export async function Footer({ brandName }: { brandName: string }) {
             </p>
 
             <ul className="space-y-2.5 text-sm">
-              <li className="flex items-center gap-2.5">
-                <Phone className="h-4 w-4 shrink-0 text-accent-400" />
-                <a href="tel:039999999" className="hover:text-white">03-9999999</a>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <Mail className="h-4 w-4 shrink-0 text-accent-400" />
-                <a href="mailto:info@example.com" className="hover:text-white">info@example.com</a>
-              </li>
-              <li className="flex items-center gap-2.5">
-                <MapPin className="h-4 w-4 shrink-0 text-accent-400" />
-                <span>תל אביב, ישראל</span>
-              </li>
+              {contact.phone && (
+                <li className="flex items-center gap-2.5">
+                  <Phone className="h-4 w-4 shrink-0 text-accent-400" />
+                  <a href={`tel:${contact.phone}`} className="hover:text-white">{contact.phone}</a>
+                </li>
+              )}
+              {contact.email && (
+                <li className="flex items-center gap-2.5">
+                  <Mail className="h-4 w-4 shrink-0 text-accent-400" />
+                  <a href={`mailto:${contact.email}`} className="hover:text-white">{contact.email}</a>
+                </li>
+              )}
+              {contact.address && (
+                <li className="flex items-center gap-2.5">
+                  <MapPin className="h-4 w-4 shrink-0 text-accent-400" />
+                  <span>{contact.address}</span>
+                </li>
+              )}
             </ul>
 
             <div className="mt-6 flex gap-2">
+              {contact.whatsapp && (
+                <a
+                  href={`https://wa.me/${toWhatsAppNumber(contact.whatsapp)}`}
+                  target="_blank" rel="noopener noreferrer"
+                  aria-label="וואטסאפ"
+                  className="grid h-10 w-10 place-items-center rounded-xs border border-white/12 bg-white/5 text-white/70 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#25D366]/50 hover:bg-white/10 hover:text-[#25D366]"
+                >
+                  <MessageCircle className="h-4.5 w-4.5" strokeWidth={2.2} />
+                </a>
+              )}
               {SOCIAL.map(({ label, href, path }) => (
                 <a
                   key={label}

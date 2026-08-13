@@ -4,7 +4,8 @@ import { CategoryShowcase } from "@/components/home/CategoryShowcase";
 import { Section, SectionHeading } from "@/components/home/Section";
 import { BusinessRail } from "@/components/home/BusinessRail";
 import { BusinessCard } from "@/components/business/BusinessCard";
-import { BannerCard } from "@/components/home/BannerCard";
+import { AdSlot } from "@/components/home/AdSlot";
+import { OwnerCtaCard } from "@/components/home/OwnerCtaCard";
 import { StatsBand } from "@/components/home/StatsBand";
 import { env } from "@/lib/env";
 import { getHomeBusinessSlices } from "@/lib/repo/businesses";
@@ -47,10 +48,11 @@ export default async function HomePage() {
       <JsonLd brandName={brand.name} />
 
       <Hero categories={categories} cities={cities} brandName={brand.name} />
-      <CategoryShowcase />
 
-      {/* מומלצים — עם באנרים בזרימת העמוד, כמו בהדמיה. במובייל הבאנרים
-          יורדים מתחת לרשת העסקים במקום להיעלם. */}
+      {/* מומלצים — ממש מתחת להירו, עם משבצות פרסום בזרימת העמוד משני
+          הצדדים, כמו בהדמיה: עמודת ימין = כרטיס "בעל עסק" + משבצת
+          פרסום, עמודת שמאל = משבצת פרסום. במובייל שתי העמודות יורדות
+          מתחת לרשת העסקים במקום להיעלם. */}
       <Section className="bg-white">
         <SectionHeading
           eyebrow={`נבחרת ${brand.name}`}
@@ -59,19 +61,22 @@ export default async function HomePage() {
           action={{ label: "לכל העסקים", href: "/search" }}
         />
         <div className="grid gap-5 lg:grid-cols-[220px_1fr_220px]">
-          {bannerStart && <BannerCard banner={bannerStart} className="hidden lg:block" />}
+          <div className="hidden flex-col gap-5 lg:flex">
+            <OwnerCtaCard />
+            <AdSlot banner={bannerStart} className="flex-1" />
+          </div>
           <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
             {featured.slice(0, 4).map((b) => <BusinessCard key={b.id} business={b} emphasis />)}
           </div>
-          {bannerEnd && <BannerCard banner={bannerEnd} className="hidden lg:block" />}
+          <AdSlot banner={bannerEnd} className="hidden lg:flex" />
         </div>
-        {(bannerStart || bannerEnd) && (
-          <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:hidden">
-            {bannerStart && <BannerCard banner={bannerStart} />}
-            {bannerEnd && <BannerCard banner={bannerEnd} />}
-          </div>
-        )}
+        <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:hidden">
+          <OwnerCtaCard />
+          <AdSlot banner={bannerEnd ?? bannerStart} />
+        </div>
       </Section>
+
+      <CategoryShowcase />
 
       {/* פופולריים */}
       <Section className="bg-ink-50">

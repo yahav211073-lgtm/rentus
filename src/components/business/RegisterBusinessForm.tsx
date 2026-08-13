@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, Send } from "lucide-react";
+import { CheckCircle2, ImagePlus, Send } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { slugify } from "@/lib/utils";
@@ -24,6 +24,7 @@ export function RegisterBusinessForm({ categories, cities }: Props) {
   const router = useRouter();
   const [state, setState] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [error, setError] = useState("");
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -32,6 +33,13 @@ export function RegisterBusinessForm({ categories, cities }: Props) {
     if (!supabase) {
       setState("error");
       setError("החיבור למסד הנתונים לא הוגדר.");
+      return;
+    }
+
+    const coverFile = form.get("cover") as File | null;
+    if (!coverFile || coverFile.size === 0) {
+      setState("error");
+      setError("תמונת שער היא שדה חובה.");
       return;
     }
 
@@ -51,6 +59,20 @@ export function RegisterBusinessForm({ categories, cities }: Props) {
     const slugBase = slugify(name) || "business";
     const slug = `${slugBase}-${Math.random().toString(36).slice(2, 7)}`;
 
+    const ext = coverFile.name.split(".").pop() || "jpg";
+    const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const { error: uploadError } = await supabase.storage
+      .from("business-images")
+      .upload(path, coverFile, { contentType: coverFile.type });
+
+    if (uploadError) {
+      setState("error");
+      setError("העלאת התמונה נכשלה. נסו קובץ אחר או נסו שוב.");
+      return;
+    }
+
+    const { data: { publicUrl } } = supabase.storage.from("business-images").getPublicUrl(path);
+
     const { data: business, error: insertError } = await supabase
       .from("businesses")
       .insert({
@@ -65,6 +87,7 @@ export function RegisterBusinessForm({ categories, cities }: Props) {
         phone: String(form.get("phone")) || null,
         whatsapp: String(form.get("whatsapp")) || null,
         email: String(form.get("email")) || null,
+        cover_url: publicUrl,
       })
       .select("id")
       .single();
@@ -100,6 +123,32 @@ export function RegisterBusinessForm({ categories, cities }: Props) {
 
   return (
     <form onSubmit={onSubmit} className="space-y-5 rounded-lg border border-ink-200/70 bg-white p-6">
+      <div>
+        <label htmlFor="reg-cover" className="mb-1.5 block text-xs font-bold text-ink-600">
+          תמונת שער <span className="text-danger-500">*</span>
+        </label>
+        <label
+          htmlFor="reg-cover"
+          className="flex h-40 cursor-pointer flex-col items-center justify-center gap-2 rounded-sm border-2 border-dashed border-ink-200 bg-ink-50 text-ink-400 transition-colors hover:border-brand-300 hover:bg-brand-50"
+          style={coverPreview ? { backgroundImage: `url(${coverPreview})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
+        >
+          {!coverPreview && (
+            <>
+              <ImagePlus className="h-7 w-7" />
+              <span className="text-sm font-semibold">העלאת תמונה ראשית של העסק</span>
+            </>
+          )}
+        </label>
+        <input
+          id="reg-cover" name="cover" type="file" accept="image/*" required
+          className="sr-only"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            setCoverPreview(file ? URL.createObjectURL(file) : null);
+          }}
+        />
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
         <Field id="reg-name" name="name" label="שם העסק" required />
         <Field id="reg-tagline" name="tagline" label="שורת תיאור קצרה" placeholder="במה אתם מתמחים?" />
