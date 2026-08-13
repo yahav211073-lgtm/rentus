@@ -7,11 +7,13 @@ insert into storage.buckets (id, name, public)
 values ('business-images', 'business-images', true)
 on conflict (id) do nothing;
 
+drop policy if exists "Public read of business images" on storage.objects;
 create policy "Public read of business images"
 on storage.objects for select
 to public
 using (bucket_id = 'business-images');
 
+drop policy if exists "Authenticated users upload to their own folder" on storage.objects;
 create policy "Authenticated users upload to their own folder"
 on storage.objects for insert
 to authenticated
@@ -20,6 +22,7 @@ with check (
   and (storage.foldername(name))[1] = auth.uid()::text
 );
 
+drop policy if exists "Service role manages all business images" on storage.objects;
 create policy "Service role manages all business images"
 on storage.objects for all
 to service_role
