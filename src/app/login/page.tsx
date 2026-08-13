@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { LogIn } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 /**
@@ -59,6 +60,14 @@ export default function LoginPage() {
       <p className="mb-7 text-sm text-ink-500">
         עדיין אין לכם חשבון? <Link href={`/signup?next=${encodeURIComponent(next)}`} className="font-bold text-brand-700 hover:text-brand-500">הרשמה</Link>
       </p>
+
+      <GoogleSignInButton next={next} />
+
+      <div className="my-5 flex items-center gap-3 text-xs text-ink-400">
+        <span className="h-px flex-1 bg-ink-200" />
+        או
+        <span className="h-px flex-1 bg-ink-200" />
+      </div>
 
       <form onSubmit={onSubmit} className="space-y-3.5">
         <Field id="login-email" name="email" label="אימייל" type="email" required autoComplete="email" />
