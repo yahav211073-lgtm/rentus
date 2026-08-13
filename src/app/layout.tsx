@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Heebo, Inter } from "next/font/google";
 import { Header } from "@/components/layout/Header";
+import { TopBar } from "@/components/layout/TopBar";
 import { Footer } from "@/components/layout/Footer";
 import { AccessibilityToolbar } from "@/components/a11y/AccessibilityToolbar";
 import { PopupManager } from "@/components/ads/PopupManager";
@@ -10,6 +11,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getActiveAds } from "@/lib/repo/ads";
 import { getBrandSettings } from "@/lib/repo/branding";
 import { getCategoriesWithCounts } from "@/lib/repo/categories";
+import { getContactDetails } from "@/lib/repo/settings";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import "./globals.css";
 
@@ -95,8 +97,8 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [user, ads, brand, categories] = await Promise.all([
-    getCurrentUser(), getActiveAds(), getBrandSettings(), getCategoriesWithCounts(),
+  const [user, ads, brand, categories, contact] = await Promise.all([
+    getCurrentUser(), getActiveAds(), getBrandSettings(), getCategoriesWithCounts(), getContactDetails(),
   ]);
   const isBusinessOwner = await checkIsBusinessOwner(user?.id);
 
@@ -150,6 +152,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           דילוג לתוכן הראשי
         </a>
 
+        <TopBar phone={contact.phone || "072-3939999"} brandName={brand.name} />
         <Header user={user} brandName={brand.name} logoUrl={brand.logoUrl} categories={categories} />
         <main id="main" className="flex-1">{children}</main>
         <Footer brandName={brand.name} />
