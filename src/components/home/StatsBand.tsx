@@ -28,7 +28,7 @@ export function StatsBand() {
       <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
         <Reveal className="mb-12 text-center">
           <h2 className="font-display text-3xl font-extrabold text-white sm:text-4xl">
-            המספרים מאחורי האינדקס
+            המספרים מאחורי Rentus
           </h2>
           <p className="mx-auto mt-3 max-w-xl text-md text-white/60">
             כל מספר כאן נספר מחדש בכל לילה. אנחנו לא מעגלים כלפי מעלה.

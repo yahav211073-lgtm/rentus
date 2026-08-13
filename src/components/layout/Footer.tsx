@@ -44,7 +44,7 @@ const SOCIAL = [
   },
 ];
 
-export function Footer() {
+export function Footer({ brandName }: { brandName: string }) {
   const popularCities = seedCities.filter((c) => c.isPopular).slice(0, 8);
   const topCategories = seedCategories.slice(0, 8);
 
@@ -67,15 +67,12 @@ export function Footer() {
                 <Store className="h-5 w-5 text-white" strokeWidth={2.4} />
                 <span className="absolute -bottom-0.5 -left-0.5 h-2.5 w-2.5 rounded-full bg-accent-400 ring-2 ring-brand-950" />
               </span>
-              <span className="flex flex-col leading-none">
-                <span className="font-display text-xl font-extrabold text-white">אינדקס</span>
-                <span className="text-2xs text-white/50">כל העסקים במקום אחד</span>
-              </span>
+              <span className="font-display text-xl font-extrabold text-white">{brandName}</span>
             </Link>
 
             <p className="mb-6 max-w-sm text-sm leading-relaxed text-white/60">
-              אינדקס העסקים המוביל בישראל. אנחנו מחברים בין אנשים שמחפשים שירות
-              לבין בעלי מקצוע מאומתים — עם ביקורות אמיתיות, מידע מלא והשוואה הוגנת.
+              {brandName} — מדריך ההשכרות המוביל בישראל. אנחנו מחברים בין אנשים שצריכים
+              לשכור לבין עסקים מאומתים — עם ביקורות אמיתיות, מידע מלא והשוואה הוגנת.
             </p>
 
             <ul className="space-y-2.5 text-sm">
@@ -130,7 +127,7 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-white/45">
-            © {new Date().getFullYear()} אינדקס. כל הזכויות שמורות.
+            © {new Date().getFullYear()} {brandName}. כל הזכויות שמורות.
           </p>
           <ul className="flex flex-wrap gap-x-5 gap-y-2 text-xs">
             {LEGAL_LINKS.map((l) => (

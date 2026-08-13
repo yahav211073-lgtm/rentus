@@ -11,7 +11,7 @@ import { toWhatsAppNumber } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "רישום עסק חינם",
-  description: "פרסמו את העסק שלכם באינדקס — פרופיל בסיסי ללא עלות, אישור תוך יום עסקים אחד.",
+  description: "פרסמו את העסק שלכם ב-Rentus — פרופיל בסיסי ללא עלות, אישור תוך יום עסקים אחד.",
 };
 
 /**
@@ -31,7 +31,7 @@ export default async function BusinessRegisterPage() {
     getCities(),
   ]);
 
-  const whatsappHref = `https://wa.me/${toWhatsAppNumber(contact.whatsapp)}?text=${encodeURIComponent("היי, אני רוצה לרשום את העסק שלי באינדקס")}`;
+  const whatsappHref = `https://wa.me/${toWhatsAppNumber(contact.whatsapp)}?text=${encodeURIComponent("היי, אני רוצה לרשום את העסק שלי ב-Rentus")}`;
 
   return (
     <>

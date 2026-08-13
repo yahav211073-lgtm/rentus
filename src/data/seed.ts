@@ -330,7 +330,7 @@ export const seedTestimonials: Testimonial[] = [
 export const seedFaq: FaqItem[] = [
   {
     id: "f1",
-    question: "האם הרישום לאינדקס כרוך בתשלום?",
+    question: "האם הרישום ל-Rentus כרוך בתשלום?",
     answer: "פרופיל בסיסי הוא ללא עלות וכולל את פרטי העסק, שעות פעילות, גלריה של עד חמש תמונות וקבלת פניות. מסלולים בתשלום מוסיפים בליטות בתוצאות החיפוש, גלריה מורחבת, ניתוח פניות ותג עסק מאומת.",
   },
   {
@@ -341,7 +341,7 @@ export const seedFaq: FaqItem[] = [
   {
     id: "f3",
     question: "כמה זמן לוקח עד שהעסק שלי מופיע?",
-    answer: "אחרי מילוי הפרטים העסק עובר אישור ידני, בדרך כלל תוך יום עסקים אחד. אישור ידני הוא מה שמונע מהאינדקס להתמלא ברשומות ריקות.",
+    answer: "אחרי מילוי הפרטים העסק עובר אישור ידני, בדרך כלל תוך יום עסקים אחד. אישור ידני הוא מה שמונע מ-Rentus להתמלא ברשומות ריקות.",
   },
   {
     id: "f4",
@@ -365,21 +365,21 @@ export const seedArticles: Article[] = [
     id: "ar1", slug: "how-to-choose-event-venue",
     title: "איך בוחרים אולם אירועים בלי להתחרט אחר כך",
     excerpt: "שבע שאלות שכדאי לשאול לפני שחותמים, וסעיף אחד בחוזה שרוב הזוגות לא קוראים.",
-    categoryName: "אירועים", authorName: "מערכת האינדקס", readingMin: 7,
+    categoryName: "אירועים", authorName: "צוות Rentus", readingMin: 7,
     publishedAt: "2026-06-18T08:00:00Z",
   },
   {
     id: "ar2", slug: "renovation-budget-guide",
     title: "מדריך תקציב שיפוץ: כמה זה באמת עולה ב-2026",
     excerpt: "פירוק עלויות אמיתי לפי חדר, כולל ההוצאות שתמיד מפתיעות באמצע הדרך.",
-    categoryName: "שיפוצים", authorName: "מערכת האינדקס", readingMin: 11,
+    categoryName: "שיפוצים", authorName: "צוות Rentus", readingMin: 11,
     publishedAt: "2026-06-04T08:00:00Z",
   },
   {
     id: "ar3", slug: "reading-reviews-right",
     title: "לקרוא ביקורות נכון: מה מסתתר מאחורי חמישה כוכבים",
     excerpt: "למה עסק עם 4.6 ומאתיים ביקורות עדיף כמעט תמיד על עסק עם 5.0 ושתים עשרה.",
-    categoryName: "מדריכים", authorName: "מערכת האינדקס", readingMin: 5,
+    categoryName: "מדריכים", authorName: "צוות Rentus", readingMin: 5,
     publishedAt: "2026-05-22T08:00:00Z",
   },
 ];

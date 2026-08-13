@@ -36,11 +36,13 @@ function dashboardHrefFor(role: string) {
 
 const NAV_LINKS = [
   { label: "עסקים מומלצים", href: "/search?sort=rating" },
-  { label: "מדריכים", href: "/blog" },
   { label: "אודות", href: "/about" },
+  { label: "צור קשר", href: "/contact" },
 ];
 
-export function Header({ user }: { user: CurrentUser | null }) {
+export function Header({
+  user, brandName, logoUrl,
+}: { user: CurrentUser | null; brandName: string; logoUrl?: string | null }) {
   // useSyncExternalStore ולא useEffect+setState: הערך נכון כבר
   // ברינדור הראשון בלקוח, בלי רינדור מדורג. ראו browser-state.ts.
   const scrolled = useScrolledPast(24);
@@ -91,23 +93,22 @@ export function Header({ user }: { user: CurrentUser | null }) {
         >
           {/* לוגו */}
           <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="לעמוד הבית">
-            <span className="relative grid h-9 w-9 place-items-center rounded-sm bg-gradient-to-br from-brand-700 to-brand-900 shadow-[0_4px_12px_-2px_rgba(11,59,117,0.5)]">
-              <Store className="h-4.5 w-4.5 text-white" strokeWidth={2.4} />
-              <span className="absolute -bottom-0.5 -left-0.5 h-2.5 w-2.5 rounded-full bg-accent-400 ring-2 ring-white" />
-            </span>
-            <span className="flex flex-col leading-none">
-              <span className={cn(
-                "font-display text-lg font-extrabold tracking-tight transition-colors",
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoUrl} alt={brandName} className="h-9 w-auto" />
+            ) : (
+              <span className="relative grid h-9 w-9 place-items-center rounded-sm bg-gradient-to-br from-brand-700 to-brand-900 shadow-[0_4px_12px_-2px_rgba(11,59,117,0.5)]">
+                <Store className="h-4.5 w-4.5 text-white" strokeWidth={2.4} />
+                <span className="absolute -bottom-0.5 -left-0.5 h-2.5 w-2.5 rounded-full bg-accent-400 ring-2 ring-white" />
+              </span>
+            )}
+            <span
+              className={cn(
+                "font-display text-xl font-extrabold tracking-tight transition-colors",
                 scrolled ? "text-brand-900" : "text-white",
-              )}>
-                אינדקס
-              </span>
-              <span className={cn(
-                "text-2xs font-medium transition-colors",
-                scrolled ? "text-ink-400" : "text-white/65",
-              )}>
-                כל העסקים במקום אחד
-              </span>
+              )}
+            >
+              {brandName}
             </span>
           </Link>
 

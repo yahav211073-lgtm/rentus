@@ -1,6 +1,6 @@
 import Link from "next/link";
 import {
-  Briefcase, LayoutGrid, LayoutDashboard, Megaphone, MessageSquareQuote, Settings, Users,
+  Briefcase, LayoutGrid, LayoutDashboard, Megaphone, MessageCircle, MessageSquareQuote, Settings, Users,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -11,6 +11,7 @@ import { getCurrentUser } from "@/lib/auth";
 const NAV = [
   { href: "/admin", label: "דשבורד", icon: LayoutDashboard, exact: true },
   { href: "/admin/businesses", label: "עסקים", icon: Briefcase },
+  { href: "/admin/leads", label: "פניות", icon: MessageCircle },
   { href: "/admin/reviews", label: "ביקורות", icon: MessageSquareQuote },
   { href: "/admin/categories", label: "קטגוריות", icon: LayoutGrid },
   { href: "/admin/ads", label: "מודעות ובאנרים", icon: Megaphone },

@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { Plus } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
+import { ButtonLink } from "@/components/ui/Button";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { ApproveRejectButtons, ArchiveToggleButton } from "@/components/admin/BusinessActionButtons";
 import type { BusinessStatus } from "@/types/domain";
@@ -43,14 +45,19 @@ export default async function AdminBusinessesPage({
     <div>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-extrabold text-ink-900">ניהול עסקים</h1>
-        <form className="flex gap-2">
-          <input type="hidden" name="status" value={status} />
-          <input
-            type="search" name="q" defaultValue={q}
-            placeholder="חיפוש לפי שם..."
-            className="h-10 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400"
-          />
-        </form>
+        <div className="flex flex-wrap items-center gap-2">
+          <form className="flex gap-2">
+            <input type="hidden" name="status" value={status} />
+            <input
+              type="search" name="q" defaultValue={q}
+              placeholder="חיפוש לפי שם..."
+              className="h-10 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400"
+            />
+          </form>
+          <ButtonLink href="/admin/businesses/new" variant="accent" size="md" icon={<Plus className="h-4 w-4" />}>
+            הוספת עסק
+          </ButtonLink>
+        </div>
       </div>
 
       <div className="mb-5 flex gap-1 border-b border-ink-200">

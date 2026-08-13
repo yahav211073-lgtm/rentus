@@ -111,3 +111,55 @@ export async function updateBusinessAdmin(businessId: string, update: BusinessAd
   revalidatePath(`/admin/businesses/${businessId}`);
   return { ok: true };
 }
+
+export interface NewBusinessInput {
+  name: string;
+  tagline: string | null;
+  description: string | null;
+  address: string | null;
+  phone: string | null;
+  whatsapp: string | null;
+  email: string | null;
+  categoryId: string | null;
+}
+
+/**
+ * הוספת עסק ישירות מהניהול — הזרימה שבה מנהל מדבר עם לקוח (טלפון
+ * שהגיע מפנייה) ובונה לו את הפרופיל בעצמו. נוצר כבר "פורסם", בלי
+ * owner_id — כשבעל העסק ירצה חשבון, מקשרים אותו ידנית מ-/admin/users.
+ */
+export async function createBusinessAdmin(input: NewBusinessInput) {
+  await requireStaff();
+  const supabase = createSupabaseAdminClient();
+
+  const slug = `${input.name.replace(/\s+/g, "-").toLowerCase()}-${Math.random().toString(36).slice(2, 7)}`;
+
+  const { data: business, error } = await supabase!
+    .from("businesses")
+    .insert({
+      slug,
+      name: input.name,
+      tagline: input.tagline,
+      description: input.description,
+      address: input.address,
+      phone: input.phone,
+      whatsapp: input.whatsapp,
+      email: input.email,
+      status: "published",
+      is_verified: true,
+    })
+    .select("id, slug")
+    .single();
+
+  if (error || !business) return { ok: false, error: error?.message ?? "השמירה נכשלה." };
+
+  if (input.categoryId) {
+    await supabase!.from("business_categories").insert({
+      business_id: business.id, category_id: input.categoryId, is_primary: true,
+    });
+  }
+
+  revalidatePath("/admin/businesses");
+  revalidatePath("/");
+  return { ok: true, businessId: business.id as string };
+}

@@ -8,6 +8,7 @@ import { SideBanner } from "@/components/ads/SideBanner";
 import { env } from "@/lib/env";
 import { getCurrentUser } from "@/lib/auth";
 import { getActiveAds } from "@/lib/repo/ads";
+import { getBrandSettings } from "@/lib/repo/branding";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import "./globals.css";
 
@@ -47,35 +48,40 @@ const inter = Inter({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL(env.siteUrl),
-  title: {
-    default: "אינדקס — כל העסקים בישראל במקום אחד",
-    template: "%s | אינדקס",
-  },
-  description:
-    "אינדקס העסקים המוביל בישראל. אלפי עסקים מאומתים, ביקורות אמיתיות והשוואת הצעות מחיר — הכל במקום אחד.",
-  keywords: ["אינדקס עסקים", "בעלי מקצוע", "המלצות", "ביקורות", "ספקים", "ישראל"],
-  authors: [{ name: "אינדקס" }],
-  openGraph: {
-    type: "website",
-    locale: "he_IL",
-    siteName: "אינדקס",
-    title: "אינדקס — כל העסקים בישראל במקום אחד",
-    description:
-      "אלפי עסקים מאומתים, ביקורות אמיתיות והשוואת הצעות מחיר. מצאו את בעל המקצוע הנכון בדקות.",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "אינדקס — כל העסקים בישראל במקום אחד",
-    description: "אלפי עסקים מאומתים, ביקורות אמיתיות והשוואת הצעות מחיר.",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
-  },
-};
+/**
+ * generateMetadata ולא אובייקט metadata סטטי — כי שם האתר נקרא
+ * מ-settings (brand.identity), לא קשיח בקוד. זה בדיוק מה שהופך שינוי
+ * שם באדמין לשינוי אמיתי בתגית ה-title, לא רק במסך הניהול עצמו.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const brand = await getBrandSettings();
+  const title = `${brand.name} — ${brand.tagline}`;
+
+  return {
+    metadataBase: new URL(env.siteUrl),
+    title: { default: title, template: `%s | ${brand.name}` },
+    description: `${brand.name} — ${brand.tagline}. מאות עסקים מאומתים, ביקורות אמיתיות והשוואת הצעות מחיר.`,
+    keywords: ["השכרת ציוד לאירועים", "השכרת אוהלים", "השכרת רכב", "כלים ומכונות", brand.name],
+    authors: [{ name: brand.name }],
+    openGraph: {
+      type: "website",
+      locale: "he_IL",
+      siteName: brand.name,
+      title,
+      description: `מאות עסקים מאומתים, ביקורות אמיתיות והשוואת הצעות מחיר. מצאו בדיוק את מה שאתם צריכים להשכיר.`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: `מאות עסקים מאומתים, ביקורות אמיתיות והשוואת הצעות מחיר.`,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+    },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: [
@@ -88,11 +94,22 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [user, ads] = await Promise.all([getCurrentUser(), getActiveAds()]);
+  const [user, ads, brand] = await Promise.all([getCurrentUser(), getActiveAds(), getBrandSettings()]);
   const isBusinessOwner = await checkIsBusinessOwner(user?.id);
 
+  // צבעי מותג מ-settings דורסים את הטוקנים בדף עצמו — זו הדרך
+  // שבה שינוי צבע באדמין משתקף באתר בלי דיפלוי (ראו globals.css
+  // לתיעוד המנגנון: --color-brand-800/600 ו---color-accent-400
+  // הם בדיוק הגוונים שרוב הרכיבים משתמשים בהם בפועל).
+  const brandStyle = {
+    "--color-brand-800": brand.colors.primary,
+    "--color-brand-600": brand.colors.secondary,
+    "--color-accent-400": brand.colors.accent,
+    "--page-bg": brand.colors.background,
+  } as React.CSSProperties;
+
   return (
-    <html lang="he" dir="rtl" className={`${heebo.variable} ${inter.variable}`}>
+    <html lang="he" dir="rtl" className={`${heebo.variable} ${inter.variable}`} style={brandStyle}>
       <head>
         {/*
           סקריפט אתחול העדפות הנגישות.
@@ -130,9 +147,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           דילוג לתוכן הראשי
         </a>
 
-        <Header user={user} />
+        <Header user={user} brandName={brand.name} logoUrl={brand.logoUrl} />
         <main id="main" className="flex-1">{children}</main>
-        <Footer />
+        <Footer brandName={brand.name} />
 
         <AccessibilityToolbar />
         {/*
