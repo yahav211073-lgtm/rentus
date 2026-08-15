@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { ImageIcon, Plus, Trash2 } from "lucide-react";
+import { ImageIcon, Plus, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import {
   createCategory, createCity, deleteCategory, deleteCity, toggleCategoryActive, updateCategoryImage,
@@ -27,7 +27,7 @@ export function CategoryManager({ categories, cities }: { categories: CategoryRo
       <section className="rounded-lg border border-ink-200/70 bg-white p-6">
         <h2 className="mb-4 font-display text-base font-bold text-ink-900">קטגוריות</h2>
 
-        <form action={submitCategory} className="mb-5 grid gap-2">
+        <form action={submitCategory} className="mb-5 grid gap-2" encType="multipart/form-data">
           <div className="flex flex-wrap gap-2">
             <input
               name="name" placeholder="שם קטגוריה חדשה" required
@@ -42,8 +42,13 @@ export function CategoryManager({ categories, cities }: { categories: CategoryRo
             </select>
           </div>
           <div className="flex flex-wrap gap-2">
+            <label className="flex h-10 min-w-0 flex-1 cursor-pointer items-center gap-2 rounded-sm border border-dashed border-ink-300 bg-white px-3 text-sm text-ink-600 transition-colors hover:border-brand-400 hover:bg-brand-50">
+              <Upload className="h-4 w-4 text-brand-700" />
+              <span>העלאת תמונה מהמכשיר</span>
+              <input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/avif" className="sr-only" />
+            </label>
             <input
-              name="imageUrl" placeholder="כתובת תמונה (URL, לא חובה)"
+              name="imageUrl" placeholder="או כתובת תמונה קיימת (לא חובה)"
               className="h-10 min-w-0 flex-1 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400"
             />
             <Button type="submit" variant="primary" size="md" loading={pending} icon={<Plus className="h-4 w-4" />}>הוספה</Button>
@@ -109,6 +114,7 @@ function CategoryItem({
 }) {
   const [editingImage, setEditingImage] = useState(false);
   const [imageUrl, setImageUrl] = useState(row.imageUrl ?? "");
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   return (
     <div className="rounded-xs hover:bg-ink-50">
@@ -150,18 +156,29 @@ function CategoryItem({
       </div>
 
       {editingImage && (
-        <div className="flex gap-1.5 px-2.5 pb-2.5">
+        <div className="grid gap-2 px-2.5 pb-2.5 sm:grid-cols-[auto_1fr_auto]">
+          <label className="flex h-8 cursor-pointer items-center gap-1.5 rounded-sm border border-dashed border-ink-300 px-2 text-xs font-semibold text-brand-700 hover:bg-brand-50">
+            <Upload className="h-3.5 w-3.5" />
+            {imageFile ? imageFile.name : "העלאת תמונה"}
+            <input
+              type="file" accept="image/jpeg,image/png,image/webp,image/avif" className="sr-only"
+              onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
+            />
+          </label>
           <input
             value={imageUrl}
             onChange={(e) => setImageUrl(e.target.value)}
-            placeholder="כתובת תמונה (URL)"
-            className="h-8 min-w-0 flex-1 rounded-sm border border-ink-200 px-2 text-xs outline-none focus:border-brand-400"
+            placeholder="או כתובת תמונה קיימת"
+            className="h-8 min-w-0 rounded-sm border border-ink-200 px-2 text-xs outline-none focus:border-brand-400"
           />
           <button
             type="button"
             disabled={pending}
             onClick={() => startTransition(async () => {
-              await updateCategoryImage(row.id, imageUrl);
+              const formData = new FormData();
+              formData.set("imageUrl", imageUrl);
+              if (imageFile) formData.set("image", imageFile);
+              await updateCategoryImage(row.id, formData);
               setEditingImage(false);
             })}
             className="rounded-sm bg-brand-800 px-3 text-xs font-bold text-white hover:bg-brand-700"

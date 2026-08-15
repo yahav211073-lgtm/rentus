@@ -4,6 +4,13 @@ import { revalidatePath } from "next/cache";
 import { requireStaff } from "@/lib/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 import { slugify } from "@/lib/utils";
+import { hasUpload, uploadPublicImage } from "@/lib/uploads";
+
+function refreshCategoryViews() {
+  revalidatePath("/admin/categories");
+  revalidatePath("/", "layout");
+  revalidatePath("/categories");
+}
 
 export async function createCategory(formData: FormData) {
   await requireStaff();
@@ -11,8 +18,13 @@ export async function createCategory(formData: FormData) {
 
   const name = String(formData.get("name") ?? "").trim();
   const parentId = String(formData.get("parentId") ?? "") || null;
-  const imageUrl = String(formData.get("imageUrl") ?? "").trim() || null;
+  let imageUrl = String(formData.get("imageUrl") ?? "").trim() || null;
   if (!name) return { ok: false, error: "שם חסר." };
+  if (hasUpload(formData.get("image"))) {
+    const upload = await uploadPublicImage(formData.get("image"), "categories");
+    if (!upload.ok) return upload;
+    imageUrl = upload.url;
+  }
 
   const { error } = await supabase!.from("categories").insert({
     name,
@@ -21,20 +33,25 @@ export async function createCategory(formData: FormData) {
     image_url: imageUrl,
   });
 
-  revalidatePath("/admin/categories");
+  refreshCategoryViews();
   return error ? { ok: false, error: error.message } : { ok: true };
 }
 
 /** תמונת הקטגוריה — הכרטיס בדף הבית מציג אותה במקום אייקון כשהיא קיימת. */
-export async function updateCategoryImage(id: string, imageUrl: string) {
+export async function updateCategoryImage(id: string, formData: FormData) {
   await requireStaff();
   const supabase = createSupabaseAdminClient();
+  let imageUrl = String(formData.get("imageUrl") ?? "").trim() || null;
+  if (hasUpload(formData.get("image"))) {
+    const upload = await uploadPublicImage(formData.get("image"), "categories");
+    if (!upload.ok) return upload;
+    imageUrl = upload.url;
+  }
   const { error } = await supabase!
     .from("categories")
-    .update({ image_url: imageUrl.trim() || null })
+    .update({ image_url: imageUrl })
     .eq("id", id);
-  revalidatePath("/admin/categories");
-  revalidatePath("/");
+  refreshCategoryViews();
   return error ? { ok: false, error: error.message } : { ok: true };
 }
 
@@ -42,7 +59,7 @@ export async function toggleCategoryActive(id: string, isActive: boolean) {
   await requireStaff();
   const supabase = createSupabaseAdminClient();
   const { error } = await supabase!.from("categories").update({ is_active: isActive }).eq("id", id);
-  revalidatePath("/admin/categories");
+  refreshCategoryViews();
   return error ? { ok: false, error: error.message } : { ok: true };
 }
 
@@ -50,7 +67,7 @@ export async function deleteCategory(id: string) {
   await requireStaff();
   const supabase = createSupabaseAdminClient();
   const { error } = await supabase!.from("categories").delete().eq("id", id);
-  revalidatePath("/admin/categories");
+  refreshCategoryViews();
   return error ? { ok: false, error: error.message } : { ok: true };
 }
 

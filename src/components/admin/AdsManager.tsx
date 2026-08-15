@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Upload } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import {
   createBanner, createPopup, deleteBanner, deletePopup, toggleBannerActive, togglePopupActive,
@@ -25,13 +25,18 @@ export function AdsManager({
         <form
           action={(fd) => startTransition(async () => { await createBanner(fd); })}
           className="mb-5 grid gap-2.5 rounded-md bg-ink-50 p-4 sm:grid-cols-2"
+          encType="multipart/form-data"
         >
           <input name="title" placeholder="שם פנימי לזיהוי" required className="h-10 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400" />
           <select name="placementKey" required className="h-10 rounded-sm border border-ink-200 bg-white px-2 text-sm outline-none focus:border-brand-400">
             <option value="">בחרו מיקום</option>
             {placements.map((p) => <option key={p.key} value={p.key}>{p.label}</option>)}
           </select>
-          <input name="assetUrl" placeholder="כתובת תמונה (URL)" className="h-10 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400 sm:col-span-2" />
+          <label className="flex h-10 cursor-pointer items-center gap-2 rounded-sm border border-dashed border-ink-300 bg-white px-3 text-sm text-ink-600 transition-colors hover:border-brand-400 hover:bg-brand-50 sm:col-span-2">
+            <Upload className="h-4 w-4 text-brand-700" /> העלאת תמונת באנר מהמכשיר
+            <input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/avif" className="sr-only" />
+          </label>
+          <input name="assetUrl" placeholder="או כתובת תמונה קיימת (לא חובה)" className="h-10 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400 sm:col-span-2" />
           <input name="alt" placeholder="טקסט חלופי (נגישות)" className="h-10 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400" />
           <input name="href" placeholder="קישור בלחיצה" className="h-10 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400" />
           <label className="flex items-center gap-2 text-sm font-semibold text-ink-700">
@@ -79,11 +84,16 @@ export function AdsManager({
         <form
           action={(fd) => startTransition(async () => { await createPopup(fd); })}
           className="mb-5 grid gap-2.5 rounded-md bg-ink-50 p-4 sm:grid-cols-2"
+          encType="multipart/form-data"
         >
           <input name="title" placeholder="שם פנימי לזיהוי" required className="h-10 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400 sm:col-span-2" />
           <input name="heading" placeholder="כותרת בפופאפ" className="h-10 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400 sm:col-span-2" />
           <textarea name="body" placeholder="טקסט" rows={2} className="rounded-sm border border-ink-200 px-3 py-2 text-sm outline-none focus:border-brand-400 sm:col-span-2" />
-          <input name="assetUrl" placeholder="כתובת תמונה (URL, לא חובה)" className="h-10 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400 sm:col-span-2" />
+          <label className="flex h-10 cursor-pointer items-center gap-2 rounded-sm border border-dashed border-ink-300 bg-white px-3 text-sm text-ink-600 transition-colors hover:border-brand-400 hover:bg-brand-50 sm:col-span-2">
+            <Upload className="h-4 w-4 text-brand-700" /> העלאת תמונה מהמכשיר
+            <input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/avif" className="sr-only" />
+          </label>
+          <input name="assetUrl" placeholder="או כתובת תמונה קיימת (לא חובה)" className="h-10 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400 sm:col-span-2" />
           <input name="ctaLabel" placeholder="טקסט כפתור" className="h-10 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400" />
           <input name="ctaHref" placeholder="קישור הכפתור" className="h-10 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400" />
           <label className="flex items-center gap-2 text-sm font-semibold text-ink-700">

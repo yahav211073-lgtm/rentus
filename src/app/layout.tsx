@@ -10,6 +10,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { getActiveAds } from "@/lib/repo/ads";
 import { getBrandSettings } from "@/lib/repo/branding";
 import { getCategoriesWithCounts } from "@/lib/repo/categories";
+import { getContactDetails } from "@/lib/repo/settings";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import "./globals.css";
 
@@ -61,7 +62,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL(env.siteUrl),
     title: { default: title, template: `%s | ${brand.name}` },
-    description: `${brand.name} — ${brand.tagline}. מאות עסקים מאומתים, ביקורות אמיתיות והשוואת הצעות מחיר.`,
+    description: `${brand.name} — מדריך ישראלי לעסקים להשכרה: ציוד, רכבים, חללים, כלים וטכנולוגיה בכל הארץ.`,
     keywords: ["השכרת ציוד לאירועים", "השכרת אוהלים", "השכרת רכב", "כלים ומכונות", brand.name],
     authors: [{ name: brand.name }],
     openGraph: {
@@ -69,12 +70,12 @@ export async function generateMetadata(): Promise<Metadata> {
       locale: "he_IL",
       siteName: brand.name,
       title,
-      description: `מאות עסקים מאומתים, ביקורות אמיתיות והשוואת הצעות מחיר. מצאו בדיוק את מה שאתם צריכים להשכיר.`,
+      description: `מצאו עסקים להשכרת ציוד, רכבים, חללים, כלים וטכנולוגיה בכל הארץ.`,
     },
     twitter: {
       card: "summary_large_image",
       title,
-      description: `מאות עסקים מאומתים, ביקורות אמיתיות והשוואת הצעות מחיר.`,
+      description: `מדריך ישראלי לעסקים להשכרה בכל הארץ.`,
     },
     robots: {
       index: true,
@@ -95,8 +96,8 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [user, ads, brand, categories] = await Promise.all([
-    getCurrentUser(), getActiveAds(), getBrandSettings(), getCategoriesWithCounts(),
+  const [user, ads, brand, categories, contact] = await Promise.all([
+    getCurrentUser(), getActiveAds(), getBrandSettings(), getCategoriesWithCounts(), getContactDetails(),
   ]);
   const isBusinessOwner = await checkIsBusinessOwner(user?.id);
 
@@ -150,7 +151,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           דילוג לתוכן הראשי
         </a>
 
-        <Header user={user} brandName={brand.name} logoUrl={brand.logoUrl} categories={categories} />
+        <Header
+          user={user}
+          brandName={brand.name}
+          tagline={brand.tagline}
+          logoUrl={brand.logoUrl}
+          categories={categories}
+          phone={contact.phone}
+        />
         <main id="main" className="flex-1">{children}</main>
         <Footer brandName={brand.name} />
 

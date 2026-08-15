@@ -5,8 +5,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Building2, ChevronDown, Clock, MapPin, Search, TrendingUp, X } from "lucide-react";
 import { seedBusinesses, seedTrendingSearches } from "@/data/seed";
-import { Button } from "@/components/ui/Button";
-import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { useStoredJson, writeStored } from "@/lib/hooks/browser-state";
 import { cn } from "@/lib/utils";
 import type { SimpleCity } from "@/lib/repo/taxonomy";
@@ -177,17 +175,40 @@ export function SearchBar({
       <form
         onSubmit={submit}
         role="search"
-        aria-label="חיפוש עסקים"
+        aria-label="חיפוש להשכרה"
         className={cn(
-          "relative flex flex-col gap-2 rounded-lg bg-white p-2 md:flex-row md:items-center md:gap-0",
+          "relative flex flex-col gap-2 bg-white p-2 md:flex-row md:items-center md:gap-0",
           isHero
-            ? "shadow-[0_24px_60px_-16px_rgba(5,25,47,0.45)] ring-1 ring-white/60"
-            : "border border-ink-200 shadow-md",
+            ? "rounded-2xl shadow-[0_24px_60px_-16px_rgba(5,25,47,0.5)]"
+            : "rounded-lg border border-ink-200 shadow-md",
         )}
       >
+        {/* עיר — ראשון מימין ב-RTL, כמו ברפרנס */}
+        <SelectField
+          icon={<MapPin className="h-4.5 w-4.5 text-ink-400" />}
+          value={city}
+          onChange={setCity}
+          label="כל האזורים"
+          ariaLabel="בחירת אזור"
+          options={cities.map((c) => ({ value: c.slug, label: c.name }))}
+        />
+
+        <Divider />
+
+        {/* קטגוריה */}
+        <SelectField
+          icon={<Building2 className="h-4.5 w-4.5 text-ink-400" />}
+          value={category}
+          onChange={setCategory}
+          label="כל הקטגוריות"
+          ariaLabel="בחירת קטגוריה"
+          options={categories.map((c) => ({ value: c.slug, label: c.parentId ? `— ${c.name}` : c.name }))}
+        />
+
+        <Divider />
+
         {/* מה מחפשים */}
         <div className="relative flex flex-1 items-center gap-2.5 px-3 py-1">
-          <Search className="h-5 w-5 shrink-0 text-ink-400" />
           <input
             ref={inputRef}
             type="search"
@@ -195,8 +216,8 @@ export function SearchBar({
             onChange={(e) => { setQuery(e.target.value); setOpen(true); setActiveIndex(-1); }}
             onFocus={() => setOpen(true)}
             onKeyDown={onKeyDown}
-            placeholder="מה אתם מחפשים? עסק, שירות או בעל מקצוע"
-            aria-label="מה מחפשים"
+            placeholder="מה אתם רוצים להשכיר?"
+            aria-label="מה אתם רוצים להשכיר"
             role="combobox"
             aria-expanded={open}
             aria-controls="search-suggestions"
@@ -216,33 +237,16 @@ export function SearchBar({
           )}
         </div>
 
-        <Divider />
-
-        {/* עיר */}
-        <SelectField
-          icon={<MapPin className="h-4.5 w-4.5 text-ink-400" />}
-          value={city}
-          onChange={setCity}
-          label="בכל הארץ"
-          ariaLabel="בחירת עיר"
-          options={cities.map((c) => ({ value: c.slug, label: c.name }))}
-        />
-
-        <Divider />
-
-        {/* קטגוריה */}
-        <SelectField
-          icon={<Building2 className="h-4.5 w-4.5 text-ink-400" />}
-          value={category}
-          onChange={setCategory}
-          label="כל הקטגוריות"
-          ariaLabel="בחירת קטגוריה"
-          options={categories.map((c) => ({ value: c.slug, label: c.parentId ? `— ${c.name}` : c.name }))}
-        />
-
-        <Button type="submit" variant="accent" size={isHero ? "lg" : "md"} className="md:min-w-[132px]">
-          חיפוש
-        </Button>
+        <button
+          type="submit"
+          aria-label="חיפוש"
+          className={cn(
+            "grid shrink-0 place-items-center bg-brand-700 text-white transition-colors hover:bg-brand-600",
+            isHero ? "h-13 w-13 rounded-xl md:h-full md:min-h-13" : "h-11 w-11 rounded-md",
+          )}
+        >
+          <Search className={isHero ? "h-5.5 w-5.5" : "h-5 w-5"} />
+        </button>
       </form>
 
       {/* --- חלונית ההצעות --- */}
@@ -318,7 +322,7 @@ export function SearchBar({
                       )}>
                         {s.type === "business" ? <Building2 className="h-4 w-4" />
                           : s.type === "city" ? <MapPin className="h-4 w-4" />
-                          : <CategoryIcon name={s.icon} className="h-4 w-4" />}
+                          : <span className="text-xs font-extrabold" aria-hidden="true">{s.label.slice(0, 1)}</span>}
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm font-semibold text-ink-800">{s.label}</span>

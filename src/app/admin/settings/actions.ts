@@ -15,5 +15,6 @@ export async function updateSetting(key: string, value: Record<string, unknown>)
     .eq("key", key);
 
   revalidatePath("/admin/settings");
+  revalidatePath("/", "layout");
   return error ? { ok: false, error: error.message } : { ok: true };
 }

@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/home/Hero";
-import { CategoryShowcase } from "@/components/home/CategoryShowcase";
+import { CategoryRail } from "@/components/home/CategoryRail";
+import { BenefitsStrip } from "@/components/home/BenefitsStrip";
+import { GuidesSidebar } from "@/components/home/GuidesSidebar";
 import { Section, SectionHeading } from "@/components/home/Section";
 import { BusinessRail } from "@/components/home/BusinessRail";
-import { BusinessCard } from "@/components/business/BusinessCard";
+import { CompanyListCard } from "@/components/business/CompanyListCard";
 import { AdSlot } from "@/components/home/AdSlot";
 import { OwnerCtaCard } from "@/components/home/OwnerCtaCard";
 import { StatsBand } from "@/components/home/StatsBand";
@@ -15,18 +17,18 @@ import { getCategoriesWithCounts } from "@/lib/repo/categories";
 import { getCities } from "@/lib/repo/taxonomy";
 
 /**
- * עמוד הבית — נטו עסקים.
+ * עמוד הבית.
  *
- * בכוונה בלי Partners/Testimonials/Blog/Newsletter: אלה סקציות תוכן
- * שיווקי גנרי מהתבנית המקורית, ולא מה שהבקשה המפורשת הייתה ("בדף
- * הראשי צריך להיות נטו עסקים"). סקציית השכנוע לרישום עסק עברה
- * לגמרי ל-/business/register.
+ * בכוונה בלי Partners/Testimonials/Newsletter: אלה סקציות תוכן שיווקי
+ * גנרי מהתבנית המקורית. פאנל "מדריכים מומלצים" (GuidesSidebar) כן
+ * נכלל — הוא ברפרנס העיצוב וקיים גם /blog אמיתי מאחוריו, לא רק קישוט.
+ * סקציית השכנוע לרישום עסק עברה לגמרי ל-/business/register.
  */
 export async function generateMetadata(): Promise<Metadata> {
   const brand = await getBrandSettings();
   return {
     title: { absolute: `${brand.name} — ${brand.tagline}` },
-    description: `מאות עסקים מאומתים ב-${brand.name}, ביקורות אמיתיות והשוואת הצעות מחיר. מצאו בדיוק את מה שאתם צריכים להשכיר.`,
+    description: `${brand.name} הוא מדריך ישראלי לעסקים להשכרה. מצאו ציוד, רכב, חללים, כלים וטכנולוגיה להשכרה בכל הארץ.`,
     alternates: { canonical: "/" },
   };
 }
@@ -47,43 +49,39 @@ export default async function HomePage() {
     <>
       <JsonLd brandName={brand.name} />
 
-      <Hero categories={categories} cities={cities} brandName={brand.name} />
+      <Hero categories={categories} cities={cities} />
+      <CategoryRail />
+      <BenefitsStrip />
 
-      {/* מומלצים — ממש מתחת להירו, עם משבצות פרסום בזרימת העמוד משני
-          הצדדים, כמו בהדמיה: עמודת ימין = כרטיס "בעל עסק" + משבצת
-          פרסום, עמודת שמאל = משבצת פרסום. במובייל שתי העמודות יורדות
-          מתחת לרשת העסקים במקום להיעלם. */}
+      {/* מומלצים — רשת עסקים + פאנל "מדריכים מומלצים" לצידה, בדיוק
+          כמו ברפרנס. */}
       <Section className="bg-white">
         <SectionHeading
           eyebrow={`נבחרת ${brand.name}`}
-          title="עסקים מומלצים"
-          subtitle="נבחרו לפי דירוג, כמות ביקורות ומהירות מענה לפניות — לא לפי תשלום."
-          action={{ label: "לכל העסקים", href: "/search" }}
+          title="חברות מומלצות"
+          subtitle="עסקים שהוגדרו כמומלצים במערכת הניהול. פרטי העסק והדירוג מוצגים בפרופיל המלא."
+          action={{ label: "לכל החברות", href: "/search" }}
         />
-        <div className="grid gap-5 lg:grid-cols-[220px_1fr_220px]">
-          <div className="hidden flex-col gap-5 lg:flex">
-            <OwnerCtaCard />
-            <AdSlot banner={bannerStart} className="flex-1" />
-          </div>
+        <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
           <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
-            {featured.slice(0, 4).map((b) => <BusinessCard key={b.id} business={b} emphasis />)}
+            {featured.slice(0, 4).map((b) => <CompanyListCard key={b.id} business={b} />)}
           </div>
-          <AdSlot banner={bannerEnd} className="hidden lg:flex" />
+          <GuidesSidebar />
         </div>
-        <div className="mt-5 grid gap-5 sm:grid-cols-2 lg:hidden">
+
+        <div className="mt-5 grid gap-5 sm:grid-cols-3">
           <OwnerCtaCard />
-          <AdSlot banner={bannerEnd ?? bannerStart} />
+          <AdSlot banner={bannerStart} />
+          <AdSlot banner={bannerEnd} className="hidden sm:flex" />
         </div>
       </Section>
-
-      <CategoryShowcase />
 
       {/* פופולריים */}
       <Section className="bg-ink-50">
         <SectionHeading
           eyebrow="הכי מבוקשים"
           title="העסקים עם הכי הרבה ביקורות"
-          subtitle="כשמאות אנשים כבר טרחו לכתוב ביקורת, זה אומר משהו."
+          subtitle="עסקים להשכרה עם פעילות ודירוגים שהוזנו למערכת."
           action={{ label: "לכל התוצאות", href: "/search?sort=reviews" }}
         />
         <BusinessRail businesses={popular} layout="grid" />
@@ -97,7 +95,7 @@ export default async function HomePage() {
           <SectionHeading
             eyebrow="שיתופי פעולה"
             title="עסקים בקידום"
-            subtitle="התוכן הזה ממומן. סימנו אותו כדי שתדעו — הדירוגים והביקורות עדיין אמיתיים."
+            subtitle="מיקומים מקודמים מסומנים באופן ברור כדי לשמור על חוויית חיפוש שקופה."
           />
           <BusinessRail businesses={sponsored} />
         </Section>
@@ -108,7 +106,7 @@ export default async function HomePage() {
         <SectionHeading
           eyebrow={`חדש ב-${brand.name}`}
           title="הצטרפו לאחרונה"
-          subtitle="עסקים שעברו אימות והצטרפו לאחרונה. שווה להיות מהראשונים שממליצים."
+          subtitle="עסקים להשכרה שנוספו לאחרונה ומוכנים לקבל פניות."
           action={{ label: "לכל החדשים", href: "/search?sort=newest" }}
         />
         <BusinessRail businesses={latest} />

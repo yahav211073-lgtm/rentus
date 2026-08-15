@@ -165,6 +165,8 @@ export interface Article {
   slug: string;
   title: string;
   excerpt?: string | null;
+  /** גוף הכתבה — פסקאות טקסט מלא, מוצג בעמוד /blog/[slug] */
+  content?: string[];
   coverUrl?: string | null;
   coverAlt?: string | null;
   categoryName?: string | null;

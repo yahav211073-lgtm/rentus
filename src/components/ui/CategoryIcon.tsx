@@ -1,9 +1,11 @@
 import {
-  Accessibility, Activity, BadgeCheck, BookOpen, Building, Building2, Calculator,
-  CalendarCheck, Camera, ChefHat, CircleParking, Clock, Disc3, Gavel, GraduationCap,
-  Hammer, Hand, HardHat, HeartPulse, Home, Key, MapPin, MessageSquareQuote, Package,
-  PartyPopper, PhoneCall, Presentation, ReceiptText, Scale, Scissors, ShieldCheck,
-  Smile, Sparkle, Sparkles, Stethoscope, Store, Tag, Truck, Wind, Wrench, Zap, Car,
+  Accessibility, Activity, Armchair, BadgeCheck, Bike, BookOpen, Building, Building2,
+  Calculator, CalendarCheck, Camera, Car, ChefHat, CircleParking, Clock, Container,
+  Disc3, Drill, Dumbbell, Forklift, Gavel, GraduationCap, Hammer, Hand, HardHat,
+  Headphones, HeartPulse, Home, House, Key, MapPin, MessageSquareQuote, Monitor,
+  Music, Package, PartyPopper, PhoneCall, Presentation, Projector, ReceiptText,
+  Scale, Scissors, ShieldCheck, Smile, Sofa, Sparkle, Sparkles, Stethoscope, Store,
+  Tag, Tent, Trees, Truck, Warehouse, Waves, Wind, Wrench, Zap,
   type LucideIcon,
 } from "lucide-react";
 
@@ -16,12 +18,13 @@ import {
  * מושך את כל 1,500 האייקונים.
  */
 const ICONS: Record<string, LucideIcon> = {
-  Accessibility, Activity, BadgeCheck, BookOpen, Building, Building2, Calculator,
-  CalendarCheck, Camera, Car, ChefHat, CircleParking, Clock, Disc3, Gavel,
-  GraduationCap, Hammer, Hand, HardHat, HeartPulse, Home, Key, MapPin,
-  MessageSquareQuote, Package, PartyPopper, PhoneCall, Presentation, ReceiptText,
-  Scale, Scissors, ShieldCheck, Smile, Sparkle, Sparkles, Stethoscope, Store,
-  Truck, Wind, Wrench, Zap,
+  Accessibility, Activity, Armchair, BadgeCheck, Bike, BookOpen, Building, Building2,
+  Calculator, CalendarCheck, Camera, Car, ChefHat, CircleParking, Clock, Container,
+  Disc3, Drill, Dumbbell, Forklift, Gavel, GraduationCap, Hammer, Hand, HardHat,
+  Headphones, HeartPulse, Home, House, Key, MapPin, MessageSquareQuote, Monitor,
+  Music, Package, PartyPopper, PhoneCall, Presentation, Projector, ReceiptText,
+  Scale, Scissors, ShieldCheck, Smile, Sofa, Sparkle, Sparkles, Stethoscope, Store,
+  Tent, Trees, Truck, Warehouse, Waves, Wind, Wrench, Zap,
 };
 
 interface Props {

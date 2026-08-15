@@ -49,7 +49,7 @@ export function Rating({ value, count, size = "md", showValue = true, className 
         </span>
         {/* שכבת מילוי, חתוכה לפי האחוז. ב-RTL חותכים מהצד השמאלי. */}
         <span
-          className="absolute inset-0 inline-flex gap-0.5 text-accent-400 overflow-hidden"
+          className="absolute inset-0 inline-flex gap-0.5 text-star-400 overflow-hidden"
           style={{ clipPath: `inset(0 0 0 ${100 - pct}%)` }}
         >
           {Array.from({ length: 5 }, (_, i) => <Star key={i} className={s.star} />)}
