@@ -113,7 +113,21 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   } as React.CSSProperties;
 
   return (
-    <html lang="he" dir="rtl" className={`${heebo.variable} ${inter.variable}`} style={brandStyle}>
+    /*
+      suppressHydrationWarning על <html> בלבד.
+      סקריפט אתחול הנגישות (למטה) חייב לרוץ לפני הצביעה הראשונה, והוא
+      כותב data-* ו---font-scale ישירות על התגית. כלומר ה-HTML שהשרת
+      שלח שונה במכוון מזה שהלקוח רואה בזמן ההשוואה — וזו בדיוק המטרה.
+      הדיכוי לא יורד בעץ: אי-התאמה אמיתית בתוך העמוד עדיין תדווח.
+    */
+    <html
+      lang="he"
+      dir="rtl"
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+      className={`${heebo.variable} ${inter.variable}`}
+      style={brandStyle}
+    >
       <head>
         {/*
           סקריפט אתחול העדפות הנגישות.

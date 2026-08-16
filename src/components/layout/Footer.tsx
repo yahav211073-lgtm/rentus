@@ -1,7 +1,10 @@
 import Link from "next/link";
-import { Mail, MapPin, MessageCircle, Phone, Store } from "lucide-react";
+import { Mail, MapPin, Phone, Store } from "lucide-react";
+import {
+  FacebookIcon, InstagramIcon, TikTokIcon, WhatsAppIcon, YouTubeIcon,
+} from "@/components/ui/icons";
 import { getCategoriesWithCounts } from "@/lib/repo/categories";
-import { getContactDetails } from "@/lib/repo/settings";
+import { getContactDetails, getSocialLinks } from "@/lib/repo/settings";
 import { getCities } from "@/lib/repo/taxonomy";
 import { toWhatsAppNumber } from "@/lib/utils";
 
@@ -27,29 +30,20 @@ const BUSINESS_LINKS = [
   { label: "פרסום באתר", href: "/advertise" },
 ];
 
-/**
- * סמלי הרשתות מצוירים כאן ולא מיובאים.
- * lucide הסירה את אייקוני המותגים בגרסאות האחרונות (סוגיית סימני מסחר),
- * ומשיכת חבילת אייקוני-מותגים שלמה בשביל שלושה סמלים היא בזבוז.
- */
 const SOCIAL = [
-  {
-    label: "פייסבוק", href: "#",
-    path: "M14 8.5h2.5V5.6C16.06 5.53 15.02 5.4 13.8 5.4c-2.54 0-4.28 1.6-4.28 4.53V12.4H6.7v3.3h2.82V24h3.46v-8.3h2.7l.43-3.3h-3.13v-2.15c0-.95.26-1.6 1.62-1.6z",
-  },
-  {
-    label: "אינסטגרם", href: "#",
-    path: "M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.65-.07-4.85s.01-3.58.07-4.85C2.38 3.92 3.89 2.38 7.15 2.23 8.42 2.17 8.8 2.16 12 2.16zm0 5.68a4.16 4.16 0 100 8.32 4.16 4.16 0 000-8.32zm0 6.86a2.7 2.7 0 110-5.4 2.7 2.7 0 010 5.4zm4.33-6.98a.97.97 0 100-1.94.97.97 0 000 1.94z",
-  },
-  {
-    label: "לינקדאין", href: "#",
-    path: "M6.94 5.5a1.94 1.94 0 11-3.88 0 1.94 1.94 0 013.88 0zM3.3 8.9h3.4V21H3.3V8.9zm5.53 0h3.26v1.65h.05c.45-.86 1.56-1.77 3.22-1.77 3.44 0 4.08 2.27 4.08 5.22V21h-3.4v-5.32c0-1.27-.02-2.9-1.77-2.9-1.77 0-2.04 1.38-2.04 2.81V21h-3.4V8.9z",
-  },
-];
+  { key: "facebook", label: "פייסבוק", Icon: FacebookIcon },
+  { key: "instagram", label: "אינסטגרם", Icon: InstagramIcon },
+  { key: "tiktok", label: "טיקטוק", Icon: TikTokIcon },
+  { key: "youtube", label: "יוטיוב", Icon: YouTubeIcon },
+] as const;
+
+function isWebUrl(value?: string) {
+  return Boolean(value && /^https?:\/\//i.test(value.trim()));
+}
 
 export async function Footer({ brandName }: { brandName: string }) {
-  const [categories, cities, contact] = await Promise.all([
-    getCategoriesWithCounts(), getCities(), getContactDetails(),
+  const [categories, cities, contact, social] = await Promise.all([
+    getCategoriesWithCounts(), getCities(), getContactDetails(), getSocialLinks(),
   ]);
   const topCategories = categories.slice(0, 8);
   const popularCities = cities.slice(0, 8);
@@ -110,19 +104,21 @@ export async function Footer({ brandName }: { brandName: string }) {
                   aria-label="וואטסאפ"
                   className="grid h-10 w-10 place-items-center rounded-xs border border-white/12 bg-white/5 text-white/70 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#25D366]/50 hover:bg-white/10 hover:text-[#25D366]"
                 >
-                  <MessageCircle className="h-4.5 w-4.5" strokeWidth={2.2} />
+                  <WhatsAppIcon className="h-4.5 w-4.5" />
                 </a>
               )}
-              {SOCIAL.map(({ label, href, path }) => (
+              {/* רק רשתות שהוגדרו ב-/admin/settings. קודם היו כאן שלושה
+                  קישורים קבועים עם href="#" — אייקונים שנראים כמו הבטחה
+                  ולא מובילים לשום מקום. */}
+              {SOCIAL.filter((s) => isWebUrl(social[s.key])).map(({ key, label, Icon }) => (
                 <a
-                  key={label}
-                  href={href}
+                  key={key}
+                  href={social[key]}
+                  target="_blank" rel="noopener noreferrer"
                   aria-label={label}
                   className="grid h-10 w-10 place-items-center rounded-xs border border-white/12 bg-white/5 text-white/70 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-400/50 hover:bg-white/10 hover:text-accent-400"
                 >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-4.5 w-4.5" aria-hidden="true">
-                    <path d={path} />
-                  </svg>
+                  <Icon className="h-4.5 w-4.5" />
                 </a>
               ))}
             </div>

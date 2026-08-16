@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import type { Banner } from "@/types/domain";
-import { CoverArt } from "@/components/ui/CoverArt";
 import { detectDevice, isWithinSchedule, matchesTargeting } from "@/lib/ads/targeting";
 import { useStoredFlag, writeStored } from "@/lib/hooks/browser-state";
 import { cn, pickWeighted } from "@/lib/utils";
@@ -125,25 +124,22 @@ export function SideBanner({
     }).catch(() => { /* התעלמות */ });
   }
 
-  if (!banner || dismissed || !hasRoom) return null;
+  // באנר בלי קריאייטיב אינו באנר. מסגרת ריקה בשולי המסך היא בדיוק
+  // מה שגורם לאתר להיראות לא גמור, ולכן במקרה כזה לא מוצג כלום.
+  if (!banner || !banner.assetUrl || dismissed || !hasRoom) return null;
 
-  const content = (
-    <>
-      {banner.kind === "video" && banner.assetUrl ? (
-        <video
-          src={banner.assetUrl}
-          autoPlay muted loop playsInline
-          aria-label={banner.alt}
-          className="h-full w-full object-cover"
-        />
-      ) : banner.assetUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={banner.assetUrl} alt={banner.alt} className="h-full w-full object-cover" loading="lazy" />
-      ) : (
-        <CoverArt seed={banner.id} label={banner.title.charAt(0)} className="h-full w-full" />
-      )}
-    </>
-  );
+  const content =
+    banner.kind === "video" ? (
+      <video
+        src={banner.assetUrl}
+        autoPlay muted loop playsInline
+        aria-label={banner.alt}
+        className="h-full w-full object-cover"
+      />
+    ) : (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img src={banner.assetUrl} alt={banner.alt} className="h-full w-full object-cover" loading="lazy" />
+    );
 
   return (
     <AnimatePresence>

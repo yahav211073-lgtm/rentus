@@ -38,7 +38,8 @@ const DETAIL_SELECT = `
   business_categories(is_primary, categories(id, slug, name)),
   business_tags(tags(id, slug, name)),
   business_hours(day_of_week, opens_at, closes_at, is_closed, note),
-  business_services(id, name, description, price, price_unit, is_featured)
+  business_services(id, name, description, price, price_unit, is_featured),
+  media(id, url, alt, caption, kind, width, height, sort_order, is_cover)
 `;
 
 function primaryCategoryOf(row: Row) {
@@ -99,6 +100,19 @@ function mapDetail(row: Row): Business {
     logoUrl: row.logo_url,
     coverUrl: row.cover_url,
     videoUrl: row.video_url,
+    /* גלריה. ממוינת כאן ולא ב-SQL כי היא מגיעה כ-embed, ו-order על
+       טבלה משובצת חל על השאילתה החיצונית ולא עליה. */
+    gallery: (row.media ?? [])
+      .filter((m: Row) => m.kind === "image" && m.url)
+      .sort((a: Row, b: Row) => (a.sort_order ?? 0) - (b.sort_order ?? 0))
+      .map((m: Row) => ({
+        id: m.id,
+        url: m.url,
+        alt: m.alt ?? `תמונה מהגלריה של ${row.name}`,
+        caption: m.caption,
+        width: m.width,
+        height: m.height,
+      })),
     categories: (row.business_categories ?? []).map((c: Row) => ({
       id: c.categories.id, slug: c.categories.slug, name: c.categories.name,
     })),

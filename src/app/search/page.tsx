@@ -63,7 +63,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
     <div className="bg-ink-50 pb-20">
       {/* --- כותרת וחיפוש --- */}
       <div className="relative isolate overflow-hidden bg-gradient-to-br from-brand-900 to-brand-700 pb-10 pt-[calc(var(--spacing-header)+32px)]">
-        <div className="bg-grid absolute inset-0 opacity-40" aria-hidden="true" />
+        <div className="bg-dots absolute inset-0 opacity-30" aria-hidden="true" />
         <div className="relative mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
           <h1 className="mb-5 font-display text-2xl font-extrabold text-white sm:text-3xl">
             {filters.q ? <>תוצאות עבור &laquo;{filters.q}&raquo;</> : "חיפוש עסקים"}

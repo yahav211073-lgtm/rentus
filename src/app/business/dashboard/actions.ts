@@ -37,3 +37,26 @@ export async function updateBusiness(businessId: string, formData: FormData) {
   revalidatePath("/business/dashboard");
   return { ok: true };
 }
+
+/**
+ * סימון התראות כנקראו.
+ *
+ * גם כאן לקוח הסשן ולא ה-admin client: מדיניות notifications_own
+ * מאפשרת עדכון רק לשורות של המשתמש עצמו, ולכן רשימת מזהים שהגיעה
+ * מהדפדפן לא יכולה לגעת בהתראות של מישהו אחר גם אם תזויף.
+ */
+export async function markNotificationsRead(ids: string[]) {
+  if (ids.length === 0) return { ok: true };
+
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "החיבור למסד הנתונים לא הוגדר." };
+
+  const { error } = await supabase
+    .from("notifications")
+    .update({ read_at: new Date().toISOString() })
+    .in("id", ids)
+    .is("read_at", null);
+
+  revalidatePath("/business/dashboard");
+  return error ? { ok: false, error: error.message } : { ok: true };
+}

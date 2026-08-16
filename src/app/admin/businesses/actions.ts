@@ -3,6 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { requireStaff } from "@/lib/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
+import { uploadPublicImage } from "@/lib/uploads";
+import { slugify } from "@/lib/utils";
 
 /**
  * כל הפעולות כאן משתמשות ב-admin client (service role) בכוונה —
@@ -12,41 +14,109 @@ import { createSupabaseAdminClient } from "@/lib/supabase/server";
  * קו ההגנה בפועל כאן, ולכן הוא הדבר הראשון בכל פעולה.
  */
 
+/** רענון כל מה שמושפע משינוי סטטוס של עסק — כולל העמוד הציבורי שלו. */
+function refreshBusiness(slug?: string | null) {
+  revalidatePath("/admin/businesses");
+  revalidatePath("/admin");
+  revalidatePath("/");
+  revalidatePath("/search");
+  revalidatePath("/business/dashboard");
+  if (slug) revalidatePath(`/business/${slug}`);
+}
+
+/**
+ * התראה לבעל העסק על החלטת המנהל.
+ *
+ * זו החוליה שסוגרת את הזרימה: בלעדיה בעל העסק היה צריך לנחש אם
+ * הבקשה אושרה. נכתבת ב-admin client כי היא נוצרת עבור משתמש אחר,
+ * וכישלון שלה לא מבטל את האישור עצמו.
+ */
+async function notifyOwner(
+  businessId: string,
+  payload: { title: string; body: string; link: string; type: string },
+) {
+  const supabase = createSupabaseAdminClient();
+  if (!supabase) return;
+
+  const { data } = await supabase
+    .from("businesses").select("owner_id").eq("id", businessId).maybeSingle();
+
+  if (!data?.owner_id) return;
+
+  await supabase.from("notifications").insert({
+    user_id: data.owner_id,
+    type: payload.type,
+    title: payload.title,
+    body: payload.body,
+    link: payload.link,
+  });
+}
+
 export async function approveBusiness(businessId: string) {
   await requireStaff();
   const supabase = createSupabaseAdminClient();
-  const { error } = await supabase!
-    .from("businesses")
-    .update({ status: "published" })
-    .eq("id", businessId);
+  if (!supabase) return { ok: false, error: "אין חיבור למסד הנתונים." };
 
-  revalidatePath("/admin/businesses");
-  revalidatePath("/admin");
-  return error ? { ok: false, error: error.message } : { ok: true };
+  const { data, error } = await supabase
+    .from("businesses")
+    .update({ status: "published", rejection_reason: null })
+    .eq("id", businessId)
+    .select("slug, name")
+    .maybeSingle();
+
+  if (error) return { ok: false, error: error.message };
+
+  await notifyOwner(businessId, {
+    type: "business.approved",
+    title: "העסק שלכם אושר ופורסם",
+    body: `${data?.name ?? "העסק"} מופיע עכשיו באתר ויכול לקבל פניות.`,
+    link: data?.slug ? `/business/${data.slug}` : "/business/dashboard",
+  });
+
+  refreshBusiness(data?.slug);
+  return { ok: true };
 }
 
 export async function rejectBusiness(businessId: string, reason: string) {
   await requireStaff();
   const supabase = createSupabaseAdminClient();
-  const { error } = await supabase!
-    .from("businesses")
-    .update({ status: "rejected", rejection_reason: reason || null })
-    .eq("id", businessId);
+  if (!supabase) return { ok: false, error: "אין חיבור למסד הנתונים." };
 
-  revalidatePath("/admin/businesses");
-  revalidatePath("/admin");
-  return error ? { ok: false, error: error.message } : { ok: true };
+  const { data, error } = await supabase
+    .from("businesses")
+    .update({ status: "rejected", rejection_reason: reason.trim() || null })
+    .eq("id", businessId)
+    .select("slug, name")
+    .maybeSingle();
+
+  if (error) return { ok: false, error: error.message };
+
+  await notifyOwner(businessId, {
+    type: "business.rejected",
+    title: "הבקשה לא אושרה",
+    body: reason.trim()
+      ? `${data?.name ?? "העסק"}: ${reason.trim()}`
+      : `${data?.name ?? "העסק"} לא אושר לפרסום. ניתן לתקן את הפרטים ולהגיש שוב.`,
+    link: "/business/dashboard",
+  });
+
+  refreshBusiness(data?.slug);
+  return { ok: true };
 }
 
 export async function setBusinessArchived(businessId: string, archived: boolean) {
   await requireStaff();
   const supabase = createSupabaseAdminClient();
-  const { error } = await supabase!
+  if (!supabase) return { ok: false, error: "אין חיבור למסד הנתונים." };
+
+  const { data, error } = await supabase
     .from("businesses")
     .update({ status: archived ? "archived" : "published" })
-    .eq("id", businessId);
+    .eq("id", businessId)
+    .select("slug")
+    .maybeSingle();
 
-  revalidatePath("/admin/businesses");
+  refreshBusiness(data?.slug);
   return error ? { ok: false, error: error.message } : { ok: true };
 }
 
@@ -68,13 +138,22 @@ export interface BusinessAdminUpdate {
   isVerified: boolean;
   boostScore: number;
   categoryId: string | null;
+  cityId: string | null;
+  social: Record<string, string>;
 }
 
 export async function updateBusinessAdmin(businessId: string, update: BusinessAdminUpdate) {
   await requireStaff();
   const supabase = createSupabaseAdminClient();
+  if (!supabase) return { ok: false, error: "אין חיבור למסד הנתונים." };
 
-  const { error } = await supabase!
+  // רשתות ריקות לא נשמרות בכלל — כך עמוד העסק לא צריך לסנן אותן,
+  // והוא לעולם לא מציג כפתור רשת שמוביל לשום מקום.
+  const social = Object.fromEntries(
+    Object.entries(update.social).filter(([, v]) => v.trim().length > 0),
+  );
+
+  const { data, error } = await supabase
     .from("businesses")
     .update({
       name: update.name,
@@ -87,6 +166,8 @@ export async function updateBusinessAdmin(businessId: string, update: BusinessAd
       whatsapp: update.whatsapp,
       email: update.email,
       website: update.website,
+      city_id: update.cityId,
+      social,
       status: update.status,
       tier: update.tier,
       is_featured: update.isFeatured,
@@ -94,85 +175,72 @@ export async function updateBusinessAdmin(businessId: string, update: BusinessAd
       is_verified: update.isVerified,
       boost_score: update.boostScore,
     })
-    .eq("id", businessId);
+    .eq("id", businessId)
+    .select("slug")
+    .maybeSingle();
 
   if (error) return { ok: false, error: error.message };
 
   if (update.categoryId) {
     // מוודאים שיש בדיוק שיוך קטגוריה-ראשית אחד: מוחקים ומכניסים מחדש
     // במקום upsert, כי אין מפתח ייחודי יציב שמזהה "השורה הראשית הישנה".
-    await supabase!.from("business_categories").delete().eq("business_id", businessId).eq("is_primary", true);
-    await supabase!.from("business_categories").insert({
+    await supabase.from("business_categories").delete().eq("business_id", businessId).eq("is_primary", true);
+    await supabase.from("business_categories").insert({
       business_id: businessId, category_id: update.categoryId, is_primary: true,
     });
   }
 
-  revalidatePath("/admin/businesses");
+  refreshBusiness(data?.slug);
   revalidatePath(`/admin/businesses/${businessId}`);
   return { ok: true };
 }
 
-export interface NewBusinessInput {
-  name: string;
-  tagline: string | null;
-  description: string | null;
-  address: string | null;
-  phone: string | null;
-  whatsapp: string | null;
-  email: string | null;
-  categoryId: string | null;
-  coverFile: File;
-}
-
 /**
- * הוספת עסק ישירות מהניהול — הזרימה שבה מנהל מדבר עם לקוח (טלפון
- * שהגיע מפנייה) ובונה לו את הפרופיל בעצמו. נוצר כבר "פורסם", בלי
- * owner_id — כשבעל העסק ירצה חשבון, מקשרים אותו ידנית מ-/admin/users.
- * תמונת שער היא שדה חובה, כמו בהרשמה העצמית.
+ * הוספת עסק ישירות מהניהול — הזרימה שבה מנהל מדבר עם לקוח בטלפון
+ * ובונה לו את הפרופיל בעצמו, בלי שהלקוח יעבור דרך הרשמה. נוצר כבר
+ * "פורסם" ובלי owner_id; כשבעל העסק יפתח חשבון, מקשרים אותו ידנית.
  */
-export async function createBusinessAdmin(input: NewBusinessInput) {
+export async function createBusinessAdmin(formData: FormData) {
   await requireStaff();
   const supabase = createSupabaseAdminClient();
+  if (!supabase) return { ok: false, error: "אין חיבור למסד הנתונים." };
 
-  const slug = `${input.name.replace(/\s+/g, "-").toLowerCase()}-${Math.random().toString(36).slice(2, 7)}`;
+  const name = String(formData.get("name") ?? "").trim();
+  if (!name) return { ok: false, error: "שם העסק הוא שדה חובה." };
 
-  const ext = input.coverFile.name.split(".").pop() || "jpg";
-  const path = `admin/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const { error: uploadError } = await supabase!.storage
-    .from("business-images")
-    .upload(path, input.coverFile, { contentType: input.coverFile.type });
+  const cover = await uploadPublicImage(formData.get("cover"), "admin");
+  if (!cover.ok) return { ok: false, error: cover.error };
 
-  if (uploadError) return { ok: false, error: "העלאת התמונה נכשלה." };
+  const slug = `${slugify(name) || "business"}-${Math.random().toString(36).slice(2, 7)}`;
 
-  const { data: { publicUrl } } = supabase!.storage.from("business-images").getPublicUrl(path);
-
-  const { data: business, error } = await supabase!
+  const { data: business, error } = await supabase
     .from("businesses")
     .insert({
       slug,
-      name: input.name,
-      tagline: input.tagline,
-      description: input.description,
-      address: input.address,
-      phone: input.phone,
-      whatsapp: input.whatsapp,
-      email: input.email,
+      name,
+      tagline: String(formData.get("tagline") ?? "").trim() || null,
+      description: String(formData.get("description") ?? "").trim() || null,
+      address: String(formData.get("address") ?? "").trim() || null,
+      phone: String(formData.get("phone") ?? "").trim() || null,
+      whatsapp: String(formData.get("whatsapp") ?? "").trim() || null,
+      email: String(formData.get("email") ?? "").trim() || null,
+      city_id: String(formData.get("cityId") ?? "") || null,
       status: "published",
       is_verified: true,
-      cover_url: publicUrl,
+      cover_url: cover.url,
     })
     .select("id, slug")
     .single();
 
   if (error || !business) return { ok: false, error: error?.message ?? "השמירה נכשלה." };
 
-  if (input.categoryId) {
-    await supabase!.from("business_categories").insert({
-      business_id: business.id, category_id: input.categoryId, is_primary: true,
+  const categoryId = String(formData.get("categoryId") ?? "");
+  if (categoryId) {
+    await supabase.from("business_categories").insert({
+      business_id: business.id, category_id: categoryId, is_primary: true,
     });
   }
 
-  revalidatePath("/admin/businesses");
-  revalidatePath("/");
+  refreshBusiness(business.slug as string);
   return { ok: true, businessId: business.id as string };
 }

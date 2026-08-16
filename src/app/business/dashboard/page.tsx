@@ -1,55 +1,86 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { Briefcase } from "lucide-react";
 import { ButtonLink } from "@/components/ui/Button";
 import { OwnerBusinessCard, type OwnerBusiness } from "@/components/business/OwnerBusinessCard";
+import { NotificationsPanel, type OwnerNotification } from "@/components/business/NotificationsPanel";
 import { getCurrentUser } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "אזור בעלי עסקים", robots: { index: false, follow: false } };
 
 /**
- * דשבורד בעל עסק v1: עריכת פרטים + צפייה בפניות. proxy.ts כבר חוסם
- * גישה למי שלא מחובר, אבל בודקים שוב כאן כי דפי שרת לא צריכים
- * לסמוך על הגנה חיצונית בלבד.
+ * דשבורד בעל עסק. proxy.ts כבר חוסם גישה למי שלא מחובר, אבל בודקים
+ * שוב כאן — דף שרת לא צריך לסמוך על הגנה חיצונית בלבד.
+ *
+ * הפניות נשלפות בשאילתה אחת לכל העסקים ולא בלולאה של שאילתה לעסק.
+ * הגרסה הקודמת עשתה N+1: בעל עסק עם חמישה עסקים ייצר שש נסיעות
+ * למסד בכל טעינת עמוד.
  */
 export default async function BusinessDashboardPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/login?next=/business/dashboard");
 
   const supabase = await createSupabaseServerClient();
-  const { data: businesses } = await supabase!
-    .from("businesses")
-    .select("id, name, tagline, description, address, phone, whatsapp, email, website, status, rejection_reason")
-    .eq("owner_id", user.id)
-    .order("created_at", { ascending: false });
+  if (!supabase) return null;
 
-  const ownerBusinesses: OwnerBusiness[] = await Promise.all(
-    (businesses ?? []).map(async (b) => {
-      const { data: leads } = await supabase!
+  const [{ data: businesses }, { data: notifications }] = await Promise.all([
+    supabase
+      .from("businesses")
+      .select("id, slug, name, tagline, description, address, phone, whatsapp, email, website, status, rejection_reason")
+      .eq("owner_id", user.id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("notifications")
+      .select("id, type, title, body, link, read_at, created_at")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(20),
+  ]);
+
+  const ids = (businesses ?? []).map((b) => b.id);
+  const { data: allLeads } = ids.length
+    ? await supabase
         .from("leads")
-        .select("id, name, phone, message, created_at")
-        .eq("business_id", b.id)
+        .select("id, business_id, name, phone, message, created_at")
+        .in("business_id", ids)
         .order("created_at", { ascending: false })
-        .limit(20);
+        .limit(200)
+    : { data: [] };
 
-      return {
-        id: b.id,
-        name: b.name,
-        tagline: b.tagline,
-        description: b.description,
-        address: b.address,
-        phone: b.phone,
-        whatsapp: b.whatsapp,
-        email: b.email,
-        website: b.website,
-        status: b.status,
-        rejectionReason: b.rejection_reason,
-        leads: (leads ?? []).map((l) => ({
-          id: l.id, name: l.name, phone: l.phone, message: l.message, createdAt: l.created_at,
-        })),
-      };
-    }),
-  );
+  const leadsByBusiness = new Map<string, OwnerBusiness["leads"]>();
+  for (const l of allLeads ?? []) {
+    const list = leadsByBusiness.get(l.business_id) ?? [];
+    if (list.length < 20) {
+      list.push({ id: l.id, name: l.name, phone: l.phone, message: l.message, createdAt: l.created_at });
+    }
+    leadsByBusiness.set(l.business_id, list);
+  }
+
+  const ownerBusinesses: OwnerBusiness[] = (businesses ?? []).map((b) => ({
+    id: b.id,
+    name: b.name,
+    tagline: b.tagline,
+    description: b.description,
+    address: b.address,
+    phone: b.phone,
+    whatsapp: b.whatsapp,
+    email: b.email,
+    website: b.website,
+    status: b.status,
+    rejectionReason: b.rejection_reason,
+    leads: leadsByBusiness.get(b.id) ?? [],
+  }));
+
+  const notificationItems: OwnerNotification[] = (notifications ?? []).map((n) => ({
+    id: n.id,
+    type: n.type,
+    title: n.title,
+    body: n.body,
+    link: n.link,
+    readAt: n.read_at,
+    createdAt: n.created_at,
+  }));
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
@@ -60,13 +91,23 @@ export default async function BusinessDashboardPage() {
           </h1>
           <p className="text-ink-500">אזור בעלי העסקים שלכם</p>
         </div>
-        <ButtonLink href="/business/register" variant="accent" size="sm">רישום עסק נוסף</ButtonLink>
+        <ButtonLink href="/business/register" variant="secondary" size="sm">
+          הגשת בקשה לעסק נוסף
+        </ButtonLink>
       </div>
 
+      <NotificationsPanel notifications={notificationItems} />
+
       {ownerBusinesses.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-ink-200 bg-white p-10 text-center">
-          <p className="mb-4 text-ink-600">עדיין לא רשמתם עסק.</p>
-          <ButtonLink href="/business/register" variant="primary" size="md">רישום העסק הראשון</ButtonLink>
+        <div className="rounded-lg border border-dashed border-ink-300 bg-white px-6 py-14 text-center">
+          <Briefcase className="mx-auto mb-3 h-8 w-8 text-ink-300" aria-hidden="true" />
+          <p className="mb-1 font-display text-lg font-bold text-ink-800">עדיין לא הגשתם בקשה</p>
+          <p className="mb-5 text-sm text-ink-500">
+            מילוי הבקשה לוקח כמה דקות. הצוות בודק אותה ומאשר בדרך כלל תוך יום עסקים אחד.
+          </p>
+          <ButtonLink href="/business/register" variant="accent" size="md">
+            הגשת בקשה להוספת עסק
+          </ButtonLink>
         </div>
       ) : (
         <div className="space-y-5">

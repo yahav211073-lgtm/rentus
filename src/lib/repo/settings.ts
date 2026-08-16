@@ -23,9 +23,33 @@ export async function getContactDetails(): Promise<ContactDetails> {
   if (!data) return FALLBACK_CONTACT;
   const v = data.value as Partial<ContactDetails>;
   return {
-    phone: v.phone ?? "",
-    email: v.email ?? "",
-    address: v.address ?? "",
-    whatsapp: v.whatsapp || FALLBACK_CONTACT.whatsapp,
+    phone: v.phone?.trim() ?? "",
+    email: v.email?.trim() ?? "",
+    address: v.address?.trim() ?? "",
+    // רווח נגרר במספר וואטסאפ שובר את קישור wa.me בשקט
+    whatsapp: v.whatsapp?.trim() || FALLBACK_CONTACT.whatsapp,
   };
+}
+
+/**
+ * קישורי הרשתות החברתיות של האתר.
+ *
+ * הפוטר מציג רק את מה שחוזר מכאן ובאמת מלא — קודם היו שם שלושה
+ * קישורים קבועים עם href="#" שנראו פעילים ולא הובילו לשום מקום.
+ */
+export async function getSocialLinks(): Promise<Record<string, string>> {
+  if (!isSupabaseConfigured) return {};
+
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return {};
+
+  const { data } = await supabase
+    .from("settings").select("value").eq("key", "social.links").maybeSingle();
+
+  const value = (data?.value ?? {}) as Record<string, string>;
+  return Object.fromEntries(
+    Object.entries(value)
+      .map(([k, v]) => [k, String(v ?? "").trim()])
+      .filter(([, v]) => v.length > 0),
+  );
 }

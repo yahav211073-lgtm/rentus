@@ -20,6 +20,27 @@ export function formatNumber(n: number): string {
   return new Intl.NumberFormat("he-IL").format(n);
 }
 
+/**
+ * ספירה בעברית תקינה.
+ *
+ * "1 עסקים" הוא שגיאת דקדוק שקופצת לעין בכל כרטיס קטגוריה, ו-"0
+ * עסקים" נכון אבל צורם. הפונקציה מטפלת בשלושת המקרים: אין, אחד,
+ * ורבים.
+ */
+export function countLabel(
+  n: number,
+  forms: { none: string; one: string; many: string },
+): string {
+  if (n === 0) return forms.none;
+  if (n === 1) return forms.one;
+  return `${formatNumber(n)} ${forms.many}`;
+}
+
+/** "3 עסקים" / "עסק אחד" / "אין עדיין עסקים" */
+export function businessCountLabel(n: number): string {
+  return countLabel(n, { none: "אין עדיין עסקים", one: "עסק אחד", many: "עסקים" });
+}
+
 export function formatPrice(cents: number, currency = "ILS"): string {
   return new Intl.NumberFormat("he-IL", {
     style: "currency",
@@ -52,6 +73,26 @@ export function formatRelative(date: string | Date): string {
   return rtf.format(diffSec, "second");
 }
 
+/**
+ * פענוח פרמטר נתיב דינמי.
+ *
+ * בגרסת Next שבשימוש כאן, `params.slug` מגיע **מקודד** — עמוד עם
+ * slug עברי מקבל "%D7%98%D7%9C..." ולא "טליסול". השוואה מול העמודה
+ * במסד נכשלת בשקט, והעמוד מחזיר 404 למרות שהרשומה קיימת. זה השפיע
+ * על כל עסק ששמו בעברית, כלומר כמעט על כולם.
+ *
+ * decodeURIComponent זורק על קלט פגום (למשל "%" בודד), ולכן במקרה
+ * כזה מוחזרת המחרוזת המקורית — שתיכשל בחיפוש ותחזיר 404 אמיתי,
+ * במקום להפיל את הבקשה ב-500.
+ */
+export function decodeParam(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
 /** slug בטוח ל-URL ששומר על אותיות עבריות. תואם ל-slugify שב-DB. */
 export function slugify(input: string): string {
   return input
@@ -62,12 +103,26 @@ export function slugify(input: string): string {
     .replace(/^-|-$/g, "");
 }
 
-/** מספר טלפון ישראלי → פורמט E.164 עבור קישורי wa.me */
+/**
+ * מספר טלפון ישראלי → פורמט E.164 עבור קישורי wa.me.
+ *
+ * הגרסה הקודמת החזירה כל מספר שמתחיל ב-972 כמו שהוא, ולכן מספר
+ * שהוזן כ-"972054-9570-585" (קידומת בינלאומית **וגם** האפס המקומי)
+ * יצר קישור לוואטסאפ שלא קיים. זה נראה תקין ברשימה ונשבר רק בלחיצה,
+ * ולכן אף אחד לא שם לב.
+ *
+ * הסדר כאן חשוב: מקלפים קידומת יציאה, ואז 972, ואז את האפס המקומי —
+ * ורק בסוף מרכיבים מחדש.
+ */
 export function toWhatsAppNumber(phone: string): string {
-  const digits = phone.replace(/\D/g, "");
-  if (digits.startsWith("972")) return digits;
-  if (digits.startsWith("0")) return `972${digits.slice(1)}`;
-  return digits;
+  let digits = phone.replace(/\D/g, "");
+  if (!digits) return "";
+
+  if (digits.startsWith("00")) digits = digits.slice(2);   // קידומת יציאה
+  if (digits.startsWith("972")) digits = digits.slice(3);  // קידומת ישראל
+  if (digits.startsWith("0")) digits = digits.slice(1);    // אפס מקומי
+
+  return `972${digits}`;
 }
 
 /** דילוג על עבודה מיותרת בקלט חיפוש חי. */

@@ -2,104 +2,91 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { CheckCircle2, ImagePlus, Save } from "lucide-react";
+import { Save } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
 import { createBusinessAdmin } from "@/app/admin/businesses/actions";
-import type { FlatCategory } from "@/lib/repo/taxonomy";
+import type { FlatCategory, SimpleCity } from "@/lib/repo/taxonomy";
 
-export function NewBusinessForm({ categories }: { categories: FlatCategory[] }) {
+/**
+ * הוספת עסק ידנית מהניהול.
+ *
+ * הטופס נשלח כ-FormData ישירות ל-Server Action, והוולידציה של
+ * התמונה (סוג, גודל) קורית בשרת. גרסה קודמת בנתה אובייקט ידנית
+ * והעלתה את הקובץ בלי בדיקה — כלומר כל קובץ שהמשתמש בחר, בכל גודל,
+ * נכנס לאחסון.
+ */
+export function NewBusinessForm({
+  categories, cities,
+}: { categories: FlatCategory[]; cities: SimpleCity[] }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState("");
-  const [coverPreview, setCoverPreview] = useState<string | null>(null);
-
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const fd = new FormData(e.currentTarget);
-    const val = (k: string) => (fd.get(k) ? String(fd.get(k)) : null);
-    const coverFile = fd.get("cover") as File | null;
-
-    if (!coverFile || coverFile.size === 0) {
-      setError("תמונת שער היא שדה חובה.");
-      return;
-    }
-
-    startTransition(async () => {
-      setError("");
-      const result = await createBusinessAdmin({
-        name: String(fd.get("name")),
-        tagline: val("tagline"),
-        description: val("description"),
-        address: val("address"),
-        phone: val("phone"),
-        whatsapp: val("whatsapp"),
-        email: val("email"),
-        categoryId: val("category"),
-        coverFile,
-      });
-      if (result.ok) {
-        router.push(`/admin/businesses/${result.businessId}`);
-      } else {
-        setError(result.error ?? "השמירה נכשלה.");
-      }
-    });
-  }
 
   return (
-    <form onSubmit={onSubmit} className="max-w-2xl space-y-4 border border-ink-200/70 bg-white p-6">
-      <p className="mb-2 text-sm text-ink-500">
-        הטופס הזה יוצר עסק שמפורסם באתר מיד. שימוש טיפוסי: התקשרתם עם לקוח שפנה, ואתם בונים לו את הפרופיל.
+    <form
+      action={(fd) =>
+        startTransition(async () => {
+          setError("");
+          const result = await createBusinessAdmin(fd);
+          if (result.ok && result.businessId) router.push(`/admin/businesses/${result.businessId}`);
+          else setError(result.error ?? "השמירה נכשלה.");
+        })
+      }
+      className="max-w-2xl space-y-4 rounded-lg border border-ink-200/70 bg-white p-6"
+    >
+      <p className="text-sm text-ink-500">
+        הטופס יוצר עסק שמפורסם באתר מיד. שימוש טיפוסי: דיברתם בטלפון עם לקוח שפנה, ואתם בונים
+        לו את הפרופיל בעצמכם.
       </p>
 
-      <div>
-        <label htmlFor="new-cover" className="mb-1.5 block text-xs font-bold text-ink-600">
-          תמונת שער <span className="text-danger-500">*</span>
-        </label>
-        <label
-          htmlFor="new-cover"
-          className="flex h-36 cursor-pointer flex-col items-center justify-center gap-2 border-2 border-dashed border-ink-200 bg-ink-50 text-ink-400 transition-colors hover:border-brand-300 hover:bg-brand-50"
-          style={coverPreview ? { backgroundImage: `url(${coverPreview})`, backgroundSize: "cover", backgroundPosition: "center" } : undefined}
-        >
-          {!coverPreview && (
-            <>
-              <ImagePlus className="h-6 w-6" />
-              <span className="text-sm font-semibold">העלאת תמונת שער</span>
-            </>
-          )}
-        </label>
-        <input
-          id="new-cover" name="cover" type="file" accept="image/*" required
-          className="sr-only"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            setCoverPreview(file ? URL.createObjectURL(file) : null);
-          }}
-        />
-      </div>
+      <ImageUploadField
+        name="cover"
+        label="תמונת שער"
+        required
+        hint="התמונה הראשית שתופיע בכרטיס העסק ובראש עמוד העסק"
+      />
 
       <div className="grid gap-4 sm:grid-cols-2">
         <Field name="name" label="שם העסק" required />
         <Field name="tagline" label="שורת תיאור קצרה" />
       </div>
+
       <div>
-        <label className="mb-1.5 block text-xs font-bold text-ink-600">תיאור</label>
-        <textarea name="description" rows={3} className="w-full border border-ink-200 px-3.5 py-2.5 text-base text-ink-900 outline-none focus:border-brand-400" />
+        <label htmlFor="new-description" className="mb-1.5 block text-xs font-bold text-ink-600">תיאור</label>
+        <textarea
+          id="new-description" name="description" rows={3}
+          className="w-full rounded-xs border border-ink-200 px-3.5 py-2.5 text-base outline-none focus:border-brand-400"
+        />
       </div>
+
       <div className="grid gap-4 sm:grid-cols-2">
         <Field name="address" label="כתובת" />
         <div>
-          <label htmlFor="new-business-category" className="mb-1.5 block text-xs font-bold text-ink-600">קטגוריה</label>
+          <label htmlFor="new-city" className="mb-1.5 block text-xs font-bold text-ink-600">עיר</label>
           <select
-            id="new-business-category" name="category"
-            className="h-11 w-full border border-ink-200 bg-white px-3.5 text-base text-ink-900 outline-none focus:border-brand-400"
+            id="new-city" name="cityId"
+            className="h-11 w-full rounded-xs border border-ink-200 bg-white px-3.5 text-base outline-none focus:border-brand-400"
           >
-            <option value="">בחרו קטגוריה</option>
-            {categories.map((c) => (
-              <option key={c.id} value={c.id}>{c.parentId ? `— ${c.name}` : c.name}</option>
-            ))}
+            <option value="">ללא</option>
+            {cities.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
           </select>
         </div>
       </div>
+
+      <div>
+        <label htmlFor="new-category" className="mb-1.5 block text-xs font-bold text-ink-600">קטגוריה</label>
+        <select
+          id="new-category" name="categoryId"
+          className="h-11 w-full rounded-xs border border-ink-200 bg-white px-3.5 text-base outline-none focus:border-brand-400"
+        >
+          <option value="">בחרו קטגוריה</option>
+          {categories.map((c) => (
+            <option key={c.id} value={c.id}>{c.parentId ? `— ${c.name}` : c.name}</option>
+          ))}
+        </select>
+      </div>
+
       <div className="grid gap-4 sm:grid-cols-3">
         <Field name="phone" label="טלפון" type="tel" />
         <Field name="whatsapp" label="וואטסאפ" type="tel" />
@@ -109,12 +96,7 @@ export function NewBusinessForm({ categories }: { categories: FlatCategory[] }) 
       <Button type="submit" variant="primary" size="lg" loading={pending} icon={<Save className="h-4.5 w-4.5" />}>
         יצירת העסק
       </Button>
-      {error && <p role="alert" className="text-sm text-danger-500">{error}</p>}
-      {pending && (
-        <p className="flex items-center gap-1.5 text-sm text-ink-400">
-          <CheckCircle2 className="h-4 w-4" /> שומר...
-        </p>
-      )}
+      {error && <p role="alert" className="text-sm font-semibold text-danger-500">{error}</p>}
     </form>
   );
 }
@@ -124,10 +106,13 @@ function Field({
 }: { name: string; label: string; type?: string; required?: boolean }) {
   return (
     <div>
-      <label htmlFor={`new-${name}`} className="mb-1.5 block text-xs font-bold text-ink-600">{label}</label>
+      <label htmlFor={`new-${name}`} className="mb-1.5 block text-xs font-bold text-ink-600">
+        {label}
+        {required && <span className="text-danger-500"> *</span>}
+      </label>
       <input
         id={`new-${name}`} name={name} type={type} required={required}
-        className="h-11 w-full border border-ink-200 px-3.5 text-base text-ink-900 outline-none focus:border-brand-400"
+        className="h-11 w-full rounded-xs border border-ink-200 px-3.5 text-base outline-none focus:border-brand-400"
       />
     </div>
   );

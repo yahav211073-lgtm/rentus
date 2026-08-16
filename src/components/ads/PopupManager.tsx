@@ -6,7 +6,6 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { X } from "lucide-react";
 import type { PopupBanner, PopupLayout } from "@/types/domain";
 import { Button, ButtonLink } from "@/components/ui/Button";
-import { CoverArt } from "@/components/ui/CoverArt";
 import { detectDevice, isWithinSchedule, matchesTargeting } from "@/lib/ads/targeting";
 import { cn } from "@/lib/utils";
 
@@ -308,15 +307,13 @@ function PopupView({
           </button>
 
           <div className={cn(isBar && "mx-auto flex max-w-[1480px] items-center gap-5 p-4")}>
-            {/* תמונה — לא בפס תחתון, שם אין לה מקום */}
-            {!isBar && (
+            {/* תמונה — לא בפס תחתון (אין שם מקום), ולא כשאין תמונה.
+                מסגרת ריקה במקום קריאייטיב היא בדיוק מה שגורם לפופאפ
+                להיראות שבור; פופאפ טקסטואלי נקי עדיף על מלבן ריק. */}
+            {!isBar && p.assetUrl && (
               <div className="relative aspect-[2/1] w-full overflow-hidden">
-                {p.assetUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={p.assetUrl} alt={p.alt ?? ""} className="h-full w-full object-cover" />
-                ) : (
-                  <CoverArt seed={p.id} className="h-full w-full" />
-                )}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={p.assetUrl} alt={p.alt ?? ""} className="h-full w-full object-cover" />
               </div>
             )}
 

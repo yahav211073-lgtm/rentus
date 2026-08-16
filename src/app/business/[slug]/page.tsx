@@ -15,9 +15,11 @@ import { ReviewList } from "@/components/business/ReviewList";
 import { WriteReviewForm } from "@/components/business/WriteReviewForm";
 import { OpeningHours } from "@/components/business/OpeningHours";
 import { BusinessCard } from "@/components/business/BusinessCard";
+import { SocialLinks } from "@/components/business/SocialLinks";
 import { Reveal } from "@/components/motion/Reveal";
+import { getCurrentUser } from "@/lib/auth";
 import { env } from "@/lib/env";
-import { formatNumber, toWhatsAppNumber } from "@/lib/utils";
+import { decodeParam, formatNumber, toWhatsAppNumber } from "@/lib/utils";
 import { BusinessMap } from "@/components/business/BusinessMapLazy";
 
 /**
@@ -35,7 +37,8 @@ import { BusinessMap } from "@/components/business/BusinessMapLazy";
 type Params = Promise<{ slug: string }>;
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeParam(rawSlug);
   const b = await getBusinessBySlug(slug);
   if (!b) return { title: "העסק לא נמצא" };
 
@@ -60,13 +63,15 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 export default async function BusinessPage({ params }: { params: Params }) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeParam(rawSlug);
   const b = await getBusinessBySlug(slug);
   if (!b) notFound();
 
-  const [reviews, related] = await Promise.all([
+  const [reviews, related, user] = await Promise.all([
     getApprovedReviews(b.id),
     getRelatedBusinesses(b, 4),
+    getCurrentUser(),
   ]);
 
   return (
@@ -214,7 +219,12 @@ export default async function BusinessPage({ params }: { params: Params }) {
             )}
 
             <ReviewList reviews={reviews} businessName={b.name} ratingAvg={b.ratingAvg} reviewCount={b.reviewCount} />
-            <WriteReviewForm businessId={b.id} businessName={b.name} />
+            <WriteReviewForm
+              businessId={b.id}
+              businessName={b.name}
+              currentUserName={user?.fullName ?? user?.email ?? null}
+              returnTo={`/business/${b.slug}#write-review`}
+            />
           </div>
 
           {/* עמודה דביקה */}
@@ -234,12 +244,12 @@ export default async function BusinessPage({ params }: { params: Params }) {
                 )}
                 {b.phone && (
                   <ContactRow icon={<Phone className="h-4 w-4" />}>
-                    <a href={`tel:${b.phone}`} className="hover:text-brand-600">{b.phone}</a>
+                    <a href={`tel:${b.phone}`} className="hover:text-brand-600" dir="ltr">{b.phone}</a>
                   </ContactRow>
                 )}
                 {b.email && (
                   <ContactRow icon={<Mail className="h-4 w-4" />}>
-                    <a href={`mailto:${b.email}`} className="hover:text-brand-600">{b.email}</a>
+                    <a href={`mailto:${b.email}`} className="hover:text-brand-600" dir="ltr">{b.email}</a>
                   </ContactRow>
                 )}
                 {b.website && (
@@ -253,6 +263,9 @@ export default async function BusinessPage({ params }: { params: Params }) {
                   </ContactRow>
                 )}
               </ul>
+
+              {/* רק רשתות שהוגדרו בפועל. הרכיב מחזיר null כשאין אף אחת. */}
+              <SocialLinks business={b} className="mt-4" />
 
               {b.latitude != null && b.longitude != null && (
                 <div className="mt-4">

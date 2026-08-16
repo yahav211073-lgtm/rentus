@@ -4,16 +4,22 @@ import { Section, SectionHeading } from "@/components/home/Section";
 import { RevealItem, RevealStagger } from "@/components/motion/Reveal";
 import { CoverArt } from "@/components/ui/CoverArt";
 import { Badge } from "@/components/ui/Badge";
-import { seedArticles } from "@/data/seed";
+import { getArticles } from "@/lib/repo/articles";
+import type { Article } from "@/types/domain";
 
 /**
  * מדריכים.
  *
  * הכתבה הראשונה מקבלת כרטיס גדול והשאר קטנים. רשת של שלושה
  * כרטיסים זהים לא אומרת למשתמש במה להתחיל; היררכיה כן.
+ *
+ * התוכן מגיע מטבלת articles ונערך ב-/admin/articles. כשאין מאמרים
+ * מפורסמים הסקציה לא מרונדרת בכלל — סקציה עם כותרת ובלי תוכן
+ * גרועה יותר מסקציה שלא קיימת.
  */
-export function BlogSection() {
-  const [lead, ...rest] = seedArticles;
+export async function BlogSection() {
+  const articles = await getArticles(4);
+  const [lead, ...rest] = articles;
   if (!lead) return null;
 
   return (
@@ -21,7 +27,7 @@ export function BlogSection() {
       <SectionHeading
         eyebrow="מדריכים"
         title="לפני שבוחרים — כדאי לקרוא"
-        subtitle="מדריכים מעשיים שנכתבו עם בעלי מקצוע, בלי תוכן שיווקי."
+        subtitle="מדריכים מעשיים שנכתבו כדי לחסוך טעויות יקרות, בלי תוכן שיווקי."
         action={{ label: "לכל המדריכים", href: "/blog" }}
       />
 
@@ -34,7 +40,7 @@ export function BlogSection() {
           >
             <div className="relative aspect-[16/9] overflow-hidden">
               <div className="absolute inset-0 transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]">
-                <CoverArt seed={lead.slug} className="h-full w-full" />
+                <ArticleCover article={lead} />
               </div>
               {lead.categoryName && (
                 <span className="absolute top-4" style={{ insetInlineStart: "1rem" }}>
@@ -64,52 +70,73 @@ export function BlogSection() {
                 className="group flex h-full gap-4 overflow-hidden rounded-lg border border-ink-200/70 bg-white p-3 transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-[0_18px_40px_-16px_rgba(11,59,117,0.2)]"
               >
                 <div className="relative w-28 shrink-0 overflow-hidden rounded-sm sm:w-32">
-                  <CoverArt seed={a.slug} className="h-full w-full" compact />
+                  <ArticleCover article={a} compact />
                 </div>
                 <div className="flex min-w-0 flex-1 flex-col gap-2 py-1">
                   {a.categoryName && (
-                    <span className="text-2xs font-bold uppercase tracking-wide text-brand-600">
+                    <span className="text-2xs font-bold tracking-wide text-brand-600">
                       {a.categoryName}
                     </span>
                   )}
                   <h3 className="line-clamp-2 text-base font-bold leading-snug text-ink-900 transition-colors group-hover:text-brand-700">
                     {a.title}
                   </h3>
-                  <span className="mt-auto inline-flex items-center gap-1.5 text-xs text-ink-400">
-                    <Clock className="h-3.5 w-3.5" />
-                    {a.readingMin} דקות קריאה
-                  </span>
+                  {a.readingMin && (
+                    <span className="mt-auto inline-flex items-center gap-1.5 text-xs text-ink-400">
+                      <Clock className="h-3.5 w-3.5" aria-hidden="true" />
+                      {a.readingMin} דקות קריאה
+                    </span>
+                  )}
                 </div>
               </Link>
             </RevealItem>
           ))}
 
-          <RevealItem>
-            <Link
-              href="/blog"
-              className="group flex items-center justify-between gap-3 rounded-lg border border-dashed border-ink-300 p-5 transition-all duration-300 hover:border-brand-400 hover:bg-brand-50"
-            >
-              <span className="text-sm font-bold text-ink-600 group-hover:text-brand-700">
-                עוד 48 מדריכים בארכיון
-              </span>
-              <ArrowLeft className="h-4 w-4 text-ink-400 transition-transform duration-200 group-hover:-translate-x-1 group-hover:text-brand-600" />
-            </Link>
-          </RevealItem>
+          {rest.length > 0 && (
+            <RevealItem>
+              <Link
+                href="/blog"
+                className="group flex items-center justify-between gap-3 rounded-lg border border-dashed border-ink-300 p-5 transition-all duration-300 hover:border-brand-400 hover:bg-brand-50"
+              >
+                <span className="text-sm font-bold text-ink-600 group-hover:text-brand-700">
+                  לכל המדריכים בארכיון
+                </span>
+                <ArrowLeft className="h-4 w-4 text-ink-400 transition-transform duration-200 group-hover:-translate-x-1 group-hover:text-brand-600" aria-hidden="true" />
+              </Link>
+            </RevealItem>
+          )}
         </div>
       </RevealStagger>
     </Section>
   );
 }
 
+/** תמונת שער אמיתית כשיש; אחרת גרפיקה יציבה שנגזרת מה-slug. */
+export function ArticleCover({ article, compact }: { article: Article; compact?: boolean }) {
+  if (article.coverUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={article.coverUrl}
+        alt={article.coverAlt ?? ""}
+        loading="lazy"
+        className="h-full w-full object-cover"
+      />
+    );
+  }
+  return <CoverArt seed={article.slug} className="h-full w-full" compact={compact} />;
+}
+
 function ArticleMeta({ readingMin, author }: { readingMin?: number | null; author?: string | null }) {
+  if (!readingMin && !author) return null;
   return (
     <div className="mt-auto flex items-center gap-3 border-t border-ink-100 pt-4 text-xs text-ink-400">
       {author && <span>{author}</span>}
       {readingMin && (
         <>
-          <span aria-hidden="true">·</span>
+          {author && <span aria-hidden="true">·</span>}
           <span className="inline-flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5" />
+            <Clock className="h-3.5 w-3.5" aria-hidden="true" />
             {readingMin} דקות קריאה
           </span>
         </>

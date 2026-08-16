@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { CoverArt } from "@/components/ui/CoverArt";
 import type { Banner } from "@/types/domain";
 
 /**
@@ -47,17 +46,14 @@ export function BannerCard({ banner, className }: { banner: Banner; className?: 
   }
 
   const content = (
-    <div ref={ref} className="group relative h-full min-h-[280px] overflow-hidden">
-      {banner.assetUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={banner.assetUrl}
-          alt={banner.alt}
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-      ) : (
-        <CoverArt seed={banner.id} label={banner.title.charAt(0)} className="absolute inset-0 h-full w-full" />
-      )}
+    <div ref={ref} className="group relative h-full min-h-[280px] overflow-hidden rounded-lg">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={banner.assetUrl ?? ""}
+        alt={banner.alt}
+        loading="lazy"
+        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+      />
       <div className="absolute inset-0 bg-gradient-to-t from-brand-950/85 via-brand-950/25 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 p-5">
         <span className="mb-2 inline-block bg-accent-400 px-2 py-0.5 text-2xs font-bold text-brand-950">פרסומת</span>

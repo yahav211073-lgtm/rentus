@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getCategoriesWithCounts } from "@/lib/repo/categories";
 import { CoverArt } from "@/components/ui/CoverArt";
-import { formatNumber } from "@/lib/utils";
+import { businessCountLabel, formatNumber } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "כל הקטגוריות",
@@ -35,7 +35,7 @@ export default async function CategoriesPage() {
                 <h2 className="font-display text-xl font-bold text-ink-900 transition-colors group-hover:text-brand-700">
                   {cat.name}
                 </h2>
-                <p className="text-sm text-ink-500">{formatNumber(cat.businessCount ?? 0)} עסקים</p>
+                <p className="text-sm text-ink-500">{businessCountLabel(cat.businessCount ?? 0)}</p>
               </div>
               <ArrowLeft className="me-auto h-5 w-5 text-ink-300 transition-transform group-hover:-translate-x-1 group-hover:text-brand-700" />
             </Link>

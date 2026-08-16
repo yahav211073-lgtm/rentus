@@ -1,192 +1,264 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { ImageIcon, Plus, Trash2, Upload } from "lucide-react";
+import { ImageOff, Pencil, Plus, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
 import {
-  createCategory, createCity, deleteCategory, deleteCity, toggleCategoryActive, updateCategoryImage,
+  createCategory, createCity, deleteCategory, deleteCity, toggleCategoryActive, updateCategory,
 } from "@/app/admin/categories/actions";
 
-interface CategoryRow { id: string; name: string; parentId: string | null; isActive: boolean; imageUrl: string | null }
+interface CategoryRow {
+  id: string;
+  name: string;
+  parentId: string | null;
+  isActive: boolean;
+  imageUrl: string | null;
+  businessCount: number;
+}
 interface CityRow { id: string; name: string }
 
-export function CategoryManager({ categories, cities }: { categories: CategoryRow[]; cities: CityRow[] }) {
+/**
+ * ניהול קטגוריות וערים.
+ *
+ * התמונה היא אזרח מדרגה ראשונה כאן ולא הגדרה נסתרת מאחורי אייקון:
+ * מאז שהקטגוריות באתר מוצגות כתמונות, קטגוריה בלי תמונה היא פער
+ * שצריך לראות ברשימה עצמה, לא לגלות בעמוד הבית.
+ */
+export function CategoryManager({
+  categories, cities,
+}: { categories: CategoryRow[]; cities: CityRow[] }) {
   const [pending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
+  const [addingCategory, setAddingCategory] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
   const parents = categories.filter((c) => !c.parentId);
+  const missingImages = categories.filter((c) => !c.imageUrl).length;
 
-  function submitCategory(formData: FormData) {
-    startTransition(async () => { await createCategory(formData); });
+  function run(fn: () => Promise<{ ok: boolean; error?: string }>, onDone?: () => void) {
+    startTransition(async () => {
+      setError(null);
+      const res = await fn();
+      if (res.ok) onDone?.();
+      else setError(res.error ?? "הפעולה נכשלה.");
+    });
   }
 
-  function submitCity(formData: FormData) {
-    startTransition(async () => { await createCity(formData); });
-  }
+  function renderCategory(row: CategoryRow, nested = false) {
+    const editing = editingId === row.id;
 
-  return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <section className="rounded-lg border border-ink-200/70 bg-white p-6">
-        <h2 className="mb-4 font-display text-base font-bold text-ink-900">קטגוריות</h2>
-
-        <form action={submitCategory} className="mb-5 grid gap-2" encType="multipart/form-data">
-          <div className="flex flex-wrap gap-2">
-            <input
-              name="name" placeholder="שם קטגוריה חדשה" required
-              className="h-10 min-w-0 flex-1 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400"
-            />
-            <select
-              name="parentId"
-              className="h-10 rounded-sm border border-ink-200 bg-white px-2 text-sm outline-none focus:border-brand-400"
-            >
-              <option value="">קטגוריית-על</option>
-              {parents.map((p) => <option key={p.id} value={p.id}>תת של {p.name}</option>)}
-            </select>
+    return (
+      <li key={row.id} className={nested ? "" : "border-t border-ink-100 first:border-t-0"}>
+        <div className={`flex flex-wrap items-center gap-3 py-2.5 ${nested ? "ps-4" : ""}`}>
+          <div className="h-10 w-14 shrink-0 overflow-hidden rounded-sm border border-ink-200 bg-ink-50">
+            {row.imageUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={row.imageUrl} alt="" className="h-full w-full object-cover" />
+            ) : (
+              <span className="grid h-full w-full place-items-center text-ink-300">
+                <ImageOff className="h-3.5 w-3.5" aria-hidden="true" />
+              </span>
+            )}
           </div>
-          <div className="flex flex-wrap gap-2">
-            <label className="flex h-10 min-w-0 flex-1 cursor-pointer items-center gap-2 rounded-sm border border-dashed border-ink-300 bg-white px-3 text-sm text-ink-600 transition-colors hover:border-brand-400 hover:bg-brand-50">
-              <Upload className="h-4 w-4 text-brand-700" />
-              <span>העלאת תמונה מהמכשיר</span>
-              <input name="image" type="file" accept="image/jpeg,image/png,image/webp,image/avif" className="sr-only" />
-            </label>
-            <input
-              name="imageUrl" placeholder="או כתובת תמונה קיימת (לא חובה)"
-              className="h-10 min-w-0 flex-1 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400"
-            />
-            <Button type="submit" variant="primary" size="md" loading={pending} icon={<Plus className="h-4 w-4" />}>הוספה</Button>
+
+          <div className="min-w-0 flex-1">
+            <span className={`block truncate ${nested ? "text-sm text-ink-600" : "font-bold text-ink-800"}`}>
+              {row.name}
+            </span>
+            <span className="text-2xs text-ink-400">
+              {row.businessCount} עסקים
+              {!row.imageUrl && " · חסרה תמונה"}
+              {!row.isActive && " · מוסתרת מהאתר"}
+            </span>
           </div>
-        </form>
 
-        <ul className="space-y-1">
-          {parents.map((p) => (
-            <li key={p.id}>
-              <CategoryItem row={p} pending={pending} startTransition={startTransition} />
-              <ul className="mr-5 mt-1 space-y-1 border-e border-ink-100 pe-0">
-                {categories.filter((c) => c.parentId === p.id).map((c) => (
-                  <CategoryItem key={c.id} row={c} pending={pending} startTransition={startTransition} nested />
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section className="rounded-lg border border-ink-200/70 bg-white p-6">
-        <h2 className="mb-4 font-display text-base font-bold text-ink-900">ערים</h2>
-
-        <form action={submitCity} className="mb-5 flex flex-wrap gap-2">
-          <input
-            name="name" placeholder="שם עיר חדשה" required
-            className="h-10 min-w-0 flex-1 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400"
-          />
-          <Button type="submit" variant="primary" size="md" loading={pending} icon={<Plus className="h-4 w-4" />}>הוספה</Button>
-        </form>
-
-        <ul className="space-y-1">
-          {cities.map((c) => (
-            <li key={c.id} className="flex items-center justify-between rounded-xs px-2.5 py-2 text-sm hover:bg-ink-50">
-              <span className="font-semibold text-ink-700">{c.name}</span>
-              <button
-                type="button"
+          <div className="flex shrink-0 items-center gap-2">
+            <label className="flex items-center gap-1.5 text-2xs font-semibold text-ink-500">
+              <input
+                type="checkbox"
+                checked={row.isActive}
                 disabled={pending}
-                onClick={() => {
-                  if (confirm(`למחוק את ${c.name}? זה ישפיע על כל עסק שמשויך אליה.`)) {
-                    startTransition(async () => { await deleteCity(c.id); });
-                  }
-                }}
-                className="text-ink-300 transition-colors hover:text-danger-500"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
-    </div>
-  );
-}
+                onChange={(e) => run(() => toggleCategoryActive(row.id, e.target.checked))}
+                className="h-3.5 w-3.5 accent-brand-700"
+              />
+              מוצגת
+            </label>
+            <button
+              type="button"
+              onClick={() => setEditingId(editing ? null : row.id)}
+              aria-label={`עריכת ${row.name}`}
+              aria-expanded={editing}
+              className="grid h-8 w-8 place-items-center rounded-xs border border-ink-200 text-ink-500 transition-colors hover:border-brand-300 hover:text-brand-700"
+            >
+              <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              disabled={pending}
+              onClick={() => {
+                if (confirm(`למחוק את "${row.name}"?`)) run(() => deleteCategory(row.id));
+              }}
+              aria-label={`מחיקת ${row.name}`}
+              className="grid h-8 w-8 place-items-center rounded-xs text-ink-400 transition-colors hover:bg-danger-50 hover:text-danger-500"
+            >
+              <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+            </button>
+          </div>
+        </div>
 
-function CategoryItem({
-  row, pending, startTransition, nested,
-}: {
-  row: CategoryRow;
-  pending: boolean;
-  startTransition: (fn: () => Promise<void> | void) => void;
-  nested?: boolean;
-}) {
-  const [editingImage, setEditingImage] = useState(false);
-  const [imageUrl, setImageUrl] = useState(row.imageUrl ?? "");
-  const [imageFile, setImageFile] = useState<File | null>(null);
+        {editing && (
+          <form
+            action={(fd) => run(() => updateCategory(row.id, fd), () => setEditingId(null))}
+            className="mb-3 grid gap-3 rounded-md border border-brand-200 bg-brand-50/40 p-3"
+          >
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs font-bold text-ink-600">שם הקטגוריה</span>
+              <input
+                name="name"
+                defaultValue={row.name}
+                className="h-10 rounded-xs border border-ink-200 bg-white px-3 text-sm outline-none focus:border-brand-400"
+              />
+            </label>
+            <ImageUploadField
+              name="image"
+              label="תמונת הקטגוריה"
+              currentUrl={row.imageUrl}
+              hint="מוצגת ברצועת עמוד הבית, בתפריט ובעמוד הקטגוריות"
+              aspect="3/2"
+            />
+            <div className="flex gap-2">
+              <Button type="submit" variant="primary" size="sm" loading={pending}>שמירה</Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => setEditingId(null)}>ביטול</Button>
+            </div>
+          </form>
+        )}
+
+        {!nested && (
+          <ul>
+            {categories.filter((c) => c.parentId === row.id).map((c) => renderCategory(c, true))}
+          </ul>
+        )}
+      </li>
+    );
+  }
 
   return (
-    <div className="rounded-xs hover:bg-ink-50">
-      <div className={`flex items-center justify-between px-2.5 py-2 text-sm ${nested ? "text-ink-600" : "font-bold text-ink-800"}`}>
-        <label className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={row.isActive}
-            disabled={pending}
-            onChange={(e) => startTransition(async () => { await toggleCategoryActive(row.id, e.target.checked); })}
-            className="h-3.5 w-3.5 accent-brand-700"
-          />
-          {row.name}
-          {!row.isActive && <span className="text-2xs text-ink-400">(מוסתר)</span>}
-          {row.imageUrl && <span className="text-2xs text-success-500">(עם תמונה)</span>}
-        </label>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setEditingImage((v) => !v)}
-            className="text-ink-300 transition-colors hover:text-brand-700"
-            aria-label="עריכת תמונת קטגוריה"
-          >
-            <ImageIcon className="h-3.5 w-3.5" />
-          </button>
-          <button
-            type="button"
-            disabled={pending}
-            onClick={() => {
-              if (confirm(`למחוק את ${row.name}? זה ישפיע על כל עסק שמשויך אליה.`)) {
-                startTransition(async () => { await deleteCategory(row.id); });
-              }
-            }}
-            className="text-ink-300 transition-colors hover:text-danger-500"
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
-        </div>
-      </div>
-
-      {editingImage && (
-        <div className="grid gap-2 px-2.5 pb-2.5 sm:grid-cols-[auto_1fr_auto]">
-          <label className="flex h-8 cursor-pointer items-center gap-1.5 rounded-sm border border-dashed border-ink-300 px-2 text-xs font-semibold text-brand-700 hover:bg-brand-50">
-            <Upload className="h-3.5 w-3.5" />
-            {imageFile ? imageFile.name : "העלאת תמונה"}
-            <input
-              type="file" accept="image/jpeg,image/png,image/webp,image/avif" className="sr-only"
-              onChange={(e) => setImageFile(e.target.files?.[0] ?? null)}
-            />
-          </label>
-          <input
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            placeholder="או כתובת תמונה קיימת"
-            className="h-8 min-w-0 rounded-sm border border-ink-200 px-2 text-xs outline-none focus:border-brand-400"
-          />
-          <button
-            type="button"
-            disabled={pending}
-            onClick={() => startTransition(async () => {
-              const formData = new FormData();
-              formData.set("imageUrl", imageUrl);
-              if (imageFile) formData.set("image", imageFile);
-              await updateCategoryImage(row.id, formData);
-              setEditingImage(false);
-            })}
-            className="rounded-sm bg-brand-800 px-3 text-xs font-bold text-white hover:bg-brand-700"
-          >
-            שמירה
-          </button>
-        </div>
+    <div className="space-y-5">
+      {error && (
+        <p role="alert" className="rounded-sm border border-danger-500/30 bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700">
+          {error}
+        </p>
       )}
+
+      <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
+        <section className="rounded-lg border border-ink-200/70 bg-white p-5 sm:p-6">
+          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 className="font-display text-base font-bold text-ink-900">קטגוריות</h2>
+              <p className="mt-0.5 text-xs text-ink-400">
+                {missingImages > 0
+                  ? `${missingImages} קטגוריות עדיין בלי תמונה.`
+                  : "לכל הקטגוריות יש תמונה."}
+              </p>
+            </div>
+            {!addingCategory && (
+              <Button
+                type="button" variant="accent" size="sm"
+                icon={<Plus className="h-4 w-4" />}
+                onClick={() => setAddingCategory(true)}
+              >
+                קטגוריה חדשה
+              </Button>
+            )}
+          </div>
+
+          {addingCategory && (
+            <form
+              action={(fd) => run(() => createCategory(fd), () => setAddingCategory(false))}
+              className="mb-5 grid gap-3 rounded-md border border-brand-200 bg-brand-50/40 p-4"
+            >
+              <div className="flex items-center justify-between">
+                <h3 className="font-display text-sm font-bold text-ink-900">קטגוריה חדשה</h3>
+                <button
+                  type="button" onClick={() => setAddingCategory(false)} aria-label="סגירה"
+                  className="grid h-8 w-8 place-items-center rounded-xs text-ink-400 hover:bg-white"
+                >
+                  <X className="h-4 w-4" aria-hidden="true" />
+                </button>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-xs font-bold text-ink-600">שם <span className="text-danger-500">*</span></span>
+                  <input
+                    name="name" required placeholder="למשל: ציוד צילום"
+                    className="h-10 rounded-xs border border-ink-200 bg-white px-3 text-sm outline-none focus:border-brand-400"
+                  />
+                </label>
+                <label className="flex flex-col gap-1.5">
+                  <span className="text-xs font-bold text-ink-600">שיוך</span>
+                  <select
+                    name="parentId"
+                    className="h-10 rounded-xs border border-ink-200 bg-white px-2 text-sm outline-none focus:border-brand-400"
+                  >
+                    <option value="">קטגוריה ראשית</option>
+                    {parents.map((p) => <option key={p.id} value={p.id}>תת-קטגוריה של {p.name}</option>)}
+                  </select>
+                </label>
+              </div>
+
+              <ImageUploadField name="image" label="תמונת הקטגוריה" aspect="3/2" />
+
+              <div>
+                <Button type="submit" variant="primary" size="sm" loading={pending}>הוספה</Button>
+              </div>
+            </form>
+          )}
+
+          <ul>{parents.map((p) => renderCategory(p))}</ul>
+        </section>
+
+        <section className="rounded-lg border border-ink-200/70 bg-white p-5 sm:p-6">
+          <h2 className="mb-4 font-display text-base font-bold text-ink-900">ערים</h2>
+
+          <form
+            action={(fd) => run(() => createCity(fd))}
+            className="mb-5 flex flex-wrap gap-2"
+          >
+            <input
+              name="name" placeholder="שם עיר חדשה" required
+              aria-label="שם עיר חדשה"
+              className="h-10 min-w-0 flex-1 rounded-xs border border-ink-200 px-3 text-sm outline-none focus:border-brand-400"
+            />
+            <Button type="submit" variant="primary" size="sm" loading={pending} icon={<Plus className="h-4 w-4" />}>
+              הוספה
+            </Button>
+          </form>
+
+          <ul className="space-y-0.5">
+            {cities.map((c) => (
+              <li key={c.id} className="flex items-center justify-between rounded-xs px-2.5 py-2 text-sm hover:bg-ink-50">
+                <span className="font-semibold text-ink-700">{c.name}</span>
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => {
+                    if (confirm(`למחוק את ${c.name}?`)) run(() => deleteCity(c.id));
+                  }}
+                  aria-label={`מחיקת ${c.name}`}
+                  className="text-ink-300 transition-colors hover:text-danger-500"
+                >
+                  <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                </button>
+              </li>
+            ))}
+            {cities.length === 0 && (
+              <li className="py-6 text-center text-sm text-ink-400">אין עדיין ערים.</li>
+            )}
+          </ul>
+        </section>
+      </div>
     </div>
   );
 }

@@ -6,7 +6,7 @@ import { getCategoriesWithCounts } from "@/lib/repo/categories";
 import { BusinessCard } from "@/components/business/BusinessCard";
 import { RevealItem, RevealStagger } from "@/components/motion/Reveal";
 import { CoverArt } from "@/components/ui/CoverArt";
-import { formatNumber } from "@/lib/utils";
+import { decodeParam, formatNumber } from "@/lib/utils";
 
 type Params = Promise<{ slug: string }>;
 
@@ -17,7 +17,8 @@ async function findCategory(slug: string) {
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeParam(rawSlug);
   const category = await findCategory(slug);
   if (!category) return { title: "הקטגוריה לא נמצאה" };
 
@@ -30,7 +31,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 }
 
 export default async function CategoryPage({ params }: { params: Params }) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = decodeParam(rawSlug);
   const category = await findCategory(slug);
   if (!category) notFound();
 
