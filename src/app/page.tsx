@@ -9,6 +9,7 @@ import { BusinessRail } from "@/components/home/BusinessRail";
 import { CompanyListCard } from "@/components/business/CompanyListCard";
 import { StatsBand } from "@/components/home/StatsBand";
 import { Testimonials } from "@/components/home/Testimonials";
+import { BlogSection } from "@/components/home/BlogSection";
 import { ButtonLink } from "@/components/ui/Button";
 import { SlidersHorizontal } from "lucide-react";
 import { env } from "@/lib/env";
@@ -76,6 +77,7 @@ export default async function HomePage() {
       )}
 
       <CategoryShowcase categories={categories} />
+      <BlogSection />
 
       {/* פופולריים */}
       {popular.length > 0 && (

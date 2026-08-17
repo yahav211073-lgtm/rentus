@@ -20,6 +20,7 @@ export default async function CategoriesPage() {
     slug: c.slug,
     name: c.name,
     imageUrl: c.imageUrl,
+    icon: c.icon,
     businessCount: c.businessCount ?? 0,
   }));
 

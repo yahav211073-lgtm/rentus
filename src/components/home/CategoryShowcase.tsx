@@ -4,6 +4,7 @@ import { Section, SectionHeading } from "@/components/home/Section";
 import { RevealItem, RevealStagger } from "@/components/motion/Reveal";
 import { businessCountLabel } from "@/lib/utils";
 import type { Category } from "@/types/domain";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 
 /**
  * רשת הקטגוריות הראשית בעמוד הבית.
@@ -35,28 +36,15 @@ export function CategoryShowcase({ categories }: { categories: Category[] }) {
           <RevealItem key={cat.id}>
             <Link
               href={`/category/${cat.slug}`}
-              className="group relative flex aspect-[16/10] w-full overflow-hidden rounded-lg border border-ink-200/70 bg-ink-200"
+              className="group relative flex min-h-60 w-full overflow-hidden rounded-xl border border-brand-800/10 bg-brand-950 p-6 shadow-[0_20px_45px_-30px_rgba(5,12,28,.7)]"
             >
-              {cat.imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={cat.imageUrl}
-                  alt=""
-                  loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
-                />
-              ) : (
-                <span
-                  className="absolute inset-0 grid place-items-center bg-brand-800 font-display text-5xl font-extrabold text-white/25"
-                  aria-hidden="true"
-                >
-                  {cat.name.slice(0, 1)}
+              <span className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(74,111,178,.55),transparent_34%),linear-gradient(145deg,#050c1c,#142b5c)]" />
+              <span className="absolute -left-12 -top-12 h-48 w-48 rounded-full border border-white/10 transition-transform duration-700 group-hover:scale-125" />
+              <span className="relative flex w-full flex-col justify-between">
+                <span className="grid h-14 w-14 place-items-center rounded-xl border border-white/15 bg-white/10 text-white backdrop-blur-sm">
+                  <CategoryIcon name={cat.icon} className="h-7 w-7" strokeWidth={1.7} />
                 </span>
-              )}
-
-              <span className="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/35 to-transparent" />
-
-              <span className="relative mt-auto w-full p-5">
+                <span>
                 <span className="mb-1 flex items-center gap-2">
                   <span className="font-display text-xl font-extrabold text-white">{cat.name}</span>
                   <ArrowLeft
@@ -74,6 +62,7 @@ export function CategoryShowcase({ categories }: { categories: Category[] }) {
                     {cat.children.slice(0, 3).map((c) => c.name).join(" · ")}
                   </span>
                 )}
+                </span>
               </span>
             </Link>
           </RevealItem>

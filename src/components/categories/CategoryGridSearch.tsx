@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, SearchX } from "lucide-react";
-import { CoverArt } from "@/components/ui/CoverArt";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { RevealItem, RevealStagger } from "@/components/motion/Reveal";
 import { businessCountLabel } from "@/lib/utils";
 import type { CarouselCategory } from "@/components/categories/CategoryCarousel";
@@ -46,23 +46,14 @@ export function CategoryGridSearch({ items }: { items: CarouselCategory[] }) {
             <RevealItem key={cat.id}>
               <Link
                 href={`/category/${cat.slug}`}
-                className="group relative flex aspect-[4/3] w-full overflow-hidden rounded-lg border border-ink-200/70 bg-ink-200"
+                className="group flex min-h-44 flex-col justify-between overflow-hidden rounded-xl border border-ink-200 bg-white p-5 transition-all hover:-translate-y-1 hover:border-brand-300 hover:shadow-[0_20px_45px_-24px_rgba(11,59,117,.4)]"
               >
-                {cat.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={cat.imageUrl}
-                    alt=""
-                    loading="lazy"
-                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
-                  />
-                ) : (
-                  <CoverArt seed={cat.slug} label={cat.name.charAt(0)} className="absolute inset-0 h-full w-full" />
-                )}
-                <span className="absolute inset-0 bg-gradient-to-t from-brand-950/85 via-brand-950/25 to-transparent" />
-                <span className="relative mt-auto w-full p-4">
-                  <span className="block font-display text-lg font-extrabold text-white">{cat.name}</span>
-                  <span className="block text-xs font-semibold text-accent-200">
+                <span className="grid h-12 w-12 place-items-center rounded-lg bg-brand-50 text-brand-700 transition-colors group-hover:bg-brand-800 group-hover:text-white">
+                  <CategoryIcon name={cat.icon} className="h-6 w-6" strokeWidth={1.8} />
+                </span>
+                <span>
+                  <span className="block font-display text-lg font-extrabold text-ink-900">{cat.name}</span>
+                  <span className="mt-1 block text-xs font-semibold text-ink-400">
                     {businessCountLabel(cat.businessCount)}
                   </span>
                 </span>

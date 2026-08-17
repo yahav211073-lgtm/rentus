@@ -46,17 +46,7 @@ export async function CategoryRail() {
               className="group flex min-h-24 min-w-[176px] snap-start items-center gap-3 overflow-hidden rounded-lg border border-ink-200/70 bg-white px-4 py-3 shadow-[0_8px_22px_-12px_rgba(5,25,47,.35)] transition-all hover:-translate-y-1 hover:border-brand-300 lg:min-w-0 [direction:rtl]"
             >
               <span className="relative grid h-16 w-16 shrink-0 place-items-center overflow-hidden rounded-full bg-gradient-to-br from-ink-50 to-brand-50 text-brand-700">
-                {cat.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={cat.imageUrl}
-                    alt=""
-                    loading="lazy"
-                    className="h-full w-full object-contain p-1 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.08]"
-                  />
-                ) : (
-                  <CategoryIcon name={cat.icon} className="h-7 w-7" />
-                )}
+                <CategoryIcon name={cat.icon} className="h-7 w-7" />
               </span>
               <span className="flex min-w-0 flex-1 flex-col gap-1 text-start">
                 <span className="text-sm font-bold leading-tight text-ink-900 transition-colors group-hover:text-brand-700">

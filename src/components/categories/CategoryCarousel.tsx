@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { CoverArt } from "@/components/ui/CoverArt";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { businessCountLabel } from "@/lib/utils";
 
 export interface CarouselCategory {
@@ -12,6 +12,7 @@ export interface CarouselCategory {
   slug: string;
   name: string;
   imageUrl?: string | null;
+  icon?: string | null;
   businessCount: number;
 }
 
@@ -61,26 +62,21 @@ export function CategoryCarousel({ items }: { items: CarouselCategory[] }) {
               <Link
                 key={cat.id}
                 href={`/category/${cat.slug}`}
-                className="group relative flex aspect-[4/5] w-full overflow-hidden rounded-xl border border-ink-200/70 bg-ink-200"
+                className="group relative flex aspect-[4/3] w-full overflow-hidden rounded-xl border border-brand-800/10 bg-brand-950"
               >
-                {cat.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={cat.imageUrl}
-                    alt=""
-                    loading="lazy"
-                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.06]"
-                  />
-                ) : (
-                  <CoverArt seed={cat.slug} label={cat.name.charAt(0)} className="absolute inset-0 h-full w-full" />
-                )}
-                <span className="absolute inset-0 bg-gradient-to-t from-brand-950/90 via-brand-950/30 to-transparent" />
-                <span className="relative mt-auto w-full p-5">
+                <span className="absolute inset-0 bg-[radial-gradient(circle_at_75%_25%,rgba(74,111,178,.6),transparent_38%),linear-gradient(145deg,#08132c,#142b5c)]" />
+                <span className="absolute -left-10 -top-10 h-40 w-40 rounded-full border border-white/10 transition-transform duration-500 group-hover:scale-125" />
+                <span className="relative flex w-full flex-col justify-between p-6">
+                  <span className="grid h-14 w-14 place-items-center rounded-xl border border-white/15 bg-white/10 text-white backdrop-blur-sm">
+                    <CategoryIcon name={cat.icon} className="h-7 w-7" strokeWidth={1.7} />
+                  </span>
+                  <span>
                   <span className="mb-1 block font-display text-xl font-extrabold text-white sm:text-2xl">
                     {cat.name}
                   </span>
                   <span className="block text-xs font-semibold text-accent-200">
                     {businessCountLabel(cat.businessCount)}
+                  </span>
                   </span>
                 </span>
               </Link>

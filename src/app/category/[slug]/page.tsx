@@ -5,7 +5,7 @@ import { searchBusinesses } from "@/lib/repo/search";
 import { getCategoriesWithCounts } from "@/lib/repo/categories";
 import { BusinessCard } from "@/components/business/BusinessCard";
 import { RevealItem, RevealStagger } from "@/components/motion/Reveal";
-import { CoverArt } from "@/components/ui/CoverArt";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { GuidesSidebar } from "@/components/home/GuidesSidebar";
 import { decodeParam, formatNumber } from "@/lib/utils";
 
@@ -42,13 +42,10 @@ export default async function CategoryPage({ params }: { params: Params }) {
   return (
     <div className="bg-ink-50 pb-20">
       <div className="relative isolate h-[260px] overflow-hidden sm:h-[320px]">
-        {category.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={category.imageUrl} alt="" className="absolute inset-0 h-full w-full object-cover" />
-        ) : (
-          <CoverArt seed={category.slug} className="absolute inset-0 h-full w-full" />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-brand-950 via-brand-950/60 to-brand-950/30" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_25%,rgba(74,111,178,.55),transparent_32%),linear-gradient(135deg,#050c1c,#142b5c)]" />
+        <div className="absolute left-[8%] top-1/2 grid h-40 w-40 -translate-y-1/2 place-items-center rounded-[2rem] border border-white/10 bg-white/5 text-white/20 sm:h-52 sm:w-52">
+          <CategoryIcon name={category.icon} className="h-20 w-20 sm:h-28 sm:w-28" strokeWidth={1.2} />
+        </div>
 
         <div className="relative mx-auto flex h-full max-w-[1480px] flex-col justify-end px-4 pb-8 sm:px-6 lg:px-8">
           <nav aria-label="פירורי לחם" className="mb-3 text-xs text-white/60">
@@ -61,7 +58,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
             <p className="max-w-xl text-white/75">{category.description}</p>
           )}
           <p className="mt-2 text-sm font-semibold text-accent-400">
-            {formatNumber(result.total)} חברות פעילות בקטגוריה
+            {result.total === 1 ? "חברה פעילה אחת בקטגוריה" : `${formatNumber(result.total)} חברות פעילות בקטגוריה`}
           </p>
         </div>
       </div>

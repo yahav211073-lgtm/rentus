@@ -27,13 +27,16 @@ export const getCategoriesWithCounts = cache(async (): Promise<Category[]> => {
       .order("sort_order"),
     supabase
       .from("business_categories")
-      .select("category_id, businesses!inner(status)")
+      .select("category_id, businesses!inner(id, status)")
       .eq("businesses.status", "published"),
   ]);
 
-  const ownCount = new Map<string, number>();
+  const businessesByCategory = new Map<string, Set<string>>();
   for (const link of links ?? []) {
-    ownCount.set(link.category_id, (ownCount.get(link.category_id) ?? 0) + 1);
+    const ids = businessesByCategory.get(link.category_id) ?? new Set<string>();
+    const business = Array.isArray(link.businesses) ? link.businesses[0] : link.businesses;
+    if (business?.id) ids.add(String(business.id));
+    businessesByCategory.set(link.category_id, ids);
   }
 
   const all = categories ?? [];
@@ -55,11 +58,13 @@ export const getCategoriesWithCounts = cache(async (): Promise<Category[]> => {
 
   return parents.map((p) => {
     const kids = children.filter((c) => c.parent_id === p.id);
-    const kidsCount = kids.reduce((sum, k) => sum + (ownCount.get(k.id) ?? 0), 0);
-    const total = (ownCount.get(p.id) ?? 0) + kidsCount;
+    const parentBusinessIds = new Set(businessesByCategory.get(p.id) ?? []);
+    for (const kid of kids) {
+      for (const businessId of businessesByCategory.get(kid.id) ?? []) parentBusinessIds.add(businessId);
+    }
     return {
-      ...toDomain(p, total),
-      children: kids.map((k) => toDomain(k, ownCount.get(k.id) ?? 0)),
+      ...toDomain(p, parentBusinessIds.size),
+      children: kids.map((k) => toDomain(k, businessesByCategory.get(k.id)?.size ?? 0)),
     };
   });
 });
