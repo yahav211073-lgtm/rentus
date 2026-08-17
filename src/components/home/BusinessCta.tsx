@@ -24,7 +24,7 @@ const BENEFITS = [
   {
     Icon: Megaphone,
     title: "בליטה בתוצאות החיפוש",
-    body: "מסלולי פרסום מציבים את העסק בראש הקטגוריה ובאזור השירות שלכם.",
+    body: "מסלולי פרסום מציבים את החברה בראש הקטגוריה ובאזור השירות שלכם.",
   },
 ];
 
@@ -42,7 +42,7 @@ export function BusinessCta() {
           <Reveal direction="start">
             <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-accent-50 px-3 py-1.5 text-2xs font-bold uppercase tracking-wider text-accent-700">
               <span className="h-1.5 w-1.5 rounded-full bg-accent-400" />
-              לבעלי עסקים
+              לבעלי חברות
             </span>
 
             <h2 className="mb-5 font-display text-3xl font-extrabold leading-tight text-ink-900 sm:text-4xl lg:text-5xl">
@@ -51,7 +51,7 @@ export function BusinessCta() {
             </h2>
 
             <p className="mb-7 max-w-xl text-md leading-relaxed text-ink-500">
-              רישום העסק לוקח שבע דקות. אחריו הפרופיל שלכם מופיע בחיפושים
+              רישום החברה לוקח שבע דקות. אחריו הפרופיל שלכם מופיע בחיפושים
               הרלוונטיים, עם ביקורות, גלריה, שעות פעילות וכפתור חיוג ישיר.
             </p>
 
@@ -66,7 +66,7 @@ export function BusinessCta() {
 
             <div className="flex flex-wrap gap-3">
               <ButtonLink href="/business/register" variant="accent" size="lg">
-                רישום העסק — חינם
+                רישום החברה — חינם
               </ButtonLink>
               <ButtonLink href="/pricing" variant="secondary" size="lg">
                 השוואת מסלולים

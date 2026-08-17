@@ -63,7 +63,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     metadataBase: new URL(env.siteUrl),
     title: { default: title, template: `%s | ${brand.name}` },
-    description: `${brand.name} — מדריך ישראלי לעסקים להשכרה: ציוד, רכבים, חללים, כלים וטכנולוגיה בכל הארץ.`,
+    description: `${brand.name} — מדריך ישראלי לחברות להשכרה: ציוד, רכבים, חללים, כלים וטכנולוגיה בכל הארץ.`,
     keywords: ["השכרת ציוד לאירועים", "השכרת אוהלים", "השכרת רכב", "כלים ומכונות", brand.name],
     authors: [{ name: brand.name }],
     manifest: "/manifest.json",
@@ -81,12 +81,12 @@ export async function generateMetadata(): Promise<Metadata> {
       locale: "he_IL",
       siteName: brand.name,
       title,
-      description: `מצאו עסקים להשכרת ציוד, רכבים, חללים, כלים וטכנולוגיה בכל הארץ.`,
+      description: `מצאו חברות להשכרת ציוד, רכבים, חללים, כלים וטכנולוגיה בכל הארץ.`,
     },
     twitter: {
       card: "summary_large_image",
       title,
-      description: `מדריך ישראלי לעסקים להשכרה בכל הארץ.`,
+      description: `מדריך ישראלי לחברות להשכרה בכל הארץ.`,
     },
     robots: {
       index: true,

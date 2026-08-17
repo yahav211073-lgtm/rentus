@@ -16,7 +16,7 @@ export function OwnerCtaCard({ className }: { className?: string }) {
         <TrendingUp className="h-5 w-5 text-accent-400" strokeWidth={2.2} />
       </span>
       <p className="mb-1 font-display text-md font-extrabold leading-tight text-white">
-        בעל עסק? הצטרפו היום
+        בעל חברה? הצטרפו היום
       </p>
       <p className="mb-3 text-xs leading-relaxed text-white/60">
         רישום פרופיל בסיסי חינם — הלקוחות כבר מחפשים אתכם.

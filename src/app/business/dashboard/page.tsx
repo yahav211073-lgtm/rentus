@@ -7,7 +7,7 @@ import { NotificationsPanel, type OwnerNotification } from "@/components/busines
 import { getCurrentUser } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export const metadata: Metadata = { title: "אזור בעלי עסקים", robots: { index: false, follow: false } };
+export const metadata: Metadata = { title: "אזור בעלי חברות", robots: { index: false, follow: false } };
 
 /**
  * דשבורד בעל עסק. proxy.ts כבר חוסם גישה למי שלא מחובר, אבל בודקים
@@ -118,10 +118,10 @@ export default async function BusinessDashboardPage() {
           <h1 className="mb-1 font-display text-2xl font-extrabold text-ink-900">
             שלום, {user.fullName ?? user.email}
           </h1>
-          <p className="text-ink-500">אזור בעלי העסקים שלכם</p>
+          <p className="text-ink-500">אזור בעלי החברות שלכם</p>
         </div>
         <ButtonLink href="/business/register" variant="secondary" size="sm">
-          הגשת בקשה לעסק נוסף
+          הגשת בקשה לחברה נוספת
         </ButtonLink>
       </div>
 
@@ -135,7 +135,7 @@ export default async function BusinessDashboardPage() {
             מילוי הבקשה לוקח כמה דקות. הצוות בודק אותה ומאשר בדרך כלל תוך יום עסקים אחד.
           </p>
           <ButtonLink href="/business/register" variant="accent" size="md">
-            הגשת בקשה להוספת עסק
+            הגשת בקשה להוספת חברה
           </ButtonLink>
         </div>
       ) : (

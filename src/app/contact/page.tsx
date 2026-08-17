@@ -48,7 +48,7 @@ export default async function ContactPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-brand-950/92 via-brand-950/55 to-brand-950/35" />
         <div className="relative mx-auto flex h-full max-w-2xl flex-col items-center justify-center px-4 text-center sm:px-6">
           <h1 className="mb-2 font-display text-3xl font-extrabold text-white sm:text-4xl">צור קשר</h1>
-          <p className="text-white/80">שאלה, בעיה, או רוצים לפרסם את העסק? נשמח לשמוע.</p>
+          <p className="text-white/80">שאלה, בעיה, או רוצים לפרסם את החברה? נשמח לשמוע.</p>
         </div>
       </div>
 

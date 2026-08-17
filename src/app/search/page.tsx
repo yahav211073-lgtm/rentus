@@ -38,12 +38,12 @@ export async function generateMetadata({ searchParams }: { searchParams: SearchP
     if (city) parts.push(`ב${city.name}`);
   }
 
-  const title = parts.length ? `חיפוש: ${parts.join(" ")}` : "חיפוש עסקים";
+  const title = parts.length ? `חיפוש: ${parts.join(" ")}` : "חיפוש חברות";
   const hasFilters = Boolean(f.category || f.city || f.tags?.length || f.minRating || f.verifiedOnly);
 
   return {
     title,
-    description: "חיפוש מתקדם בין אלפי עסקים מאומתים — לפי קטגוריה, עיר, דירוג ומאפיינים.",
+    description: "חיפוש מתקדם בין אלפי חברות מאומתות — לפי קטגוריה, עיר, דירוג ומאפיינים.",
     robots: { index: !hasFilters && !f.q, follow: true },
     alternates: { canonical: "/search" },
   };
@@ -67,7 +67,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
         <div className="bg-dots absolute inset-0 opacity-30" aria-hidden="true" />
         <div className="relative mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
           <h1 className="mb-5 font-display text-2xl font-extrabold text-white sm:text-3xl">
-            {filters.q ? <>תוצאות עבור &laquo;{filters.q}&raquo;</> : "חיפוש עסקים"}
+            {filters.q ? <>תוצאות עבור &laquo;{filters.q}&raquo;</> : "חיפוש חברות"}
           </h1>
           <SearchBar variant="compact" defaultQuery={filters.q ?? ""} categories={categories} cities={cities} />
         </div>
@@ -83,7 +83,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
             {/* שורת סיכום ומיון */}
             <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-ink-500" aria-live="polite">
-                נמצאו <strong className="font-bold text-ink-900">{formatNumber(result.total)}</strong> עסקים
+                נמצאו <strong className="font-bold text-ink-900">{formatNumber(result.total)}</strong> חברות
                 {result.total > PAGE_SIZE && (
                   <> · עמוד {result.page} מתוך {totalPages}</>
                 )}
@@ -130,7 +130,7 @@ function EmptyState({ query, categories }: { query?: string; categories: { slug:
       </span>
 
       <h2 className="mb-2 font-display text-xl font-bold text-ink-900">
-        {query ? <>לא מצאנו עסקים עבור &laquo;{query}&raquo;</> : "אין תוצאות עם המסננים האלה"}
+        {query ? <>לא מצאנו חברות עבור &laquo;{query}&raquo;</> : "אין תוצאות עם המסננים האלה"}
       </h2>
       <p className="mx-auto mb-7 max-w-md text-base leading-relaxed text-ink-500">
         אפשר לנסות מונח כללי יותר, להסיר חלק מהמסננים, או להתחיל מאחת

@@ -38,7 +38,7 @@ export function countLabel(
 
 /** "3 עסקים" / "עסק אחד" / "אין עדיין עסקים" */
 export function businessCountLabel(n: number): string {
-  return countLabel(n, { none: "אין עדיין עסקים", one: "עסק אחד", many: "עסקים" });
+  return countLabel(n, { none: "אין עדיין חברות", one: "חברה אחת", many: "חברות" });
 }
 
 export function formatPrice(cents: number, currency = "ILS"): string {

@@ -23,7 +23,7 @@ export function Hero({
   const reduced = useReducedMotion();
 
   return (
-    <section className="relative isolate overflow-hidden bg-brand-950 pb-14 pt-10 sm:pb-16">
+    <section className="relative isolate h-[310px] overflow-hidden bg-brand-950">
       {/* priority + fetchPriority: זו התמונה הראשונה שנטענת בעמוד הבית
           (LCP), ולכן היא היחידה באתר שלא נטענת lazy. */}
       <Image
@@ -51,24 +51,24 @@ export function Hero({
         aria-hidden="true"
       />
 
-      <div className="relative mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center">
+      <div className="relative mx-auto max-w-[1480px] px-4 pt-[48px] sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[840px] text-center">
           <motion.h1
             initial={{ opacity: 0, y: reduced ? 0 : 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55 }}
-            className="mb-4 font-display text-3xl font-extrabold leading-[1.15] text-white sm:text-4xl lg:text-[2.75rem]"
+            className="mb-2 font-display text-3xl font-extrabold leading-[1.15] text-white sm:text-4xl lg:text-[2.35rem]"
           >
-            כל מה שאפשר להשכיר, במקום אחד.
+            מחפשים ציוד? המקום הנכון.
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: reduced ? 0 : 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.08 }}
-            className="mb-8 text-base text-white/75 sm:text-lg"
+            className="mb-6 text-base text-white/80 sm:text-lg"
           >
-            מצאו עסקים להשכרת ציוד, רכב, חללים, כלי עבודה ועוד — בכל הארץ
+            השוו מחירים, קבלו הצעות ובחרו את החברה המתאימה לכם
           </motion.p>
 
           <motion.div

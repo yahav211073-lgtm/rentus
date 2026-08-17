@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const { slug: rawSlug } = await params;
   const slug = decodeParam(rawSlug);
   const b = await getBusinessBySlug(slug);
-  if (!b) return { title: "העסק לא נמצא" };
+  if (!b) return { title: "החברה לא נמצאה" };
 
   const location = b.city ? ` ב${b.city.name}` : "";
   const title = b.seoTitle ?? `${b.name}${location}`;
@@ -186,7 +186,7 @@ export default async function BusinessPage({ params }: { params: Params }) {
         <div className="grid gap-7 lg:grid-cols-[1fr_380px]">
           <div className="min-w-0 space-y-7">
             {b.description && (
-              <Panel title="על העסק">
+              <Panel title="על החברה">
                 <p className="whitespace-pre-line text-base leading-relaxed text-ink-600">
                   {b.description}
                 </p>
@@ -262,7 +262,7 @@ export default async function BusinessPage({ params }: { params: Params }) {
                       href={b.website} target="_blank" rel="noopener noreferrer nofollow"
                       className="hover:text-brand-600"
                     >
-                      אתר העסק
+                      אתר החברה
                     </a>
                   </ContactRow>
                 )}
@@ -285,7 +285,7 @@ export default async function BusinessPage({ params }: { params: Params }) {
         {related.length > 0 && (
           <section className="mt-14">
             <h2 className="mb-6 font-display text-2xl font-extrabold text-ink-900">
-              עסקים דומים באזור
+              חברות דומות באזור
             </h2>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {related.map((r) => <BusinessCard key={r.id} business={r} />)}
@@ -333,7 +333,7 @@ function ShareRow({ name }: { name: string }) {
         className="inline-flex items-center gap-2 text-sm font-semibold text-ink-500 transition-colors hover:text-brand-600"
       >
         <Share2 className="h-4 w-4" />
-        שיתוף העסק
+        שיתוף החברה
       </a>
     </div>
   );

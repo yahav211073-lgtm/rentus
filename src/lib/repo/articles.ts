@@ -49,7 +49,12 @@ function mapArticle(row: Row): Article {
   };
 }
 
-export async function getArticles(limit = 24): Promise<Article[]> {
+/**
+ * עטוף ב-cache(): נקרא גם מהעמוד שמארח את GuidesSidebar (כדי לדעת
+ * אם להציג את הסקשן בכלל) וגם מ-GuidesSidebar עצמו — בלי דה-דופליקציה
+ * זו אותה שאילתה רצה פעמיים ברצף.
+ */
+export const getArticles = cache(async (limit = 24): Promise<Article[]> => {
   if (!isSupabaseConfigured) return [];
   const supabase = await createSupabaseServerClient();
   if (!supabase) return [];
@@ -62,7 +67,7 @@ export async function getArticles(limit = 24): Promise<Article[]> {
     .limit(limit);
 
   return (data ?? []).map(mapArticle);
-}
+});
 
 /**
  * עטוף ב-cache(): נקרא גם מ-generateMetadata וגם מגוף העמוד

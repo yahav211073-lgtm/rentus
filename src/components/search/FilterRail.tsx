@@ -176,7 +176,7 @@ export function FilterRail({ facets, total, categories, cities, children }: Prop
 
       <FilterGroup title="אמון">
         <CheckRow
-          label="עסקים מאומתים בלבד"
+          label="חברות מאומתות בלבד"
           icon={<BadgeCheck className="h-4 w-4 text-brand-600" />}
           checked={verifiedOnly}
           onToggle={() => setParam("verified", verifiedOnly ? null : "1")}

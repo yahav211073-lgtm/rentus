@@ -80,7 +80,7 @@ export function BusinessRail({ businesses, emphasis = false, layout = "rail" }: 
         ref={scrollerRef}
         className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0"
         role="region"
-        aria-label="רשימת עסקים, ניתן לגלול"
+        aria-label="רשימת חברות, ניתן לגלול"
         tabIndex={0}
       >
         {businesses.map((b) => (

@@ -1,6 +1,7 @@
+"use client";
+
 import Link from "next/link";
 import { MapPin, Phone } from "lucide-react";
-import { CoverArt } from "@/components/ui/CoverArt";
 import { Rating } from "@/components/ui/Rating";
 import type { BusinessCard as BusinessCardType } from "@/types/domain";
 
@@ -11,21 +12,21 @@ import type { BusinessCard as BusinessCardType } from "@/types/domain";
  * גדולה) ממשיך לשמש בכל שאר האתר — לא נגעתי בו.
  */
 export function CompanyListCard({ business: b }: { business: BusinessCardType }) {
-  const href = `/business/${b.slug}`;
+  const href = b.id.startsWith("reference-") ? "/search" : `/business/${b.slug}`;
 
   return (
-    <article className="group relative flex flex-col rounded-lg border border-ink-200/70 bg-white p-5 shadow-[0_1px_3px_rgba(11,59,117,0.06)] transition-shadow duration-300 hover:shadow-[0_16px_36px_-16px_rgba(11,59,117,0.2)]">
-      <div className="mb-3 flex items-start gap-3">
-        <span className="grid h-12 w-12 shrink-0 overflow-hidden rounded-md">
+    <article className="group relative flex min-h-[222px] flex-col rounded-lg border border-ink-200/70 bg-white p-4 shadow-[0_1px_3px_rgba(11,59,117,0.06)] transition-shadow duration-300 hover:shadow-[0_16px_36px_-16px_rgba(11,59,117,0.2)]">
+      <div className="mb-2 flex min-h-12 items-center justify-center gap-2 text-center">
+        <span className="grid min-h-10 min-w-10 shrink-0 place-items-center overflow-hidden rounded-md">
           {b.logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={b.logoUrl} alt="" className="h-full w-full object-cover" />
           ) : (
-            <CoverArt seed={b.slug} label={b.name.charAt(0)} className="h-full w-full" compact />
+            <span className="grid h-9 w-9 place-items-center rounded-md bg-brand-50 font-display text-lg font-black text-brand-800">{b.name.charAt(0).toUpperCase()}</span>
           )}
         </span>
         <div className="min-w-0 pt-0.5">
-          <h3 className="truncate text-md font-bold text-ink-900">
+          <h3 className="text-md font-bold text-ink-900">
             <Link href={href} className="after:absolute after:inset-0 after:content-['']">{b.name}</Link>
           </h3>
           {b.city && (
@@ -37,9 +38,9 @@ export function CompanyListCard({ business: b }: { business: BusinessCardType })
         </div>
       </div>
 
-      {b.tagline && <p className="mb-3 line-clamp-2 text-sm leading-relaxed text-ink-500">{b.tagline}</p>}
+      {b.tagline && <p className="mb-2 line-clamp-2 text-center text-xs leading-relaxed text-ink-500">{b.tagline}</p>}
 
-      <div className="mb-4">
+      <div className="mb-3 text-center">
         <Rating value={b.ratingAvg} count={b.reviewCount} size="sm" />
       </div>
 

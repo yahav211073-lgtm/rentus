@@ -34,7 +34,7 @@ export function WriteReviewForm({ businessId, businessName, currentUserName, ret
         <h2 className="mb-1.5 font-display text-lg font-bold text-ink-900">רוצים לכתוב ביקורת?</h2>
         <p className="mx-auto mb-5 max-w-sm text-sm leading-relaxed text-ink-600">
           ביקורות נכתבות מחשבון מזוהה בלבד. זה מה ששומר על הדירוגים אמינים — ומונע ביקורות
-          מזויפות על עסקים אמיתיים.
+          מזויפות על חברות אמיתיות.
         </p>
         <ButtonLink href={`/login?next=${encodeURIComponent(returnTo)}`} variant="primary" size="md">
           התחברות וכתיבת ביקורת
@@ -49,7 +49,7 @@ export function WriteReviewForm({ businessId, businessName, currentUserName, ret
         <CheckCircle2 className="mx-auto mb-3 h-9 w-9 text-success-500" aria-hidden="true" />
         <h2 className="mb-1.5 font-display text-lg font-bold text-ink-900">תודה על הביקורת</h2>
         <p className="text-sm text-ink-600">
-          היא ממתינה לבדיקה קצרה ותתפרסם בעמוד העסק ברגע שתאושר.
+          היא ממתינה לבדיקה קצרה ותתפרסם בעמוד החברה ברגע שתאושר.
         </p>
       </section>
     );

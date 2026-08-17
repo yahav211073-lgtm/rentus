@@ -30,8 +30,8 @@ export async function StatsBand() {
   if (published === 0) return null;
 
   const stats = [
-    { id: "businesses", label: "עסקים באינדקס", value: published },
-    { id: "verified", label: "עסקים מאומתים", value: verified.count ?? 0 },
+    { id: "businesses", label: "חברות רשומות", value: published },
+    { id: "verified", label: "חברות מאומתות", value: verified.count ?? 0 },
     { id: "reviews", label: "ביקורות שאושרו", value: reviews.count ?? 0 },
     { id: "cities", label: "ערים ברחבי הארץ", value: cities.count ?? 0 },
   ].filter((s) => s.value > 0);

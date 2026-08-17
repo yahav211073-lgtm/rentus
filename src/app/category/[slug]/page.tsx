@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 
   return {
     title: category.name,
-    description: category.description ?? `כל העסקים בתחום ${category.name} — במקום אחד.`,
+    description: category.description ?? `כל החברות בתחום ${category.name} — במקום אחד.`,
     alternates: { canonical: `/category/${category.slug}` },
     openGraph: { images: category.imageUrl ? [category.imageUrl] : undefined },
   };
@@ -61,7 +61,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
             <p className="max-w-xl text-white/75">{category.description}</p>
           )}
           <p className="mt-2 text-sm font-semibold text-accent-400">
-            {formatNumber(result.total)} עסקים פעילים בקטגוריה
+            {formatNumber(result.total)} חברות פעילות בקטגוריה
           </p>
         </div>
       </div>
@@ -85,9 +85,9 @@ export default async function CategoryPage({ params }: { params: Params }) {
           <div className="min-w-0 flex-1">
             {result.items.length === 0 ? (
               <div className="rounded-lg border border-dashed border-ink-300 bg-white p-10 text-center sm:p-16">
-                <h2 className="mb-2 font-display text-xl font-bold text-ink-900">עדיין אין עסקים בקטגוריה הזו</h2>
+                <h2 className="mb-2 font-display text-xl font-bold text-ink-900">עדיין אין חברות בקטגוריה הזו</h2>
                 <p className="mx-auto max-w-md text-base leading-relaxed text-ink-500">
-                  היו הראשונים — <Link href="/business/register" className="font-bold text-brand-700 hover:text-brand-500">רשמו את העסק שלכם</Link> בקטגוריה הזו.
+                  היו הראשונים — <Link href="/business/register" className="font-bold text-brand-700 hover:text-brand-500">רשמו את החברה שלכם</Link> בקטגוריה הזו.
                 </p>
               </div>
             ) : (

@@ -37,7 +37,7 @@ export function RegisterBusinessForm({ categories, cities }: Props) {
           הבקשה נכנסה לתור האישור של הצוות, בדרך כלל תוך יום עסקים אחד. תקבלו התראה באתר
           ברגע שתתקבל החלטה, ותוכלו לעקוב אחרי הסטטוס מ־
           <Link href="/business/dashboard" className="font-bold text-brand-700 hover:text-brand-500">
-            אזור בעלי העסקים
+            אזור בעלי החברות
           </Link>.
         </p>
       </section>
@@ -62,13 +62,13 @@ export function RegisterBusinessForm({ categories, cities }: Props) {
     >
       <ImageUploadField
         name="cover"
-        label="תמונה ראשית של העסק"
+        label="תמונה ראשית של החברה"
         required
-        hint="התמונה שתופיע בראש עמוד העסק ובכרטיס שלו ברשימות"
+        hint="התמונה שתופיע בראש עמוד החברה ובכרטיס שלה ברשימות"
       />
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field id="reg-name" name="name" label="שם העסק" required />
+        <Field id="reg-name" name="name" label="שם החברה" required />
         <Field id="reg-tagline" name="tagline" label="שורת תיאור קצרה" placeholder="במה אתם מתמחים?" />
       </div>
 
@@ -110,7 +110,7 @@ export function RegisterBusinessForm({ categories, cities }: Props) {
       <p className="-mt-3 text-2xs text-ink-400">צריך טלפון או וואטסאפ אחד לפחות כדי שנוכל לחזור אליכם.</p>
 
       <div>
-        <label htmlFor="reg-description" className="mb-1.5 block text-xs font-bold text-ink-600">תיאור העסק</label>
+        <label htmlFor="reg-description" className="mb-1.5 block text-xs font-bold text-ink-600">תיאור החברה</label>
         <textarea
           id="reg-description" name="description" rows={4}
           className="w-full rounded-xs border border-ink-200 px-3.5 py-2.5 text-base outline-none transition-colors placeholder:text-ink-400 focus:border-brand-400"

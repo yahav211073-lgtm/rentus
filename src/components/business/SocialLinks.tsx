@@ -59,7 +59,7 @@ export function SocialLinks({ business, className }: { business: BusinessSocial;
       {business.phone && (
         <a
           href={`tel:${business.phone}`}
-          aria-label="חיוג לעסק"
+          aria-label="חיוג לחברה"
           className="grid h-10 w-10 place-items-center rounded-xs border border-ink-200 text-ink-500 transition-colors hover:border-brand-300 hover:text-brand-700"
         >
           <Phone className="h-4.5 w-4.5" aria-hidden="true" />
@@ -82,7 +82,7 @@ export function SocialLinks({ business, className }: { business: BusinessSocial;
         <a
           href={business.website!}
           target="_blank" rel="noopener noreferrer nofollow"
-          aria-label="אתר העסק"
+          aria-label="אתר החברה"
           className="grid h-10 w-10 place-items-center rounded-xs border border-ink-200 text-ink-500 transition-colors hover:border-brand-300 hover:text-brand-700"
         >
           <Globe className="h-4.5 w-4.5" aria-hidden="true" />

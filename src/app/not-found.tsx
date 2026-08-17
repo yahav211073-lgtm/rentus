@@ -21,11 +21,11 @@ export default function NotFound() {
         העמוד הזה לא קיים
       </h1>
       <p className="mb-6 text-base leading-relaxed text-ink-600">
-        ייתכן שהקישור השתנה, או שהעסק שחיפשתם כבר לא מפורסם באתר.
+        ייתכן שהקישור השתנה, או שהחברה שחיפשתם כבר לא מפורסמת באתר.
       </p>
 
       <div className="flex flex-wrap justify-center gap-2.5">
-        <ButtonLink href="/search" variant="primary" size="lg">חיפוש עסקים</ButtonLink>
+        <ButtonLink href="/search" variant="primary" size="lg">חיפוש חברות</ButtonLink>
         <ButtonLink href="/categories" variant="secondary" size="lg">כל הקטגוריות</ButtonLink>
       </div>
 

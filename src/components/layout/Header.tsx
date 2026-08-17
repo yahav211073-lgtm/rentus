@@ -37,12 +37,17 @@ function dashboardHrefFor(role: string) {
  */
 
 const NAV_LINKS = [
+  { label: "ראשי", href: "/" },
   { label: "כל הקטגוריות", href: "/categories" },
-  { label: "עסקים מומלצים", href: "/search?sort=rating" },
+  { label: "חיפוש חברות", href: "/search" },
   { label: "מדריכים", href: "/blog" },
   { label: "אודות", href: "/about" },
   { label: "צור קשר", href: "/contact" },
 ];
+
+// תפריט הדסקטופ מרנדר את "ראשי" לפני כפתור תפריט-העל, ואת השאר אחריו —
+// כפתור תפריט-העל עצמו לא חלק מהמערך כי הוא לא קישור רגיל.
+const DESKTOP_LINKS_AFTER_MEGA = NAV_LINKS.slice(2);
 
 export function Header({
   user, brandName, tagline, logoUrl, categories, phone,
@@ -101,7 +106,7 @@ export function Header({
             <Link href="/" className="flex min-w-0 shrink items-center gap-2.5" aria-label="לעמוד הבית">
               {logoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={logoUrl} alt={brandName} className="h-9 w-auto max-w-[190px] object-contain sm:h-11" />
+                <img src={logoUrl} alt={brandName} className="h-10 w-auto max-w-[210px] object-contain sm:h-12" />
               ) : (
                 <>
                   <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-brand-600 to-brand-800 shadow-[0_4px_12px_-2px_rgba(11,59,117,0.45)] sm:h-11 sm:w-11">
@@ -123,6 +128,13 @@ export function Header({
 
             {/* ניווט דסקטופ */}
             <nav className="hidden flex-1 items-center gap-0.5 lg:flex" aria-label="ניווט ראשי">
+              <Link
+                href="/"
+                className="rounded-xs px-3.5 py-2 text-base font-semibold text-ink-700 transition-colors hover:bg-brand-50 hover:text-brand-800"
+              >
+                ראשי
+              </Link>
+
               <div
                 ref={megaRef}
                 className="relative"
@@ -140,7 +152,7 @@ export function Header({
                   aria-haspopup="true"
                   className="inline-flex items-center gap-1.5 rounded-xs px-3.5 py-2 text-base font-semibold text-ink-700 transition-colors hover:bg-brand-50 hover:text-brand-800"
                 >
-                  קטגוריות
+                  קטגוריות ציוד
                   <ChevronDown
                     className={cn("h-4 w-4 transition-transform duration-300", megaOpen && "rotate-180")}
                     aria-hidden="true"
@@ -152,7 +164,7 @@ export function Header({
                 </AnimatePresence>
               </div>
 
-              {NAV_LINKS.slice(1).map((l) => (
+              {DESKTOP_LINKS_AFTER_MEGA.map((l) => (
                 <Link
                   key={l.href}
                   href={l.href}
@@ -201,6 +213,18 @@ export function Header({
                   כניסה
                 </Link>
               )}
+
+              <div className="hidden items-center gap-2 lg:flex">
+                <Link
+                  href="/business/login"
+                  className="inline-flex items-center rounded-xs border border-ink-200 px-3.5 py-2 text-sm font-semibold text-ink-700 transition-colors hover:border-brand-300 hover:bg-brand-50"
+                >
+                  כניסה לבעלי חברות
+                </Link>
+                <ButtonLink href="/business/register" variant="accent" size="sm">
+                  הצטרפות לחברות
+                </ButtonLink>
+              </div>
 
               <button
                 type="button"
@@ -408,8 +432,11 @@ function MobileMenu({
                   <ButtonLink href="/login" variant="primary" size="lg" fullWidth>
                     כניסה לחשבון
                   </ButtonLink>
-                  <ButtonLink href="/business/register" variant="secondary" size="lg" fullWidth>
-                    בעלי עסקים — הגשת בקשה
+                  <ButtonLink href="/business/login" variant="secondary" size="lg" fullWidth>
+                    כניסה לבעלי חברות
+                  </ButtonLink>
+                  <ButtonLink href="/business/register" variant="accent" size="lg" fullWidth>
+                    הצטרפות לחברות
                   </ButtonLink>
                 </>
               )}

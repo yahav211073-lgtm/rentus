@@ -63,10 +63,10 @@ export function Newsletter() {
                   ניוזלטר
                 </span>
                 <h2 className="mb-3 font-display text-3xl font-extrabold text-white sm:text-4xl">
-                  העסקים הכי מומלצים, פעם בשבוע
+                  החברות הכי מומלצות, פעם בשבוע
                 </h2>
                 <p className="max-w-lg text-md leading-relaxed text-white/65">
-                  מדריך אחד, שלושה עסקים נבחרים ומבצע אחד שכדאי להכיר.
+                  מדריך אחד, שלוש חברות נבחרות ומבצע אחד שכדאי להכיר.
                   בלי ספאם, ואפשר לבטל בלחיצה אחת.
                 </p>
               </div>

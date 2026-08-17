@@ -24,9 +24,9 @@ const LEGAL_LINKS = [
 ];
 
 const BUSINESS_LINKS = [
-  { label: "רישום עסק חינם", href: "/business/register" },
+  { label: "רישום חברה חינם", href: "/business/register" },
   { label: "מסלולי פרסום", href: "/pricing" },
-  { label: "כניסה לניהול העסק", href: "/business/login" },
+  { label: "כניסה לניהול החברה", href: "/business/login" },
   { label: "פרסום באתר", href: "/advertise" },
 ];
 
@@ -79,7 +79,7 @@ export async function Footer({ brandName, logoUrl }: { brandName: string; logoUr
 
             <p className="mb-6 max-w-sm text-sm leading-relaxed text-white/60">
               {brandName} — מדריך ההשכרות המוביל בישראל. אנחנו מחברים בין אנשים שצריכים
-              לשכור לבין עסקים מאומתים — עם ביקורות אמיתיות, מידע מלא והשוואה הוגנת.
+              לשכור לבין חברות מאומתות — עם ביקורות אמיתיות, מידע מלא והשוואה הוגנת.
             </p>
 
             <ul className="space-y-2.5 text-sm">
@@ -139,11 +139,11 @@ export async function Footer({ brandName, logoUrl }: { brandName: string; logoUr
 
           <FooterColumn title="ערים מובילות">
             {popularCities.map((c) => (
-              <FooterLink key={c.id} href={`/search?city=${c.slug}`}>עסקים ב{c.name}</FooterLink>
+              <FooterLink key={c.id} href={`/search?city=${c.slug}`}>חברות ב{c.name}</FooterLink>
             ))}
           </FooterColumn>
 
-          <FooterColumn title="לבעלי עסקים">
+          <FooterColumn title="לבעלי חברות">
             {BUSINESS_LINKS.map((l) => (
               <FooterLink key={l.href} href={l.href}>{l.label}</FooterLink>
             ))}

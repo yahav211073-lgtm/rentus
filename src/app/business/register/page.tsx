@@ -10,8 +10,8 @@ import { getFlatCategories, getCities } from "@/lib/repo/taxonomy";
 import { toWhatsAppNumber } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "רישום עסק חינם",
-  description: "פרסמו את העסק שלכם ב-Rentus — פרופיל בסיסי ללא עלות, אישור תוך יום עסקים אחד.",
+  title: "רישום חברה חינם",
+  description: "פרסמו את החברה שלכם ב-Rentus — פרופיל בסיסי ללא עלות, אישור תוך יום עסקים אחד.",
 };
 
 /**
@@ -31,7 +31,7 @@ export default async function BusinessRegisterPage() {
     getCities(),
   ]);
 
-  const whatsappHref = `https://wa.me/${toWhatsAppNumber(contact.whatsapp)}?text=${encodeURIComponent("היי, אני רוצה לרשום את העסק שלי ב-Rentus")}`;
+  const whatsappHref = `https://wa.me/${toWhatsAppNumber(contact.whatsapp)}?text=${encodeURIComponent("היי, אני רוצה לרשום את החברה שלי ב-Rentus")}`;
 
   return (
     <>
@@ -39,7 +39,7 @@ export default async function BusinessRegisterPage() {
 
       <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
         <div className="mb-8 text-center">
-          <h1 className="mb-2 font-display text-3xl font-extrabold text-ink-900">רישום העסק שלכם</h1>
+          <h1 className="mb-2 font-display text-3xl font-extrabold text-ink-900">רישום החברה שלכם</h1>
           <p className="text-ink-500">
             פרופיל בסיסי ללא עלות. הטופס נבדק ידנית ומאושר תוך יום עסקים אחד.
           </p>
@@ -70,7 +70,7 @@ export default async function BusinessRegisterPage() {
             <UserPlus className="mx-auto mb-3 h-9 w-9 text-brand-600" />
             <h2 className="mb-1.5 font-display text-lg font-bold text-ink-900">קודם צריך חשבון</h2>
             <p className="mb-5 text-sm leading-relaxed text-ink-600">
-              כדי שהעסק ישויך אליכם ותוכלו לנהל אותו בהמשך, צריך להתחבר או להירשם קודם. לוקח דקה.
+              כדי שהחברה תשויך אליכם ותוכלו לנהל אותה בהמשך, צריך להתחבר או להירשם קודם. לוקח דקה.
             </p>
             <div className="flex flex-wrap justify-center gap-2.5">
               <ButtonLink href="/signup?next=/business/register" variant="primary" size="lg">
@@ -84,7 +84,7 @@ export default async function BusinessRegisterPage() {
         )}
 
         <p className="mt-6 text-center text-xs text-ink-400">
-          בעל עסק קיים? <Link href="/business/login" className="font-bold text-brand-700 hover:text-brand-500">כניסה לניהול העסק</Link>
+          בעל חברה קיימת? <Link href="/business/login" className="font-bold text-brand-700 hover:text-brand-500">כניסה לניהול החברה</Link>
         </p>
       </div>
     </>

@@ -89,15 +89,15 @@ export function OwnerBusinessCard({ business }: { business: OwnerBusiness }) {
           <div className="grid gap-3.5 sm:grid-cols-2">
             <ImageUploadField
               name="cover" label="תמונת כיסוי" currentUrl={business.coverUrl}
-              hint="תוצג בראש עמוד העסק" aspect="16/9"
+              hint="תוצג בראש עמוד החברה" aspect="16/9"
             />
             <ImageUploadField
-              name="logo" label="לוגו העסק" currentUrl={business.logoUrl}
+              name="logo" label="לוגו החברה" currentUrl={business.logoUrl}
               hint="PNG שקוף מומלץ" aspect="1/1"
             />
           </div>
           <div className="grid gap-3.5 sm:grid-cols-2">
-            <EditField name="name" label="שם העסק" defaultValue={business.name} required />
+            <EditField name="name" label="שם החברה" defaultValue={business.name} required />
             <EditField name="tagline" label="שורת תיאור" defaultValue={business.tagline ?? ""} />
           </div>
           <EditField name="address" label="כתובת" defaultValue={business.address ?? ""} />

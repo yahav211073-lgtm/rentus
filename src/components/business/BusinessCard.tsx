@@ -136,7 +136,7 @@ export function BusinessCard({ business: b, emphasis = false, className, priorit
           {b.isVerified && (
             <BadgeCheck
               className="mt-0.5 h-4.5 w-4.5 shrink-0 text-brand-600"
-              aria-label="עסק מאומת"
+              aria-label="חברה מאומתת"
             />
           )}
         </div>

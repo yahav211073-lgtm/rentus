@@ -179,34 +179,10 @@ export function SearchBar({
         className={cn(
           "relative flex flex-col gap-2 bg-white p-2 md:flex-row md:items-center md:gap-0",
           isHero
-            ? "rounded-2xl shadow-[0_24px_60px_-16px_rgba(5,25,47,0.5)]"
+            ? "rounded-lg p-0 shadow-[0_24px_60px_-16px_rgba(5,25,47,0.5)]"
             : "rounded-lg border border-ink-200 shadow-md",
         )}
       >
-        {/* עיר — ראשון מימין ב-RTL, כמו ברפרנס */}
-        <SelectField
-          icon={<MapPin className="h-4.5 w-4.5 text-ink-400" />}
-          value={city}
-          onChange={setCity}
-          label="כל האזורים"
-          ariaLabel="בחירת אזור"
-          options={cities.map((c) => ({ value: c.slug, label: c.name }))}
-        />
-
-        <Divider />
-
-        {/* קטגוריה */}
-        <SelectField
-          icon={<Building2 className="h-4.5 w-4.5 text-ink-400" />}
-          value={category}
-          onChange={setCategory}
-          label="כל הקטגוריות"
-          ariaLabel="בחירת קטגוריה"
-          options={categories.map((c) => ({ value: c.slug, label: c.parentId ? `— ${c.name}` : c.name }))}
-        />
-
-        <Divider />
-
         {/* מה מחפשים */}
         <div className="relative flex flex-1 items-center gap-2.5 px-3 py-1">
           <input
@@ -216,8 +192,8 @@ export function SearchBar({
             onChange={(e) => { setQuery(e.target.value); setOpen(true); setActiveIndex(-1); }}
             onFocus={() => setOpen(true)}
             onKeyDown={onKeyDown}
-            placeholder="מה אתם רוצים להשכיר?"
-            aria-label="מה אתם רוצים להשכיר"
+            placeholder="מה אתם מחפשים?"
+            aria-label="מה אתם מחפשים"
             role="combobox"
             aria-expanded={open}
             aria-controls="search-suggestions"
@@ -237,12 +213,34 @@ export function SearchBar({
           )}
         </div>
 
+        <Divider />
+
+        <SelectField
+          icon={<Building2 className="h-4.5 w-4.5 text-ink-400" />}
+          value={category}
+          onChange={setCategory}
+          label="כל הקטגוריות"
+          ariaLabel="בחירת קטגוריה"
+          options={categories.map((c) => ({ value: c.slug, label: c.parentId ? `— ${c.name}` : c.name }))}
+        />
+
+        <Divider />
+
+        <SelectField
+          icon={<MapPin className="h-4.5 w-4.5 text-ink-400" />}
+          value={city}
+          onChange={setCity}
+          label="כל האזורים"
+          ariaLabel="בחירת אזור"
+          options={cities.map((c) => ({ value: c.slug, label: c.name }))}
+        />
+
         <button
           type="submit"
           aria-label="חיפוש"
           className={cn(
             "grid shrink-0 place-items-center bg-brand-700 text-white transition-colors hover:bg-brand-600",
-            isHero ? "h-13 w-13 rounded-xl md:h-full md:min-h-13" : "h-11 w-11 rounded-md",
+            isHero ? "h-14 w-16 rounded-none rounded-s-lg md:min-h-14" : "h-11 w-11 rounded-md",
           )}
         >
           <Search className={isHero ? "h-5.5 w-5.5" : "h-5 w-5"} />

@@ -2,18 +2,20 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { X } from "lucide-react";
 import type { Banner } from "@/types/domain";
 import { detectDevice, isWithinSchedule, matchesTargeting } from "@/lib/ads/targeting";
+import { useStoredFlag, writeStored } from "@/lib/hooks/browser-state";
 import { pickWeighted } from "@/lib/utils";
 
 /**
  * עמודת שוליים קבועה.
  *
- * לא באנר צף שמדביק את עצמו על התוכן ואפשר לסגור — זה בדיוק מה
- * שגרם לו להרגיש כמו פרסומת פולשנית. זו עמודת שוליים תמידית, צמודה
- * לקצה האמיתי של המסך, בלי מסגרת/צל/כפתור סגירה — חלק קבוע מהעמוד,
- * לא חלון קופץ. היא עדיין `fixed` מבחינה טכנית (כדי לא לגעת ברוחב
- * התוכן בכל עמוד באתר), אבל מוצגת רק כשיש שוליים אמיתיים ופנויים.
+ * צמודה לקצה האמיתי של המסך, בלי כרטיס/מסגרת/צל — חלק קבוע מהעמוד,
+ * לא חלון קופץ. `fixed` מבחינה טכנית (כדי לא לגעת ברוחב התוכן בכל
+ * עמוד באתר), מוצגת רק כשיש שוליים אמיתיים ופנויים, וניתנת לסגירה
+ * בכפתור X — הסגירה נזכרת לכל הסשן, כדי שגולש שסגר לא יראה אותה
+ * שוב בכל ניווט לעמוד הבא.
  *
  * · חשיפה נספרת פעם אחת, וברגע שהבאנר באמת נראה (IntersectionObserver),
  *   לא ברגע שהוא נוצר ב-DOM. חשיפה שלא נראתה היא לא חשיפה, וספירה
@@ -22,6 +24,8 @@ import { pickWeighted } from "@/lib/utils";
  * · הבאנר מסומן כ"פרסומת" בטקסט גלוי — דרישה של הנחיות פרסום
  *   וגם של אמון בסיסי.
  */
+
+const DISMISS_KEY = "index:side-banners-dismissed";
 
 interface Props {
   banners: Banner[];
@@ -36,6 +40,7 @@ export function SideBanner({
   banners, side, isLoggedIn = false, isBusinessOwner = false, categorySlugs, citySlug,
 }: Props) {
   const pathname = usePathname();
+  const dismissed = useStoredFlag("session", DISMISS_KEY);
   const [hasRoom, setHasRoom] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const trackedRef = useRef(false);
@@ -99,6 +104,11 @@ export function SideBanner({
     return () => observer.disconnect();
   }, [banner, pathname]);
 
+  function dismiss() {
+    // הכתיבה מפיצה אירוע שמעדכן את כל הבאנרים בעמוד בבת אחת
+    writeStored("session", DISMISS_KEY, "1");
+  }
+
   function trackClick() {
     if (!banner) return;
     void fetch("/api/ads/event", {
@@ -111,7 +121,7 @@ export function SideBanner({
 
   // באנר בלי קריאייטיב אינו באנר. מסגרת ריקה בשולי המסך היא בדיוק
   // מה שגורם לאתר להיראות לא גמור, ולכן במקרה כזה לא מוצג כלום.
-  if (!banner || !banner.assetUrl || !hasRoom) return null;
+  if (!banner || !banner.assetUrl || !hasRoom || dismissed) return null;
 
   const content =
     banner.kind === "video" ? (
@@ -137,6 +147,15 @@ export function SideBanner({
         <span className="absolute top-2 z-10 rounded-xs bg-ink-950/55 px-1.5 py-0.5 text-2xs font-medium text-white/85" style={{ insetInlineStart: "0.5rem" }}>
           פרסומת
         </span>
+        <button
+          type="button"
+          onClick={dismiss}
+          aria-label="סגירת הפרסומת"
+          className="absolute top-2 z-10 grid h-6 w-6 place-items-center rounded-full bg-ink-950/55 text-white/85 backdrop-blur-sm transition-colors hover:bg-ink-950/75 hover:text-white"
+          style={{ insetInlineEnd: "0.5rem" }}
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
         <div className="aspect-[160/500] overflow-hidden">
           {banner.href ? (
             <a
