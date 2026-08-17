@@ -11,18 +11,13 @@ import { getArticles } from "@/lib/repo/articles";
 export async function GuidesSidebar({ className }: { className?: string }) {
   const articles = (await getArticles()).slice(0, 3);
   if (articles.length === 0) return null;
-  const referenceCopy = [
-    { title: "איך לבחור חברת השכרת ציוד", excerpt: "מדריך מקיף לבחירת החברה המתאימה" },
-    { title: "השכרת מכשירי קשר — המדריך המלא", excerpt: "כל מה שצריך לדעת לפני שמזמינים" },
-    { title: "ציוד לאירועים: מה חשוב לדעת?", excerpt: "טיפים לתכנון אירוע מושלם" },
-  ];
 
   return (
     <aside className={`rounded-lg border border-ink-200/70 bg-white p-5 shadow-[0_1px_3px_rgba(11,59,117,0.06)] ${className ?? ""}`}>
       <h3 className="mb-4 font-display text-lg font-extrabold text-ink-900">מדריכים מומלצים</h3>
 
       <ul className="space-y-4">
-        {articles.map((a, index) => (
+        {articles.map((a) => (
           <li key={a.id} className="border-b border-ink-100 pb-4 last:border-0 last:pb-0">
             <Link href={`/blog/${a.slug}`} className="group flex items-start gap-3">
               <span className="relative h-16 w-20 shrink-0 overflow-hidden rounded-md">
@@ -30,11 +25,11 @@ export async function GuidesSidebar({ className }: { className?: string }) {
               </span>
               <span className="min-w-0">
                 <span className="block text-sm font-bold leading-snug text-brand-700 line-clamp-2 group-hover:text-brand-500">
-                  {referenceCopy[index]?.title ?? a.title}
+                  {a.title}
                 </span>
                 {a.excerpt && (
                   <span className="mt-1 block text-xs leading-relaxed text-ink-400 line-clamp-2">
-                    {referenceCopy[index]?.excerpt ?? a.excerpt}
+                    {a.excerpt}
                   </span>
                 )}
               </span>

@@ -7,6 +7,7 @@ import { UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { InteriorHero } from "@/components/layout/InteriorHero";
 
 /**
  * הרשמה — Google או אימייל+סיסמה.
@@ -88,7 +89,10 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-16 sm:px-6">
+    <div className="bg-ink-50 pb-20">
+      <InteriorHero eyebrow="מצטרפים ל-Rentus" title="יצירת חשבון" description="חשבון אחד לחיפוש, ביקורות וניהול חברה." compact />
+    <div className="mx-auto -mt-5 max-w-md px-4 sm:px-6">
+      <div className="relative rounded-xl border border-ink-200 bg-white p-6 shadow-[0_24px_60px_-28px_rgba(11,59,117,.4)] sm:p-8">
       <h1 className="mb-1.5 font-display text-2xl font-extrabold text-ink-900">יצירת חשבון</h1>
       <p className="mb-7 text-sm text-ink-500">
         כבר יש לכם חשבון? <Link href={`/login?next=${encodeURIComponent(next)}`} className="font-bold text-brand-700 hover:text-brand-500">כניסה</Link>
@@ -133,6 +137,8 @@ export default function SignupPage() {
       <p className="mt-5 text-2xs leading-relaxed text-ink-400">
         בהרשמה אתם מאשרים את תנאי השימוש ומדיניות הפרטיות.
       </p>
+      </div>
+    </div>
     </div>
   );
 }

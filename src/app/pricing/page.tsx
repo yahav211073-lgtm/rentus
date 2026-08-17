@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Check } from "lucide-react";
 import { ButtonLink } from "@/components/ui/Button";
 import { getBrandSettings } from "@/lib/repo/branding";
+import { InteriorHero } from "@/components/layout/InteriorHero";
 
 export const metadata: Metadata = { title: "מסלולי פרסום", alternates: { canonical: "/pricing" } };
 
@@ -20,17 +21,15 @@ export default async function PricingPage() {
   const brand = await getBrandSettings();
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-16 sm:px-6">
-      <div className="mb-12 text-center">
-        <h1 className="mb-3 font-display text-3xl font-extrabold text-ink-900">מסלולי פרסום</h1>
-        <p className="text-ink-500">פרופיל בסיסי תמיד ללא עלות. מסלולים בתשלום מוסיפים בליטה בתוצאות.</p>
-      </div>
+    <div className="bg-ink-50 pb-20">
+      <InteriorHero eyebrow="לבעלי חברות" title="מסלולי פרסום" description="פרופיל בסיסי תמיד ללא עלות. מסלול פרימיום מוסיף נראות במקומות שבהם הלקוחות מחפשים." compact />
+      <div className="mx-auto max-w-4xl px-4 pt-10 sm:px-6">
 
       <div className="grid gap-6 sm:grid-cols-2">
         {PLANS.map((plan) => (
           <div
             key={plan.name}
-            className={`flex flex-col border p-7 ${plan.highlight ? "border-accent-400 bg-brand-900 text-white" : "border-ink-200/70 bg-white"}`}
+            className={`flex flex-col overflow-hidden rounded-xl border p-7 shadow-[0_14px_34px_-24px_rgba(11,59,117,.35)] ${plan.highlight ? "border-brand-700 bg-brand-900 text-white" : "border-ink-200/70 bg-white"}`}
           >
             <h2 className={`mb-1 font-display text-xl font-bold ${plan.highlight ? "text-white" : "text-ink-900"}`}>{plan.name}</h2>
             <p className={`mb-6 font-display text-3xl font-extrabold ${plan.highlight ? "text-accent-400" : "text-brand-800"}`}>{plan.price}</p>
@@ -56,6 +55,7 @@ export default async function PricingPage() {
       <p className="mt-8 text-center text-xs text-ink-400">
         המחירים והמסלולים ב-{brand.name} מנוהלים ידנית ועשויים להשתנות. לפרטים מלאים דברו איתנו.
       </p>
+      </div>
     </div>
   );
 }

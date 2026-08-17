@@ -16,14 +16,6 @@ import { CategoryIcon } from "@/components/ui/CategoryIcon";
  */
 export async function CategoryRail() {
   const categories = (await getCategoriesWithCounts()).slice(0, 7);
-  const referenceCounts: Record<string, number> = {
-    "machshirei-kesher": 215,
-    eventim: 356,
-    generatorim: 173,
-    teura: 189,
-    "hagbara-sound": 226,
-    "bamot-terasot": 142,
-  };
 
   if (categories.length === 0) return null;
 
@@ -71,7 +63,7 @@ export async function CategoryRail() {
                   {cat.name}
                 </span>
                 <span className="text-xs text-ink-400">
-                  {businessCountLabel(referenceCounts[cat.slug] ?? cat.businessCount ?? 0)}
+                  {businessCountLabel(cat.businessCount ?? 0)}
                 </span>
               </span>
             </Link>

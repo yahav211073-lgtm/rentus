@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/Badge";
 import { ArticleCover } from "@/components/home/BlogSection";
 import { getBrandSettings } from "@/lib/repo/branding";
 import { getArticles } from "@/lib/repo/articles";
+import { InteriorHero } from "@/components/layout/InteriorHero";
 
 export async function generateMetadata(): Promise<Metadata> {
   const brand = await getBrandSettings();
@@ -19,11 +20,14 @@ export default async function BlogIndexPage() {
   const articles = await getArticles();
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
-      <h1 className="mb-3 font-display text-3xl font-extrabold text-ink-900">מדריכים</h1>
-      <p className="mb-10 max-w-2xl text-lg leading-relaxed text-ink-600">
-        מדריכים מעשיים שנכתבו כדי לחסוך טעויות יקרות — בלי תוכן שיווקי.
-      </p>
+    <div className="bg-ink-50 pb-20">
+      <InteriorHero
+        eyebrow="הידע של Rentus"
+        title="מדריכים מקצועיים להשכרה חכמה"
+        description="כל המאמרים שפורסמו במערכת — מידע מעשי שעוזר לבחור ציוד וחברה בלי טעויות יקרות."
+        compact
+      />
+      <div className="mx-auto max-w-[1180px] px-4 pt-10 sm:px-6">
 
       {articles.length === 0 ? (
         <div className="rounded-lg border border-dashed border-ink-300 bg-ink-50 px-6 py-16 text-center">
@@ -65,6 +69,7 @@ export default async function BlogIndexPage() {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }

@@ -17,38 +17,6 @@ import { getArticles } from "@/lib/repo/articles";
 import { getBrandSettings } from "@/lib/repo/branding";
 import { getCategoriesWithCounts } from "@/lib/repo/categories";
 import { getCities } from "@/lib/repo/taxonomy";
-import type { BusinessCard as BusinessCardType } from "@/types/domain";
-
-const REFERENCE_BUSINESSES: BusinessCardType[] = [
-  {
-    id: "reference-energy", slug: "energy", name: "ENERGY", tagline: "השכרת גנרטורים מכל הסוגים",
-    logoUrl: null, coverUrl: null, ratingAvg: 4.5, reviewCount: 66, isVerified: true,
-    isFeatured: true, isSponsored: false, tier: "premium", priceRange: null,
-    phone: "072-3909090", whatsapp: null, website: null, social: {},
-    city: { name: "אשדוד", slug: "ashdod" }, primaryCategory: { name: "גנרטורים", slug: "generatorim" }, tags: [],
-  },
-  {
-    id: "reference-big-machine", slug: "big-machine", name: "ביג מאשין", tagline: "השכרת ציוד כבד, במות ופתרונות הרמה",
-    logoUrl: null, coverUrl: null, ratingAvg: 4.5, reviewCount: 74, isVerified: true,
-    isFeatured: true, isSponsored: false, tier: "premium", priceRange: null,
-    phone: "072-2505050", whatsapp: null, website: null, social: {},
-    city: { name: "חיפה", slug: "haifa" }, primaryCategory: { name: "במות והרמה", slug: "bamot-terasot" }, tags: [],
-  },
-  {
-    id: "reference-all-sound", slug: "all-sound", name: "ALL SOUND", tagline: "הגברה, תאורה ובמות לאירועים",
-    logoUrl: null, coverUrl: null, ratingAvg: 5, reviewCount: 87, isVerified: true,
-    isFeatured: true, isSponsored: false, tier: "premium", priceRange: null,
-    phone: "072-2208080", whatsapp: null, website: null, social: {},
-    city: { name: "תל אביב", slug: "tel-aviv" }, primaryCategory: { name: "הגברה וסאונד", slug: "hagbara-sound" }, tags: [],
-  },
-  {
-    id: "reference-talsol", slug: "talsol", name: "טליסול", tagline: "השכרת מכשירי קשר ופתרונות תקשורת",
-    logoUrl: null, coverUrl: null, ratingAvg: 5, reviewCount: 98, isVerified: true,
-    isFeatured: true, isSponsored: false, tier: "premium", priceRange: null,
-    phone: "072-3313131", whatsapp: null, website: null, social: {},
-    city: { name: "פתח תקווה", slug: "petah-tikva" }, primaryCategory: { name: "מכשירי קשר", slug: "machshirei-kesher" }, tags: [],
-  },
-];
 
 /**
  * עמוד הבית.
@@ -70,7 +38,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const [{ sponsored, popular, latest }, brand, categories, cities, articles] = await Promise.all([
+  const [{ topRated, featured, sponsored, popular, latest }, brand, categories, cities, articles] = await Promise.all([
     getHomeBusinessSlices(),
     getBrandSettings(),
     getCategoriesWithCounts(),
@@ -78,7 +46,9 @@ export default async function HomePage() {
     getArticles(),
   ]);
 
-  const recommended = REFERENCE_BUSINESSES;
+  const recommended = [...featured, ...topRated].filter(
+    (business, index, all) => all.findIndex((candidate) => candidate.id === business.id) === index,
+  );
 
   return (
     <>

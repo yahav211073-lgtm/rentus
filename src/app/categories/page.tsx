@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getCategoriesWithCounts } from "@/lib/repo/categories";
 import { CategoryCarousel } from "@/components/categories/CategoryCarousel";
 import { CategoryGridSearch } from "@/components/categories/CategoryGridSearch";
+import { InteriorHero } from "@/components/layout/InteriorHero";
 
 export const metadata: Metadata = {
   title: "כל הקטגוריות",
@@ -24,16 +25,15 @@ export default async function CategoriesPage() {
 
   return (
     <div className="bg-ink-50 pb-20">
-      <div className="mx-auto max-w-[1480px] px-4 pt-14 text-center sm:px-6 lg:px-8">
-        <h1 className="mb-2 font-display text-3xl font-extrabold text-ink-900 sm:text-4xl">
-          מה אתם צריכים להשכיר?
-        </h1>
-        <p className="mx-auto mb-10 max-w-xl text-ink-500">
-          כל תחומי ההשכרה באתר, במקום אחד — דפדפו בין הקטגוריות או חפשו ישירות.
-        </p>
-      </div>
+      <InteriorHero
+        eyebrow="כל התחומים במקום אחד"
+        title="מה אתם צריכים להשכיר?"
+        description="דפדפו בין הקטגוריות הפעילות במערכת ומצאו חברות, ציוד ופתרונות בכל הארץ."
+        action={{ label: "לחיפוש מתקדם", href: "/search" }}
+        compact
+      />
 
-      <div className="mx-auto mb-16 max-w-[1100px] px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto mb-16 max-w-[1100px] px-4 pt-10 sm:px-6 lg:px-8">
         <CategoryCarousel items={flat} />
       </div>
 

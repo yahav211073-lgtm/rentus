@@ -12,7 +12,7 @@ import type { BusinessCard as BusinessCardType } from "@/types/domain";
  * גדולה) ממשיך לשמש בכל שאר האתר — לא נגעתי בו.
  */
 export function CompanyListCard({ business: b }: { business: BusinessCardType }) {
-  const href = b.id.startsWith("reference-") ? "/search" : `/business/${b.slug}`;
+  const href = `/business/${b.slug}`;
 
   return (
     <article className="group relative flex min-h-[222px] flex-col rounded-lg border border-ink-200/70 bg-white p-4 shadow-[0_1px_3px_rgba(11,59,117,0.06)] transition-shadow duration-300 hover:shadow-[0_16px_36px_-16px_rgba(11,59,117,0.2)]">

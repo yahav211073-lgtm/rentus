@@ -7,6 +7,7 @@ import { LogIn } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { InteriorHero } from "@/components/layout/InteriorHero";
 
 /**
  * כניסה מאוחדת — משתמשים רגילים ובעלי עסקים נכנסים מאותו טופס.
@@ -55,7 +56,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-16 sm:px-6">
+    <div className="bg-ink-50 pb-20">
+      <InteriorHero eyebrow="האזור האישי" title="כניסה לחשבון" description="שמרו חברות, כתבו ביקורות ונהלו את פרטי החברה שלכם במקום אחד." compact />
+    <div className="mx-auto -mt-5 max-w-md px-4 sm:px-6">
+      <div className="relative rounded-xl border border-ink-200 bg-white p-6 shadow-[0_24px_60px_-28px_rgba(11,59,117,.4)] sm:p-8">
       <h1 className="mb-1.5 font-display text-2xl font-extrabold text-ink-900">כניסה לחשבון</h1>
       <p className="mb-7 text-sm text-ink-500">
         עדיין אין לכם חשבון? <Link href={`/signup?next=${encodeURIComponent(next)}`} className="font-bold text-brand-700 hover:text-brand-500">הרשמה</Link>
@@ -85,6 +89,8 @@ export default function LoginPage() {
           <p role="alert" className="text-sm text-danger-500">{error}</p>
         )}
       </form>
+      </div>
+    </div>
     </div>
   );
 }
