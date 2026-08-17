@@ -40,7 +40,7 @@ interface Props {
 
 const PRICE_LABELS = ["₪", "₪₪", "₪₪₪", "₪₪₪₪"];
 
-export function BusinessCard({ business: b, emphasis = false, className }: Props) {
+export function BusinessCard({ business: b, emphasis = false, className, priority = false }: Props) {
   const href = `/business/${b.slug}`;
 
   return (
@@ -67,7 +67,8 @@ export function BusinessCard({ business: b, emphasis = false, className }: Props
               src={b.coverUrl}
               alt={`תמונת רקע של ${b.name}`}
               className="h-full w-full object-cover"
-              loading="lazy"
+              loading={priority ? "eager" : "lazy"}
+              fetchPriority={priority ? "high" : "auto"}
             />
           ) : (
             <CoverArt seed={b.slug} label={b.name.charAt(0)} className="h-full w-full" />

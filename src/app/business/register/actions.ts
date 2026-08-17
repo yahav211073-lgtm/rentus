@@ -66,7 +66,15 @@ export async function submitBusinessRequest(formData: FormData) {
     .single();
 
   if (error || !business) {
-    return { ok: false as const, error: "שמירת הבקשה נכשלה. נסו שוב או פנו אלינו בוואטסאפ." };
+    console.error("[submitBusinessRequest] insert into businesses failed:", error);
+    const fallback = "שמירת הבקשה נכשלה. נסו שוב או פנו אלינו בוואטסאפ.";
+    const message =
+      error?.code === "23503" && error.message.includes("city_id")
+        ? "יש לבחור עיר תקינה מהרשימה."
+        : error?.code === "42501" || error?.message?.includes("row-level security")
+          ? "אין הרשאה לבצע פעולה זו. נסו להתחבר מחדש."
+          : fallback;
+    return { ok: false as const, error: message };
   }
 
   // שיוך הקטגוריה נכשל לעיתים על RLS של טבלת הקישור. עסק בלי

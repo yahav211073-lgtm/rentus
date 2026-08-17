@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/env";
 import { seedCategories } from "@/data/seed";
@@ -7,8 +8,12 @@ import type { Category } from "@/types/domain";
  * קטגוריות עם ספירה אמיתית של עסקים פורסמים — לא המספרים הקבועים
  * מה-seed. קטגוריית-על סופרת גם את הילדים שלה, כמו שמצפים לראות
  * ב"מוסכים" שמכיל גם "פנצ'רייה" וגם "חשמלאי רכב".
+ *
+ * עטוף ב-cache(): נקרא גם מ-layout.tsx (ניווט) וגם מכל עמוד קטגוריה
+ * (generateMetadata + גוף העמוד) באותה בקשה — בלי דה-דופליקציה זו
+ * אותה שאילתה רצה כמה פעמים ברצף.
  */
-export async function getCategoriesWithCounts(): Promise<Category[]> {
+export const getCategoriesWithCounts = cache(async (): Promise<Category[]> => {
   if (!isSupabaseConfigured) return seedCategories;
 
   const supabase = await createSupabaseServerClient();
@@ -57,4 +62,4 @@ export async function getCategoriesWithCounts(): Promise<Category[]> {
       children: kids.map((k) => toDomain(k, ownCount.get(k.id) ?? 0)),
     };
   });
-}
+});

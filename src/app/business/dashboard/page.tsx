@@ -27,7 +27,7 @@ export default async function BusinessDashboardPage() {
   const [{ data: businesses }, { data: notifications }] = await Promise.all([
     supabase
       .from("businesses")
-      .select("id, slug, name, tagline, description, address, phone, whatsapp, email, website, status, rejection_reason")
+      .select("id, slug, name, tagline, description, address, phone, whatsapp, email, website, status, rejection_reason, cover_url, logo_url")
       .eq("owner_id", user.id)
       .order("created_at", { ascending: false }),
     supabase
@@ -39,14 +39,25 @@ export default async function BusinessDashboardPage() {
   ]);
 
   const ids = (businesses ?? []).map((b) => b.id);
-  const { data: allLeads } = ids.length
-    ? await supabase
-        .from("leads")
-        .select("id, business_id, name, phone, message, created_at")
-        .in("business_id", ids)
-        .order("created_at", { ascending: false })
-        .limit(200)
-    : { data: [] };
+  const [{ data: allLeads }, { data: allHours }, { data: allServices }] = ids.length
+    ? await Promise.all([
+        supabase
+          .from("leads")
+          .select("id, business_id, name, phone, message, created_at")
+          .in("business_id", ids)
+          .order("created_at", { ascending: false })
+          .limit(200),
+        supabase
+          .from("business_hours")
+          .select("business_id, day_of_week, opens_at, closes_at, is_closed")
+          .in("business_id", ids),
+        supabase
+          .from("business_services")
+          .select("business_id, id, name, description, price, price_unit")
+          .in("business_id", ids)
+          .order("sort_order", { ascending: true }),
+      ])
+    : [{ data: [] }, { data: [] }, { data: [] }];
 
   const leadsByBusiness = new Map<string, OwnerBusiness["leads"]>();
   for (const l of allLeads ?? []) {
@@ -55,6 +66,20 @@ export default async function BusinessDashboardPage() {
       list.push({ id: l.id, name: l.name, phone: l.phone, message: l.message, createdAt: l.created_at });
     }
     leadsByBusiness.set(l.business_id, list);
+  }
+
+  const hoursByBusiness = new Map<string, OwnerBusiness["hours"]>();
+  for (const h of allHours ?? []) {
+    const list = hoursByBusiness.get(h.business_id) ?? [];
+    list.push({ dayOfWeek: h.day_of_week, opensAt: h.opens_at, closesAt: h.closes_at, isClosed: h.is_closed });
+    hoursByBusiness.set(h.business_id, list);
+  }
+
+  const servicesByBusiness = new Map<string, OwnerBusiness["services"]>();
+  for (const s of allServices ?? []) {
+    const list = servicesByBusiness.get(s.business_id) ?? [];
+    list.push({ id: s.id, name: s.name, description: s.description, price: s.price, priceUnit: s.price_unit });
+    servicesByBusiness.set(s.business_id, list);
   }
 
   const ownerBusinesses: OwnerBusiness[] = (businesses ?? []).map((b) => ({
@@ -69,7 +94,11 @@ export default async function BusinessDashboardPage() {
     website: b.website,
     status: b.status,
     rejectionReason: b.rejection_reason,
+    coverUrl: b.cover_url,
+    logoUrl: b.logo_url,
     leads: leadsByBusiness.get(b.id) ?? [],
+    hours: hoursByBusiness.get(b.id) ?? [],
+    services: servicesByBusiness.get(b.id) ?? [],
   }));
 
   const notificationItems: OwnerNotification[] = (notifications ?? []).map((n) => ({

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/env";
 import { seedBusinesses, seedBusinessDetail, seedReviews } from "@/data/seed";
@@ -140,7 +141,13 @@ function mapDetail(row: Row): Business {
   };
 }
 
-export async function getBusinessBySlug(slug: string): Promise<Business | null> {
+/**
+ * עטוף ב-cache() של React בכוונה: generateMetadata ורכיב העמוד שניהם
+ * קוראים לפונקציה הזו עם אותו slug באותה בקשה. בלי דה-דופליקציה זו
+ * שאילתת Supabase רצה פעמיים ברצף — ותרומה ישירה ל-TTFB (ר' מדידת
+ * Lighthouse שהובילה לתיקון הזה).
+ */
+export const getBusinessBySlug = cache(async (slug: string): Promise<Business | null> => {
   if (!isSupabaseConfigured) {
     return slug === seedBusinessDetail.slug ? seedBusinessDetail : null;
   }
@@ -156,7 +163,7 @@ export async function getBusinessBySlug(slug: string): Promise<Business | null> 
 
   if (error || !data) return null;
   return mapDetail(data);
-}
+});
 
 export async function getRelatedBusinesses(business: Business, limit = 4): Promise<BusinessCard[]> {
   if (!isSupabaseConfigured) {

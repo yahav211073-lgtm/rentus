@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Inbox } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { LeadsTable, type AdminLead } from "@/components/admin/LeadsTable";
-import { LEAD_STATUS_LABEL, type LeadStatus } from "@/app/admin/leads/actions";
+import { LEAD_STATUS_LABEL, type LeadStatus } from "@/lib/lead-status";
 
 export const metadata = { title: "פניות", robots: { index: false, follow: false } };
 

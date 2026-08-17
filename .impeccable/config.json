@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "codex-grid-background",
+        "value": ".bg-dots",
+        "files": [
+          "src/app/globals.css"
+        ],
+        "createdAt": "2026-08-17T08:43:39.764Z",
+        "reason": "pre-existing subtle texture utility (opacity ~0.03 effective), used consistently as a decorative accent on solid-color bands in search header/newsletter/footer, not a page-wide blueprint-style grid; not authored or touched in this session"
+      }
+    ]
+  }
+}

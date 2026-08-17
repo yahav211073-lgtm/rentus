@@ -5,6 +5,7 @@ export interface BrandSettings {
   name: string;
   tagline: string;
   logoUrl: string | null;
+  heroImageUrl: string;
   colors: { primary: string; secondary: string; accent: string; background: string };
 }
 
@@ -12,6 +13,7 @@ const DEFAULTS: BrandSettings = {
   name: env.siteName,
   tagline: "כל מה שמשכירים, במקום אחד",
   logoUrl: null,
+  heroImageUrl: "/images/hero-stage.jpg",
   colors: { primary: "#0A4590", secondary: "#0D63D6", accent: "#FFC107", background: "#EAF5FF" },
 };
 
@@ -31,13 +33,14 @@ export async function getBrandSettings(): Promise<BrandSettings> {
     .select("key, value")
     .in("key", ["brand.identity", "brand.colors"]);
 
-  const identity = data?.find((r) => r.key === "brand.identity")?.value as Partial<{ name: string; tagline: string; logoUrl: string }> | undefined;
+  const identity = data?.find((r) => r.key === "brand.identity")?.value as Partial<{ name: string; tagline: string; logoUrl: string; heroImageUrl: string }> | undefined;
   const colors = data?.find((r) => r.key === "brand.colors")?.value as Partial<BrandSettings["colors"]> | undefined;
 
   return {
     name: identity?.name || DEFAULTS.name,
     tagline: identity?.tagline || DEFAULTS.tagline,
     logoUrl: identity?.logoUrl || null,
+    heroImageUrl: identity?.heroImageUrl || DEFAULTS.heroImageUrl,
     colors: {
       primary: colors?.primary || DEFAULTS.colors.primary,
       secondary: colors?.secondary || DEFAULTS.colors.secondary,

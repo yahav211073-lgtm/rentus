@@ -41,6 +41,11 @@ function toMinutes(time: string): number {
   return h * 60 + m;
 }
 
+/** "09:00:00" (כפי ש-Postgres מחזיר עמודת time) -> "09:00". */
+function formatTime(time: string): string {
+  return time.slice(0, 5);
+}
+
 export function OpeningHours({ hours }: { hours: BusinessHours[] }) {
   const { day: today, minutes: nowMin } = nowInIsrael();
 
@@ -84,7 +89,7 @@ export function OpeningHours({ hours }: { hours: BusinessHours[] }) {
               <span className={cn("tabular-nums", h.isClosed && "text-ink-400")}>
                 {h.isClosed
                   ? (h.note ?? "סגור")
-                  : `${h.opensAt} – ${h.closesAt}`}
+                  : `${formatTime(h.opensAt!)} – ${formatTime(h.closesAt!)}`}
               </span>
             </li>
           );

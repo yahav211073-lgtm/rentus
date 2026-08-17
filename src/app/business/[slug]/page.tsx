@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -81,8 +82,14 @@ export default async function BusinessPage({ params }: { params: Params }) {
       {/* --- כיסוי --- */}
       <div className="relative h-[280px] overflow-hidden sm:h-[360px]">
         {b.coverUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={b.coverUrl} alt={`תמונת רקע של ${b.name}`} className="h-full w-full object-cover" />
+          <Image
+            src={b.coverUrl}
+            alt={`תמונת רקע של ${b.name}`}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
         ) : (
           <CoverArt seed={b.slug} className="h-full w-full" />
         )}
@@ -142,7 +149,7 @@ export default async function BusinessPage({ params }: { params: Params }) {
                       {b.address ?? b.city.name}
                     </span>
                   )}
-                  {b.viewCount && (
+                  {b.viewCount != null && b.viewCount > 0 && (
                     <span className="text-ink-400">{formatNumber(b.viewCount)} צפיות</span>
                   )}
                 </div>

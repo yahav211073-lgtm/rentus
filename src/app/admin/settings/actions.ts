@@ -59,6 +59,11 @@ export async function updateBrandIdentity(formData: FormData) {
   });
   if (!logo.ok) return { ok: false, error: logo.error };
 
+  const hero = await resolveImageField(formData, {
+    fileKey: "hero", urlKey: "__none__", clearKey: "heroClear", folder: "brand",
+  });
+  if (!hero.ok) return { ok: false, error: hero.error };
+
   const { data: current } = await supabase
     .from("settings").select("value").eq("key", "brand.identity").maybeSingle();
   const existing = (current?.value ?? {}) as Record<string, unknown>;
@@ -70,8 +75,9 @@ export async function updateBrandIdentity(formData: FormData) {
     ...existing,
     name,
     tagline: String(formData.get("tagline") ?? "").trim(),
-    // undefined = לא נגעו בשדה התמונה; שומרים על הלוגו הקיים.
+    // undefined = לא נגעו בשדה התמונה; שומרים על הערך הקיים.
     logoUrl: logo.url === undefined ? (existing.logoUrl ?? null) : logo.url,
+    heroImageUrl: hero.url === undefined ? (existing.heroImageUrl ?? null) : hero.url,
   });
 }
 

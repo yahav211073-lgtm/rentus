@@ -3,6 +3,7 @@ import { Heebo, Inter } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AccessibilityToolbar } from "@/components/a11y/AccessibilityToolbar";
+import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 import { PopupManager } from "@/components/ads/PopupManager";
 import { SideBanner } from "@/components/ads/SideBanner";
 import { env } from "@/lib/env";
@@ -65,6 +66,16 @@ export async function generateMetadata(): Promise<Metadata> {
     description: `${brand.name} — מדריך ישראלי לעסקים להשכרה: ציוד, רכבים, חללים, כלים וטכנולוגיה בכל הארץ.`,
     keywords: ["השכרת ציוד לאירועים", "השכרת אוהלים", "השכרת רכב", "כלים ומכונות", brand.name],
     authors: [{ name: brand.name }],
+    manifest: "/manifest.json",
+    icons: {
+      icon: "/favicon.ico",
+      apple: "/apple-touch-icon.png",
+    },
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: brand.name,
+    },
     openGraph: {
       type: "website",
       locale: "he_IL",
@@ -173,10 +184,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           categories={categories}
           phone={contact.phone}
         />
-        <main id="main" className="flex-1">{children}</main>
+        <main id="main" className="flex-1" style={{ paddingTop: "var(--spacing-header)" }}>{children}</main>
         <Footer brandName={brand.name} />
 
         <AccessibilityToolbar />
+        <ServiceWorkerRegister />
         {/*
           הפופאפים והבאנרים נטענים בשרת מ-banners/popup_banners לפי
           is_active, כדי שאין הבהוב של תוכן שיווקי לפני שכללי המיקוד

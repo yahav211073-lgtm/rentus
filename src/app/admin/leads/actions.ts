@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireStaff } from "@/lib/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
+import { STATUSES, type LeadStatus } from "@/lib/lead-status";
 
 /**
  * ניהול פניות.
@@ -11,17 +12,6 @@ import { createSupabaseAdminClient } from "@/lib/supabase/server";
  * הערך שהגיע מהלקוח — Server Action היא נקודת קצה לכל דבר, וכל מי
  * שיש לו סשן יכול לקרוא לה עם כל מחרוזת.
  */
-const STATUSES = ["new", "contacted", "qualified", "won", "lost", "spam"] as const;
-export type LeadStatus = (typeof STATUSES)[number];
-
-export const LEAD_STATUS_LABEL: Record<LeadStatus, string> = {
-  new: "חדשה",
-  contacted: "יצרנו קשר",
-  qualified: "רלוונטית",
-  won: "נסגרה בהצלחה",
-  lost: "לא רלוונטית",
-  spam: "ספאם",
-};
 
 export async function updateLeadStatus(leadId: string, status: string) {
   await requireStaff();

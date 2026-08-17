@@ -7,7 +7,7 @@ import { ImageUploadField } from "@/components/admin/ImageUploadField";
 import { updateBrandIdentity, updateSetting, updateSocialLinks } from "@/app/admin/settings/actions";
 
 interface Props {
-  brandIdentity: { name: string; tagline: string; logoUrl: string | null };
+  brandIdentity: { name: string; tagline: string; logoUrl: string | null; heroImageUrl: string | null };
   brandColors: { primary: string; secondary: string; accent: string; background: string };
   contactDetails: { phone: string; email: string; address: string; whatsapp: string };
   socialLinks: Record<string, string>;
@@ -103,6 +103,15 @@ function BrandIdentitySection({ identity }: { identity: Props["brandIdentity"] }
           currentUrl={identity.logoUrl}
           hint="PNG שקוף מומלץ · יוצג בגובה 40 פיקסלים"
           aspect="5/2"
+          className="sm:col-span-2"
+        />
+
+        <ImageUploadField
+          name="hero"
+          label="תמונת רקע להירו (עמוד הבית)"
+          currentUrl={identity.heroImageUrl}
+          hint="JPG או WebP רחב מומלץ · מוצג מאחורי הכותרת בעמוד הבית"
+          aspect="16/9"
           className="sm:col-span-2"
         />
       </div>

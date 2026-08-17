@@ -90,7 +90,10 @@ export function AdminShell({
   return (
     <div className="min-h-screen bg-ink-50">
       {/* סרגל עליון — במובייל בלבד */}
-      <div className="sticky top-0 z-40 flex items-center justify-between gap-3 border-b border-ink-200 bg-white px-4 py-3 lg:hidden">
+      <div
+        className="sticky z-40 flex items-center justify-between gap-3 border-b border-ink-200 bg-white px-4 py-3 lg:hidden"
+        style={{ top: "var(--spacing-header)" }}
+      >
         <button
           type="button"
           onClick={() => setOpen(true)}
@@ -113,7 +116,7 @@ export function AdminShell({
       <div className="mx-auto flex max-w-[1480px] flex-col gap-6 px-4 py-6 sm:px-6 lg:flex-row lg:px-8">
         {/* סרגל צד — דסקטופ */}
         <aside className="hidden shrink-0 lg:block lg:w-60">
-          <div className="sticky top-6">
+          <div className="sticky" style={{ top: "calc(var(--spacing-header) + 24px)" }}>
             <div className="mb-4 rounded-lg border border-ink-200/70 bg-white p-4">
               <p className="text-2xs text-ink-400">מחובר כ־</p>
               <p className="truncate font-bold text-ink-800">{userName}</p>

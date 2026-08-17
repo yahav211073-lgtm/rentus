@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import { SearchBar } from "@/components/search/SearchBar";
 import type { Category } from "@/types/domain";
@@ -13,18 +14,27 @@ import type { SimpleCity } from "@/lib/repo/taxonomy";
  * מרקטפלייס להשכרות, ולא אינדקס שירותים כללי.
  */
 export function Hero({
-  categories, cities,
+  categories, cities, imageUrl,
 }: {
   categories: Category[];
   cities: SimpleCity[];
+  imageUrl: string;
 }) {
   const reduced = useReducedMotion();
 
   return (
-    <section
-      className="relative isolate overflow-hidden bg-brand-950 bg-cover bg-center pb-14 pt-[calc(var(--spacing-header)+40px)] sm:pb-16"
-      style={{ backgroundImage: "url(/images/hero-stage.jpg)" }}
-    >
+    <section className="relative isolate overflow-hidden bg-brand-950 pb-14 pt-10 sm:pb-16">
+      {/* priority + fetchPriority: זו התמונה הראשונה שנטענת בעמוד הבית
+          (LCP), ולכן היא היחידה באתר שלא נטענת lazy. */}
+      <Image
+        src={imageUrl}
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover"
+      />
+
       {/* שכבת האפלה — הכי כהה למטה, בגובה הטקסט, ובהירה יותר בקצוות
           כדי שהציוד בתמונה עדיין ייראה */}
       <div

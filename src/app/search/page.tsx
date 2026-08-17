@@ -4,6 +4,7 @@ import { SearchX } from "lucide-react";
 import { parseSearchParams, searchBusinesses, PAGE_SIZE } from "@/lib/repo/search";
 import { SearchBar } from "@/components/search/SearchBar";
 import { FilterRail } from "@/components/search/FilterRail";
+import { GuidesSidebar } from "@/components/home/GuidesSidebar";
 import { SortSelect } from "@/components/search/SortSelect";
 import { BusinessCard } from "@/components/business/BusinessCard";
 import { RevealItem, RevealStagger } from "@/components/motion/Reveal";
@@ -62,7 +63,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
   return (
     <div className="bg-ink-50 pb-20">
       {/* --- כותרת וחיפוש --- */}
-      <div className="relative isolate overflow-hidden bg-gradient-to-br from-brand-900 to-brand-700 pb-10 pt-[calc(var(--spacing-header)+32px)]">
+      <div className="relative isolate overflow-hidden bg-gradient-to-br from-brand-900 to-brand-700 pb-10 pt-8">
         <div className="bg-dots absolute inset-0 opacity-30" aria-hidden="true" />
         <div className="relative mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
           <h1 className="mb-5 font-display text-2xl font-extrabold text-white sm:text-3xl">
@@ -74,7 +75,9 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
 
       <div className="mx-auto max-w-[1480px] px-4 pt-8 sm:px-6 lg:px-8">
         <div className="flex gap-7">
-          <FilterRail facets={result.facets} total={result.total} categories={categories} cities={cities} />
+          <FilterRail facets={result.facets} total={result.total} categories={categories} cities={cities}>
+            <GuidesSidebar />
+          </FilterRail>
 
           <div className="min-w-0 flex-1">
             {/* שורת סיכום ומיון */}
@@ -93,9 +96,9 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
             ) : (
               <>
                 <RevealStagger className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                  {result.items.map((b) => (
+                  {result.items.map((b, i) => (
                     <RevealItem key={b.id}>
-                      <BusinessCard business={b} />
+                      <BusinessCard business={b} priority={i === 0} />
                     </RevealItem>
                   ))}
                 </RevealStagger>

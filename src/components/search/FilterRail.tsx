@@ -30,6 +30,8 @@ interface Props {
   total: number;
   categories: FlatCategory[];
   cities: SimpleCity[];
+  /** תוכן נוסף מתחת לתיבת המסננים בעמודת הצד — למשל מדריכים מומלצים. דסקטופ בלבד. */
+  children?: React.ReactNode;
 }
 
 const RATING_OPTIONS = [4.5, 4, 3.5];
@@ -40,7 +42,7 @@ const PRICE_OPTIONS = [
   { value: 4, label: "₪₪₪₪" },
 ];
 
-export function FilterRail({ facets, total, categories, cities }: Props) {
+export function FilterRail({ facets, total, categories, cities, children }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -213,6 +215,7 @@ export function FilterRail({ facets, total, categories, cities }: Props) {
           </div>
           {content}
         </div>
+        {children && <div className="mt-5">{children}</div>}
       </aside>
 
       {/* מובייל — כפתור צף + מגירה תחתונה */}

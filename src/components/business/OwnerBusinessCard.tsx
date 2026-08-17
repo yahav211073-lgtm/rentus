@@ -1,12 +1,15 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { CheckCircle2, ChevronDown, Pencil } from "lucide-react";
+import { CheckCircle2, ChevronDown, Clock, Pencil, Wrench } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
+import { OpeningHoursEditor } from "@/components/business/OpeningHoursEditor";
+import { ServicesEditor } from "@/components/business/ServicesEditor";
 import { updateBusiness } from "@/app/business/dashboard/actions";
 import { formatRelative } from "@/lib/utils";
-import type { BusinessStatus } from "@/types/domain";
+import type { BusinessHours, BusinessService, BusinessStatus } from "@/types/domain";
 
 const STATUS_LABEL: Record<BusinessStatus, { label: string; variant: "warning" | "success" | "danger" | "neutral" }> = {
   draft: { label: "טיוטה", variant: "neutral" },
@@ -29,7 +32,11 @@ export interface OwnerBusiness {
   website: string | null;
   status: BusinessStatus;
   rejectionReason: string | null;
+  coverUrl: string | null;
+  logoUrl: string | null;
   leads: { id: string; name: string | null; phone: string | null; message: string | null; createdAt: string }[];
+  hours: BusinessHours[];
+  services: BusinessService[];
 }
 
 export function OwnerBusinessCard({ business }: { business: OwnerBusiness }) {
@@ -80,6 +87,16 @@ export function OwnerBusinessCard({ business }: { business: OwnerBusiness }) {
       {editing && (
         <form action={onSubmit} className="mb-6 space-y-3.5 border-t border-ink-100 pt-5">
           <div className="grid gap-3.5 sm:grid-cols-2">
+            <ImageUploadField
+              name="cover" label="תמונת כיסוי" currentUrl={business.coverUrl}
+              hint="תוצג בראש עמוד העסק" aspect="16/9"
+            />
+            <ImageUploadField
+              name="logo" label="לוגו העסק" currentUrl={business.logoUrl}
+              hint="PNG שקוף מומלץ" aspect="1/1"
+            />
+          </div>
+          <div className="grid gap-3.5 sm:grid-cols-2">
             <EditField name="name" label="שם העסק" defaultValue={business.name} required />
             <EditField name="tagline" label="שורת תיאור" defaultValue={business.tagline ?? ""} />
           </div>
@@ -109,7 +126,37 @@ export function OwnerBusinessCard({ business }: { business: OwnerBusiness }) {
       )}
 
       <LeadsSection leads={business.leads} />
+
+      <CollapsibleSection icon={Clock} title="שעות פעילות">
+        <OpeningHoursEditor businessId={business.id} hours={business.hours} />
+      </CollapsibleSection>
+
+      <CollapsibleSection icon={Wrench} title="שירותים ומחירון">
+        <ServicesEditor businessId={business.id} services={business.services} />
+      </CollapsibleSection>
     </section>
+  );
+}
+
+function CollapsibleSection({
+  icon: Icon, title, children,
+}: { icon: typeof Clock; title: string; children: React.ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="border-t border-ink-100 pt-4">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between text-sm font-bold text-ink-700"
+      >
+        <span className="flex items-center gap-2">
+          <Icon className="h-4 w-4 text-brand-700" aria-hidden="true" />
+          {title}
+        </span>
+        <ChevronDown className={`h-4 w-4 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+      {open && <div className="mt-4">{children}</div>}
+    </div>
   );
 }
 

@@ -26,6 +26,7 @@ export default async function AdminSettingsPage() {
           name: byKey["brand.identity"]?.name ?? "",
           tagline: byKey["brand.identity"]?.tagline ?? "",
           logoUrl: byKey["brand.identity"]?.logoUrl ?? null,
+          heroImageUrl: byKey["brand.identity"]?.heroImageUrl ?? "/images/hero-stage.jpg",
         }}
         brandColors={{
           primary: byKey["brand.colors"]?.primary ?? "#0C1D40",

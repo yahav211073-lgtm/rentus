@@ -5,9 +5,8 @@ import Link from "next/link";
 import { ChevronDown, Phone, Trash2 } from "lucide-react";
 import { WhatsAppIcon } from "@/components/ui/icons";
 import { formatRelative, toWhatsAppNumber } from "@/lib/utils";
-import {
-  LEAD_STATUS_LABEL, deleteLead, updateLeadNote, updateLeadStatus, type LeadStatus,
-} from "@/app/admin/leads/actions";
+import { deleteLead, updateLeadNote, updateLeadStatus } from "@/app/admin/leads/actions";
+import { LEAD_STATUS_LABEL, type LeadStatus } from "@/lib/lead-status";
 
 export interface AdminLead {
   id: string;

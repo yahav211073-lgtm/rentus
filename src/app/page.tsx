@@ -54,7 +54,7 @@ export default async function HomePage() {
     <>
       <JsonLd brandName={brand.name} />
 
-      <Hero categories={categories} cities={cities} />
+      <Hero categories={categories} cities={cities} imageUrl={brand.heroImageUrl} />
       <CategoryRail />
       <BenefitsStrip />
 

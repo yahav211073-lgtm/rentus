@@ -12,7 +12,7 @@ import { cn, pickWeighted } from "@/lib/utils";
 /**
  * באנר צדדי צף.
  *
- * מוצג רק ממסכים רחבים מאוד (‎≥1600px‎), בשוליים שממילא ריקים.
+ * מוצג רק ממסכים רחבים מ-1440px (רוחב לפטופ רגיל ומעלה), בשוליים שממילא ריקים.
  * זו נקודה עקרונית: פרסום שדוחף את התוכן או מכסה אותו הוא הדבר
  * שהופך אתר לזול. אם אין מקום — הבאנר פשוט לא מוצג.
  *
@@ -49,11 +49,12 @@ export function SideBanner({
   const ref = useRef<HTMLDivElement>(null);
   const trackedRef = useRef(false);
 
-  // מקום פנוי בשוליים. 1600px = 1480 מיכל + 2×60 שוליים.
+  // מקום פנוי בשוליים. 1440px = רוחב לפטופ רגיל (למשל MacBook Air/Pro
+  // בזום ברירת מחדל) — מתחת לזה השוליים צרים מדי לבאנר בלי לדחוק תוכן.
   // כאן setState בתוך effect הוא בסדר: המדידה חייבת לקרות אחרי
   // הפריסה, וממילא הבאנר נכנס עם השהיה של 0.8 שניות.
   useEffect(() => {
-    const check = () => setHasRoom(window.innerWidth >= 1600);
+    const check = () => setHasRoom(window.innerWidth >= 1440);
     const frame = requestAnimationFrame(check);
     window.addEventListener("resize", check);
     return () => {
@@ -150,7 +151,7 @@ export function SideBanner({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.5, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
         aria-label="אזור פרסום"
-        className="fixed top-1/2 z-40 hidden -translate-y-1/2 [@media(min-width:1600px)]:block"
+        className="fixed top-1/2 z-40 hidden -translate-y-1/2 [@media(min-width:1440px)]:block"
         style={side === "start" ? { insetInlineStart: "18px" } : { insetInlineEnd: "18px" }}
       >
         <div className="relative w-[160px] overflow-hidden rounded-lg border border-ink-200 bg-white shadow-[0_16px_40px_-14px_rgba(11,59,117,0.28)]">

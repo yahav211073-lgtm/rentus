@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/env";
 import type { Article } from "@/types/domain";
@@ -63,7 +64,12 @@ export async function getArticles(limit = 24): Promise<Article[]> {
   return (data ?? []).map(mapArticle);
 }
 
-export async function getArticleBySlug(slug: string): Promise<Article | null> {
+/**
+ * עטוף ב-cache(): נקרא גם מ-generateMetadata וגם מגוף העמוד
+ * ב-blog/[slug] עם אותו slug באותה בקשה — בלי דה-דופליקציה זו
+ * שאילתת Supabase רצה פעמיים ברצף (ראו התיקון הזהה ב-getBusinessBySlug).
+ */
+export const getArticleBySlug = cache(async (slug: string): Promise<Article | null> => {
   if (!isSupabaseConfigured) return null;
   const supabase = await createSupabaseServerClient();
   if (!supabase) return null;
@@ -76,7 +82,7 @@ export async function getArticleBySlug(slug: string): Promise<Article | null> {
     .maybeSingle();
 
   return data ? mapArticle(data) : null;
-}
+});
 
 /**
  * זמן קריאה משוער.
