@@ -31,6 +31,43 @@ export async function getContactDetails(): Promise<ContactDetails> {
   };
 }
 
+export interface AboutContent {
+  intro: string;
+  points: { title: string; body: string }[];
+}
+
+const FALLBACK_ABOUT: AboutContent = {
+  intro: "הוא המקום שבו מוצאים כל מה שצריך להשכיר — מציוד לאירועים ועד כלי עבודה ורכב — דרך עסקים מאומתים בכל הארץ. במקום לחפש בעשרים קבוצות ואתרים שונים, הכל נמצא כאן, במקום אחד.",
+  points: [
+    { title: "עסקים מאומתים", body: "כל עסק חדש עובר בדיקה ואישור ידני לפני שהוא מתפרסם — לא כל מי שנרשם עולה אוטומטית." },
+    { title: "ביקורות אמיתיות בלבד", body: "ביקורות עוברות מודרציה לפני פרסום, כדי שהדירוג שאתם רואים יהיה אמין." },
+    { title: "פריסה ארצית", body: "עסקים מכל אזורי הארץ — צפון, מרכז, דרום — במקום אחד." },
+    { title: "השוואה הוגנת", body: "עסקים מומלצים נבחרים לפי דירוג וביקורות, לא לפי מי ששילם הכי הרבה." },
+  ],
+};
+
+/** settings.about.content — טקסט עמוד "אודות", ניתן לעריכה מ-/admin/settings. */
+export async function getAboutContent(): Promise<AboutContent> {
+  if (!isSupabaseConfigured) return FALLBACK_ABOUT;
+
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return FALLBACK_ABOUT;
+
+  const { data } = await supabase
+    .from("settings").select("value").eq("key", "about.content").maybeSingle();
+
+  if (!data) return FALLBACK_ABOUT;
+  const v = data.value as Partial<AboutContent>;
+  const points = Array.isArray(v.points) && v.points.length === 4 ? v.points : FALLBACK_ABOUT.points;
+  return {
+    intro: v.intro?.trim() || FALLBACK_ABOUT.intro,
+    points: points.map((p, i) => ({
+      title: p?.title?.trim() || FALLBACK_ABOUT.points[i].title,
+      body: p?.body?.trim() || FALLBACK_ABOUT.points[i].body,
+    })),
+  };
+}
+
 /**
  * קישורי הרשתות החברתיות של האתר.
  *

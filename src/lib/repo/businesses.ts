@@ -225,6 +225,7 @@ export async function getApprovedReviews(businessId: string): Promise<Review[]> 
 }
 
 export interface HomeBusinessSlices {
+  topRated: BusinessCard[];
   featured: BusinessCard[];
   popular: BusinessCard[];
   sponsored: BusinessCard[];
@@ -234,6 +235,7 @@ export interface HomeBusinessSlices {
 export async function getHomeBusinessSlices(): Promise<HomeBusinessSlices> {
   if (!isSupabaseConfigured) {
     return {
+      topRated: [...seedBusinesses].sort((a, b) => b.ratingAvg - a.ratingAvg).slice(0, 8),
       featured: seedBusinesses.filter((b) => b.isFeatured),
       sponsored: seedBusinesses.filter((b) => b.isSponsored),
       popular: [...seedBusinesses].sort((a, b) => b.reviewCount - a.reviewCount).slice(0, 8),
@@ -242,11 +244,13 @@ export async function getHomeBusinessSlices(): Promise<HomeBusinessSlices> {
   }
 
   const supabase = await createSupabaseServerClient();
-  if (!supabase) return { featured: [], popular: [], sponsored: [], latest: [] };
+  if (!supabase) return { topRated: [], featured: [], popular: [], sponsored: [], latest: [] };
 
   const base = () => supabase.from("businesses").select(CARD_SELECT).eq("status", "published");
 
-  const [featured, sponsored, popular, latest] = await Promise.all([
+  const [topRated, featured, sponsored, popular, latest] = await Promise.all([
+    // דירוג גבוה = לפחות ביקורת אחת אמיתית, לא ברירת המחדל 0 של עסק חדש
+    base().gt("review_count", 0).order("rating_avg", { ascending: false }).order("review_count", { ascending: false }).limit(8),
     base().eq("is_featured", true).order("boost_score", { ascending: false }).limit(8),
     base().eq("is_sponsored", true).order("boost_score", { ascending: false }).limit(8),
     base().order("review_count", { ascending: false }).limit(8),
@@ -254,6 +258,7 @@ export async function getHomeBusinessSlices(): Promise<HomeBusinessSlices> {
   ]);
 
   return {
+    topRated: (topRated.data ?? []).map(mapCard),
     featured: (featured.data ?? []).map(mapCard),
     sponsored: (sponsored.data ?? []).map(mapCard),
     popular: (popular.data ?? []).map(mapCard),

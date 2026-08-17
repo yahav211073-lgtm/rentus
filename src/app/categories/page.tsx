@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import { getCategoriesWithCounts } from "@/lib/repo/categories";
-import { CoverArt } from "@/components/ui/CoverArt";
-import { businessCountLabel, formatNumber } from "@/lib/utils";
+import { CategoryCarousel } from "@/components/categories/CategoryCarousel";
+import { CategoryGridSearch } from "@/components/categories/CategoryGridSearch";
 
 export const metadata: Metadata = {
   title: "כל הקטגוריות",
@@ -14,47 +12,33 @@ export const metadata: Metadata = {
 export default async function CategoriesPage() {
   const categories = await getCategoriesWithCounts();
 
+  // שטוח: קטגוריות-אב ותתי-קטגוריות באותה רשימה, כדי שהחיפוש
+  // והסליידר יתייחסו לכולן באותה מידה — לא רק לשלוש קטגוריות-האב.
+  const flat = categories.flatMap((c) => [c, ...(c.children ?? [])]).map((c) => ({
+    id: c.id,
+    slug: c.slug,
+    name: c.name,
+    imageUrl: c.imageUrl,
+    businessCount: c.businessCount ?? 0,
+  }));
+
   return (
-    <div className="mx-auto max-w-[1480px] px-4 py-14 sm:px-6 lg:px-8">
-      <h1 className="mb-2 font-display text-3xl font-extrabold text-ink-900">כל הקטגוריות</h1>
-      <p className="mb-10 text-ink-500">בחרו תחום כדי לראות את כל העסקים שלו.</p>
+    <div className="bg-ink-50 pb-20">
+      <div className="mx-auto max-w-[1480px] px-4 pt-14 text-center sm:px-6 lg:px-8">
+        <h1 className="mb-2 font-display text-3xl font-extrabold text-ink-900 sm:text-4xl">
+          מה אתם צריכים להשכיר?
+        </h1>
+        <p className="mx-auto mb-10 max-w-xl text-ink-500">
+          כל תחומי ההשכרה באתר, במקום אחד — דפדפו בין הקטגוריות או חפשו ישירות.
+        </p>
+      </div>
 
-      <div className="space-y-10">
-        {categories.map((cat) => (
-          <section key={cat.id}>
-            <Link href={`/category/${cat.slug}`} className="group mb-4 flex items-center gap-4">
-              <span className="relative h-16 w-16 shrink-0 overflow-hidden">
-                {cat.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={cat.imageUrl} alt="" className="h-full w-full object-cover" />
-                ) : (
-                  <CoverArt seed={cat.slug} className="h-full w-full" />
-                )}
-              </span>
-              <div>
-                <h2 className="font-display text-xl font-bold text-ink-900 transition-colors group-hover:text-brand-700">
-                  {cat.name}
-                </h2>
-                <p className="text-sm text-ink-500">{businessCountLabel(cat.businessCount ?? 0)}</p>
-              </div>
-              <ArrowLeft className="me-auto h-5 w-5 text-ink-300 transition-transform group-hover:-translate-x-1 group-hover:text-brand-700" />
-            </Link>
+      <div className="mx-auto mb-16 max-w-[1100px] px-4 sm:px-6 lg:px-8">
+        <CategoryCarousel items={flat} />
+      </div>
 
-            {cat.children && cat.children.length > 0 && (
-              <div className="flex flex-wrap gap-2 ps-20">
-                {cat.children.map((sub) => (
-                  <Link
-                    key={sub.id}
-                    href={`/category/${sub.slug}`}
-                    className="rounded-full border border-ink-200 bg-white px-4 py-2 text-sm font-semibold text-ink-600 transition-colors hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700"
-                  >
-                    {sub.name} · {formatNumber(sub.businessCount ?? 0)}
-                  </Link>
-                ))}
-              </div>
-            )}
-          </section>
-        ))}
+      <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
+        <CategoryGridSearch items={flat} />
       </div>
     </div>
   );

@@ -41,7 +41,7 @@ function isWebUrl(value?: string) {
   return Boolean(value && /^https?:\/\//i.test(value.trim()));
 }
 
-export async function Footer({ brandName }: { brandName: string }) {
+export async function Footer({ brandName, logoUrl }: { brandName: string; logoUrl?: string | null }) {
   const [categories, cities, contact, social] = await Promise.all([
     getCategoriesWithCounts(), getCities(), getContactDetails(), getSocialLinks(),
   ]);
@@ -63,11 +63,18 @@ export async function Footer({ brandName }: { brandName: string }) {
           {/* מותג */}
           <div>
             <Link href="/" className="mb-5 inline-flex items-center gap-2.5">
-              <span className="relative grid h-10 w-10 place-items-center rounded-sm bg-gradient-to-br from-brand-500 to-brand-700">
-                <Store className="h-5 w-5 text-white" strokeWidth={2.4} />
-                <span className="absolute -bottom-0.5 -left-0.5 h-2.5 w-2.5 rounded-full bg-accent-400 ring-2 ring-brand-950" />
-              </span>
-              <span className="font-display text-xl font-extrabold text-white">{brandName}</span>
+              {logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={logoUrl} alt={brandName} className="h-10 w-auto max-w-[190px] object-contain brightness-0 invert" />
+              ) : (
+                <>
+                  <span className="relative grid h-10 w-10 place-items-center rounded-sm bg-gradient-to-br from-brand-500 to-brand-700">
+                    <Store className="h-5 w-5 text-white" strokeWidth={2.4} />
+                    <span className="absolute -bottom-0.5 -left-0.5 h-2.5 w-2.5 rounded-full bg-accent-400 ring-2 ring-brand-950" />
+                  </span>
+                  <span className="font-display text-xl font-extrabold text-white">{brandName}</span>
+                </>
+              )}
             </Link>
 
             <p className="mb-6 max-w-sm text-sm leading-relaxed text-white/60">

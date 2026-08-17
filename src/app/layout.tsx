@@ -185,7 +185,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           phone={contact.phone}
         />
         <main id="main" className="flex-1" style={{ paddingTop: "var(--spacing-header)" }}>{children}</main>
-        <Footer brandName={brand.name} />
+        <Footer brandName={brand.name} logoUrl={brand.logoUrl} />
 
         <AccessibilityToolbar />
         <ServiceWorkerRegister />

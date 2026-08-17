@@ -11,6 +11,7 @@ interface Props {
   brandColors: { primary: string; secondary: string; accent: string; background: string };
   contactDetails: { phone: string; email: string; address: string; whatsapp: string };
   socialLinks: Record<string, string>;
+  aboutContent: { intro: string; points: { title: string; body: string }[] };
 }
 
 /**
@@ -20,10 +21,11 @@ interface Props {
  * יחיד גורם למנהל להסס לפני כל שינוי קטן, כי הוא לא בטוח מה עוד
  * ייכתב יחד איתו.
  */
-export function SettingsForm({ brandIdentity, brandColors, contactDetails, socialLinks }: Props) {
+export function SettingsForm({ brandIdentity, brandColors, contactDetails, socialLinks, aboutContent }: Props) {
   return (
     <div className="space-y-6">
       <BrandIdentitySection identity={brandIdentity} />
+      <AboutContentSection content={aboutContent} />
 
       <SettingsSection
         settingKey="brand.colors"
@@ -51,6 +53,77 @@ export function SettingsForm({ brandIdentity, brandColors, contactDetails, socia
 
       <SocialLinksSection links={socialLinks} />
     </div>
+  );
+}
+
+function AboutContentSection({ content }: { content: Props["aboutContent"] }) {
+  const [pending, startTransition] = useTransition();
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const fd = new FormData(e.currentTarget);
+    const value = {
+      intro: String(fd.get("intro") ?? "").trim(),
+      points: [0, 1, 2, 3].map((i) => ({
+        title: String(fd.get(`point-${i}-title`) ?? "").trim(),
+        body: String(fd.get(`point-${i}-body`) ?? "").trim(),
+      })),
+    };
+
+    startTransition(async () => {
+      setSaved(false);
+      setError(null);
+      const result = await updateSetting("about.content", value);
+      if (result.ok) setSaved(true);
+      else setError(result.error ?? "השמירה נכשלה.");
+    });
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="rounded-lg border border-ink-200/70 bg-white p-6">
+      <h2 className="mb-1 font-display text-base font-bold text-ink-900">עמוד אודות</h2>
+      <p className="mb-4 text-xs text-ink-400">
+        הטקסט המרכזי ו-4 נקודות החוזק שמוצגות בעמוד /about.
+      </p>
+
+      <label className="mb-4 flex flex-col gap-1.5">
+        <span className="text-xs font-bold text-ink-600">פסקת פתיחה</span>
+        <textarea
+          name="intro"
+          rows={3}
+          defaultValue={content.intro}
+          className="w-full rounded-xs border border-ink-200 px-3.5 py-2.5 text-base text-ink-900 outline-none transition-colors focus:border-brand-400"
+        />
+      </label>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        {content.points.map((p, i) => (
+          <div key={i} className="rounded-xs border border-ink-100 p-3.5">
+            <label className="mb-2 flex flex-col gap-1.5">
+              <span className="text-xs font-bold text-ink-600">כותרת נקודה {i + 1}</span>
+              <input
+                name={`point-${i}-title`}
+                defaultValue={p.title}
+                className="h-10 w-full rounded-xs border border-ink-200 px-3 text-sm outline-none focus:border-brand-400"
+              />
+            </label>
+            <label className="flex flex-col gap-1.5">
+              <span className="text-xs font-bold text-ink-600">טקסט</span>
+              <textarea
+                name={`point-${i}-body`}
+                rows={2}
+                defaultValue={p.body}
+                className="w-full rounded-xs border border-ink-200 px-3 py-2 text-sm outline-none focus:border-brand-400"
+              />
+            </label>
+          </div>
+        ))}
+      </div>
+
+      <SaveRow pending={pending} saved={saved} error={error} />
+    </form>
   );
 }
 

@@ -10,8 +10,9 @@ import { CompanyListCard } from "@/components/business/CompanyListCard";
 import { AdSlot } from "@/components/home/AdSlot";
 import { OwnerCtaCard } from "@/components/home/OwnerCtaCard";
 import { StatsBand } from "@/components/home/StatsBand";
-import { BlogSection } from "@/components/home/BlogSection";
 import { Testimonials } from "@/components/home/Testimonials";
+import { ButtonLink } from "@/components/ui/Button";
+import { SlidersHorizontal } from "lucide-react";
 import { env } from "@/lib/env";
 import { getHomeBusinessSlices } from "@/lib/repo/businesses";
 import { getActiveAds } from "@/lib/repo/ads";
@@ -39,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const [{ featured, sponsored, popular, latest }, ads, brand, categories, cities] = await Promise.all([
+  const [{ topRated, featured, sponsored, popular, latest }, ads, brand, categories, cities] = await Promise.all([
     getHomeBusinessSlices(),
     getActiveAds(),
     getBrandSettings(),
@@ -56,11 +57,25 @@ export default async function HomePage() {
 
       <Hero categories={categories} cities={cities} imageUrl={brand.heroImageUrl} />
       <CategoryRail />
+
+      {/* מדורגים הכי גבוה — למעלה, זו הסיבה הראשונה לסמוך על האתר */}
+      {topRated.length > 0 && (
+        <Section className="bg-white">
+          <SectionHeading
+            eyebrow="הכי מומלצים"
+            title="העסקים עם הדירוג הגבוה ביותר"
+            subtitle="דירוג אמיתי לפי ביקורות מאומתות בלבד."
+            action={{ label: "לכל התוצאות", href: "/search?sort=rating" }}
+          />
+          <BusinessRail businesses={topRated} layout="grid" />
+        </Section>
+      )}
+
       <BenefitsStrip />
 
       {/* מומלצים — רשת עסקים + פאנל המדריכים לצידה */}
       {featured.length > 0 && (
-        <Section className="bg-white">
+        <Section className="bg-ink-50">
           <SectionHeading
             eyebrow={`נבחרת ${brand.name}`}
             title="חברות מומלצות"
@@ -111,9 +126,36 @@ export default async function HomePage() {
         </Section>
       )}
 
-      {/* חדשים */}
+      {/* כל העסקים, עם סינון וקטגוריות — למטה, אחרי שכבר ראו את המומלצים */}
+      <Section className="bg-white">
+        <div className="flex flex-col items-center gap-5 rounded-lg border border-ink-200/70 bg-ink-50 px-6 py-12 text-center">
+          <span className="grid h-14 w-14 place-items-center rounded-full bg-brand-800 text-white">
+            <SlidersHorizontal className="h-6 w-6" />
+          </span>
+          <div>
+            <h2 className="mb-2 font-display text-2xl font-extrabold text-ink-900">
+              רוצים לראות את כל העסקים?
+            </h2>
+            <p className="mx-auto max-w-md text-ink-500">
+              סננו לפי קטגוריה, עיר, דירוג ומאפיינים — ומצאו בדיוק את מי שאתם מחפשים.
+            </p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-2">
+            {categories.slice(0, 6).map((c) => (
+              <ButtonLink key={c.id} href={`/category/${c.slug}`} variant="secondary" size="sm">
+                {c.name}
+              </ButtonLink>
+            ))}
+          </div>
+          <ButtonLink href="/search" variant="primary" size="lg">
+            סינון וחיפוש בכל העסקים
+          </ButtonLink>
+        </div>
+      </Section>
+
+      {/* חדשים — בסוף */}
       {latest.length > 0 && (
-        <Section className="bg-white">
+        <Section className="bg-ink-50">
           <SectionHeading
             eyebrow={`חדש ב-${brand.name}`}
             title="הצטרפו לאחרונה"
@@ -124,7 +166,6 @@ export default async function HomePage() {
         </Section>
       )}
 
-      <BlogSection />
       <Testimonials />
     </>
   );

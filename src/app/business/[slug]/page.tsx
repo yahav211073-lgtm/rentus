@@ -11,7 +11,6 @@ import { CoverArt } from "@/components/ui/CoverArt";
 import { Badge } from "@/components/ui/Badge";
 import { Rating } from "@/components/ui/Rating";
 import { ButtonLink } from "@/components/ui/Button";
-import { LeadForm } from "@/components/business/LeadForm";
 import { ReviewList } from "@/components/business/ReviewList";
 import { WriteReviewForm } from "@/components/business/WriteReviewForm";
 import { OpeningHours } from "@/components/business/OpeningHours";
@@ -119,10 +118,10 @@ export default async function BusinessPage({ params }: { params: Params }) {
             </nav>
 
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-              <div className="h-20 w-20 shrink-0 overflow-hidden rounded-lg border border-ink-200 sm:h-24 sm:w-24">
-                {b.logoUrl ? (
+              <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full border border-ink-200 sm:h-24 sm:w-24">
+                {b.logoUrl || b.coverUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={b.logoUrl} alt={`הלוגו של ${b.name}`} className="h-full w-full object-cover" />
+                  <img src={b.logoUrl ?? b.coverUrl!} alt={`התמונה של ${b.name}`} className="h-full w-full object-cover" />
                 ) : (
                   <CoverArt seed={`${b.slug}-logo`} label={b.name.charAt(0)} compact className="h-full w-full" />
                 )}
@@ -236,8 +235,6 @@ export default async function BusinessPage({ params }: { params: Params }) {
 
           {/* עמודה דביקה */}
           <aside className="space-y-5 lg:sticky lg:top-[calc(var(--spacing-header)+16px)] lg:self-start">
-            <LeadForm businessId={b.id} businessName={b.name} />
-
             {b.hours && b.hours.length > 0 && (
               <Panel title="שעות פעילות" icon={<Clock className="h-4 w-4" />}>
                 <OpeningHours hours={b.hours} />

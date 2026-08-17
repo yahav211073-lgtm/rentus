@@ -1,5 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { SettingsForm } from "@/components/admin/SettingsForm";
+import { getAboutContent } from "@/lib/repo/settings";
 
 export const metadata = { title: "הגדרות אתר", robots: { index: false, follow: false } };
 
@@ -7,10 +8,13 @@ export default async function AdminSettingsPage() {
   const supabase = await createSupabaseServerClient();
   if (!supabase) return null;
 
-  const { data: rows } = await supabase
-    .from("settings")
-    .select("key, value")
-    .in("key", ["brand.identity", "brand.colors", "contact.details", "social.links"]);
+  const [{ data: rows }, aboutContent] = await Promise.all([
+    supabase
+      .from("settings")
+      .select("key, value")
+      .in("key", ["brand.identity", "brand.colors", "contact.details", "social.links"]),
+    getAboutContent(),
+  ]);
 
   const byKey = Object.fromEntries((rows ?? []).map((r) => [r.key, r.value as Record<string, string>]));
 
@@ -41,6 +45,7 @@ export default async function AdminSettingsPage() {
           whatsapp: byKey["contact.details"]?.whatsapp ?? "",
         }}
         socialLinks={byKey["social.links"] ?? {}}
+        aboutContent={aboutContent}
       />
     </div>
   );
