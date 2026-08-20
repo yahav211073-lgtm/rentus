@@ -16,6 +16,7 @@ import { searchBusinesses } from "@/lib/repo/search";
 import { GuidesSidebar } from "@/components/home/GuidesSidebar";
 import { AdSlot } from "@/components/home/AdSlot";
 import { ReviewsSection } from "@/components/home/ReviewsSection";
+import { seedBusinesses } from "@/data/seed";
 import { jsonLd } from "@/lib/utils";
 
 /**
@@ -57,9 +58,21 @@ export default async function HomePage() {
   /* לא חותכים ל-4 כאן. BusinessCarousel מציג רשת סטטית עד ארבעה
      ועובר לקרוסלה מעליהם — כלומר הוספת עסק מומלץ חמישי בניהול
      משנה את ההתנהגות בלי שינוי קוד. */
-  const recommended = [...featured, ...topRated]
+  const liveRecommended = [...featured, ...topRated]
     .filter((b, i, all) => all.findIndex((c) => c.id === b.id) === i)
     .slice(0, 12);
+
+  /* סביבת הפיתוח מחוברת כרגע למסד שאין בו עדיין עסקים. במצב כזה
+     אסור שכל החלק שמתחת לקטגוריות ייעלם: מציגים את תוכן ההדגמה
+     שכבר קיים בפרויקט, עד שהעסק הראשון מתפרסם במסד. ברגע שיש
+     אפילו עסק חי אחד, נתוני המסד הם מקור האמת היחיד. */
+  const fallbackRecommended = seedBusinesses
+    .filter((business) => business.isFeatured)
+    .sort((a, b) => b.ratingAvg - a.ratingAvg);
+  const hasLiveBusinesses = all.total > 0;
+  const recommended = hasLiveBusinesses
+    ? (liveRecommended.length > 0 ? liveRecommended : all.items).slice(0, 12)
+    : fallbackRecommended.slice(0, 12);
 
   const yearsActive = foundedYear ? Math.max(1, new Date().getFullYear() - foundedYear) : 0;
 
@@ -71,7 +84,8 @@ export default async function HomePage() {
   /* "כל החברות" היא חלון הראווה המלא של תוצאות עמוד הבית, כולל
      החברות המומלצות. כך החצים עוברים ברצף על כל התוצאות שנשלפו,
      והכותרת לא מבטיחה "הכול" בזמן שחלק מהעסקים הוסרו ממנה. */
-  const allBusinesses = all.items.slice(0, 12);
+  const businessTotal = hasLiveBusinesses ? all.total : seedBusinesses.length;
+  const allBusinesses = (hasLiveBusinesses ? all.items : seedBusinesses).slice(0, 12);
 
   return (
     <>
@@ -150,7 +164,7 @@ export default async function HomePage() {
                   href="/search"
                   className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-bold text-brand-700 transition-colors hover:text-brand-800"
                 >
-                  {`לכל ${all.total} החברות`}
+                  {`לכל ${businessTotal} החברות`}
                   <ArrowLeft
                     className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1"
                     aria-hidden="true"
@@ -168,7 +182,7 @@ export default async function HomePage() {
           נכתבים בקוד. שנות הפעילות נגזרות מהעסק הוותיק ביותר —
           זו העובדה היחידה שיש למערכת על "מאז מתי". */}
       <ReviewsSection
-        businessCount={all.total}
+        businessCount={businessTotal}
         userCount={userCount}
         yearsActive={yearsActive}
       />

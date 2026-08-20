@@ -249,12 +249,8 @@ export async function createBusinessAdmin(formData: FormData) {
       email: String(formData.get("email") ?? "").trim() || null,
       city_id: String(formData.get("cityId") ?? "") || null,
       status: "published",
-      area_id: String(formData.get("areaId") ?? "") || null,
-      /* מאומת ביצירה. טופס היצירה אוסף עכשיו גם שעות פעילות וגם
-         אזור שירות, כלומר כל מה ש-missingVerificationFields דורשת
-         נמצא כאן — ולכן אין סיבה להכריח את המנהל לפתוח את העסק
-         שוב רק כדי ללחוץ על תג. עסק שנוסף ידנית מהניהול הוא בהגדרה
-         עסק שמישהו מהצוות אימת בטלפון.
+      /* עסק שנוסף ידנית מהניהול הוא בהגדרה עסק שמישהו מהצוות
+         אימת בטלפון, ולכן הוא נוצר כמאומת גם בלי שלב אישור נוסף.
          שים לב: זה **לא** דורש owner_id. עסק שנוסף מהניהול נשאר
          בלי חשבון בעלים, וזה מצב תקין ומכוון. */
       is_verified: true,
@@ -287,13 +283,6 @@ export async function createBusinessAdmin(formData: FormData) {
         closes_at: h.isClosed ? null : h.closesAt,
       })),
     );
-  }
-
-  const areaId = String(formData.get("areaId") ?? "");
-  if (areaId) {
-    await supabase.from("business_service_areas").insert({
-      business_id: business.id, area_id: areaId,
-    });
   }
 
   refreshBusiness(business.slug as string);

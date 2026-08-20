@@ -8,12 +8,11 @@ import { Button } from "@/components/ui/Button";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
 import { submitBusinessRequest } from "@/app/business/register/actions";
 import { HoursFieldset } from "@/components/business/HoursFieldset";
-import type { FlatCategory, SimpleArea, SimpleCity } from "@/lib/repo/taxonomy";
+import type { FlatCategory, SimpleCity } from "@/lib/repo/taxonomy";
 
 interface Props {
   categories: FlatCategory[];
   cities: SimpleCity[];
-  areas: SimpleArea[];
 }
 
 /**
@@ -24,7 +23,7 @@ interface Props {
  * accept="image/*" בלבד — כלומר כל קובץ, בכל גודל, נכנס לאחסון.
  * ולידציה בדפדפן היא נוחות; ולידציה בשרת היא ההגנה.
  */
-export function RegisterBusinessForm({ categories, cities, areas }: Props) {
+export function RegisterBusinessForm({ categories, cities }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [done, setDone] = useState(false);
@@ -113,19 +112,7 @@ export function RegisterBusinessForm({ categories, cities, areas }: Props) {
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div>
-          <label htmlFor="reg-area" className="mb-1.5 block text-xs font-bold text-ink-600">אזור שירות</label>
-          <select
-            id="reg-area" name="area"
-            className="h-11 w-full rounded-xs border border-ink-200 bg-white px-3.5 text-base outline-none focus:border-brand-400"
-          >
-            <option value="">בחרו אזור</option>
-            {areas.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
-          </select>
-        </div>
-        <Field id="reg-address" name="address" label="כתובת" placeholder="רחוב ומספר" />
-      </div>
+      <Field id="reg-address" name="address" label="כתובת" placeholder="רחוב ומספר" />
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Field id="reg-phone" name="phone" label="טלפון" type="tel" inputMode="tel" placeholder="050-0000000" />
@@ -141,7 +128,7 @@ export function RegisterBusinessForm({ categories, cities, areas }: Props) {
         <textarea
           id="reg-description" name="description" rows={4}
           className="w-full rounded-xs border border-ink-200 px-3.5 py-2.5 text-base outline-none transition-colors placeholder:text-ink-400 focus:border-brand-400"
-          placeholder="במה אתם עוסקים, מה מייחד אתכם, אזורי שירות"
+          placeholder="במה אתם עוסקים ומה מייחד אתכם"
         />
       </div>
 

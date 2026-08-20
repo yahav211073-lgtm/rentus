@@ -7,7 +7,7 @@ import { Save } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
 import { createBusinessAdmin } from "@/app/admin/businesses/actions";
-import type { FlatCategory, SimpleArea, SimpleCity } from "@/lib/repo/taxonomy";
+import type { FlatCategory, SimpleCity } from "@/lib/repo/taxonomy";
 
 /**
  * הוספת עסק ידנית מהניהול.
@@ -18,8 +18,8 @@ import type { FlatCategory, SimpleArea, SimpleCity } from "@/lib/repo/taxonomy";
  * נכנס לאחסון.
  */
 export function NewBusinessForm({
-  categories, cities, areas,
-}: { categories: FlatCategory[]; cities: SimpleCity[]; areas: SimpleArea[] }) {
+  categories, cities,
+}: { categories: FlatCategory[]; cities: SimpleCity[] }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState("");
@@ -58,8 +58,8 @@ export function NewBusinessForm({
       />
 
       <p className="rounded-xs border border-ink-200 bg-ink-50 p-3 text-xs leading-relaxed text-ink-500">
-        העסק ייווצר כ<strong>לא מאומת</strong>. אחרי היצירה השלימו במסך העריכה
-        שעות פעילות ואזורי שירות, ואז אפשר יהיה לסמן אותו כמאומת.
+        העסק ייווצר כ<strong>מפורסם ומאומת</strong>. פרטים נוספים אפשר להשלים
+        לאחר היצירה במסך העריכה.
       </p>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -103,19 +103,6 @@ export function NewBusinessForm({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <div>
-          <label htmlFor="new-area" className="mb-1.5 block text-xs font-bold text-ink-600">
-            אזור שירות <span className="text-danger-500">*</span>
-          </label>
-          <select
-            id="new-area" name="areaId" required
-            className="h-11 w-full rounded-xs border border-ink-200 bg-white px-3.5 text-base outline-none focus:border-brand-400"
-          >
-            <option value="">בחרו אזור</option>
-            {areas.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
-          </select>
-        </div>
-
         <Field name="phone" label="טלפון" type="tel" />
         <Field name="whatsapp" label="וואטסאפ" type="tel" />
         <Field name="email" label="אימייל" type="email" />
