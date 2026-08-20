@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   BadgeCheck, CalendarCheck, Clock, Globe, Images, Mail, MapPin, MessageCircle,
-  Phone, Route, ShieldCheck, Sparkles, Store, Tag as TagIcon, Wallet,
+  Navigation, Phone, Route, ShieldCheck, Sparkles, Store, Tag as TagIcon, Wallet,
 } from "lucide-react";
 
 import { getApprovedReviews, getBusinessBySlug, getRelatedBusinesses } from "@/lib/repo/businesses";
@@ -16,17 +16,16 @@ import { ButtonLink } from "@/components/ui/Button";
 import { ReviewList } from "@/components/business/ReviewList";
 import { WriteReviewForm } from "@/components/business/WriteReviewForm";
 import { OpeningHours } from "@/components/business/OpeningHours";
-import { BusinessCard } from "@/components/business/BusinessCard";
+import { CompanyListCard } from "@/components/business/CompanyListCard";
 import { SocialLinks } from "@/components/business/SocialLinks";
 import { BusinessGallery } from "@/components/business/BusinessGallery";
-import { LeadForm } from "@/components/business/LeadForm";
 import { ReadMore } from "@/components/business/ReadMore";
 import { ShareButton } from "@/components/business/ShareButton";
 import { Reveal } from "@/components/motion/Reveal";
 import { getBrandSettings } from "@/lib/repo/branding";
 import { getCurrentUser } from "@/lib/auth";
 import { env } from "@/lib/env";
-import { decodeParam, formatNumber, toWhatsAppNumber, jsonLd } from "@/lib/utils";
+import { decodeParam, formatNumber, toWhatsAppNumber, wazeLink, jsonLd } from "@/lib/utils";
 import { BusinessMap } from "@/components/business/BusinessMapLazy";
 
 /**
@@ -96,7 +95,10 @@ export default async function BusinessPage({ params }: { params: Params }) {
   const hours = b.hours ?? [];
   const stats = buildStats(b);
   const highlights = buildHighlights(b);
-  const hasLocation = Boolean(b.address || b.city || b.area || b.isMobileService);
+  const waze = wazeLink(b);
+  const hasLocation = Boolean(
+    b.address || b.city || b.area || b.isMobileService || b.serviceAreas?.length,
+  );
 
   return (
     <div className="bg-ink-50 pb-16 sm:pb-20">
@@ -141,7 +143,7 @@ export default async function BusinessPage({ params }: { params: Params }) {
                     className="object-cover"
                   />
                 ) : (
-                  <CoverArt seed={b.slug} label={b.name.charAt(0)} className="h-full w-full" />
+                  <CoverArt seed={b.slug} className="h-full w-full" />
                 )}
 
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-brand-950/45 via-transparent to-transparent" />
@@ -178,7 +180,7 @@ export default async function BusinessPage({ params }: { params: Params }) {
 
                     <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
                       {b.reviewCount > 0 ? (
-                        <Rating value={b.ratingAvg} count={b.reviewCount} size="md" />
+                        <Rating value={b.ratingAvg} count={b.reviewCount} size="md" variant="stars" />
                       ) : (
                         <span className="text-sm text-ink-400">אין עדיין ביקורות</span>
                       )}
@@ -224,12 +226,20 @@ export default async function BusinessPage({ params }: { params: Params }) {
                 )}
 
                 {/* פעולות */}
+                {/* פעולות. אין כאן טופס פנייה: פנייה דרך האתר בוטלה
+                    כהחלטת מוצר, והגולש פונה ישירות. הטלפון הוא הפעולה
+                    הראשית ולכן הוא הכפתור המלא — והוא מציג את המספר
+                    עצמו, כי "התקשרו" גנרי מסתיר בדיוק את מה שמשווים. */}
                 <div className="mt-auto flex flex-wrap gap-2.5 border-t border-ink-100 pt-5">
-                  <LeadForm
-                    businessId={b.id}
-                    businessName={b.name}
-                    className="flex-1 sm:flex-none"
-                  />
+                  {b.phone && (
+                    <a
+                      href={`tel:${b.phone}`}
+                      className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xs bg-accent-500 px-6 font-bold text-white transition-colors hover:bg-accent-600 sm:flex-none"
+                    >
+                      <Phone className="h-4.5 w-4.5" aria-hidden="true" />
+                      <span dir="ltr">{b.phone}</span>
+                    </a>
+                  )}
 
                   {b.whatsapp && (
                     <a
@@ -243,13 +253,15 @@ export default async function BusinessPage({ params }: { params: Params }) {
                     </a>
                   )}
 
-                  {b.phone && (
+                  {waze && (
                     <a
-                      href={`tel:${b.phone}`}
-                      className="inline-flex h-12 items-center justify-center gap-2 rounded-xs border border-ink-200 bg-white px-5 font-bold text-ink-700 transition-colors hover:border-brand-300 hover:bg-brand-50 hover:text-brand-800"
+                      href={waze}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex h-12 items-center justify-center gap-2 rounded-xs border border-[#33CCFF]/50 bg-[#33CCFF]/10 px-5 font-bold text-[#0a6f91] transition-colors hover:bg-[#33CCFF]/20"
                     >
-                      <Phone className="h-4.5 w-4.5" aria-hidden="true" />
-                      <span dir="ltr">{b.phone}</span>
+                      <Navigation className="h-4.5 w-4.5" aria-hidden="true" />
+                      ניווט ב-Waze
                     </a>
                   )}
 
@@ -429,6 +441,16 @@ export default async function BusinessPage({ params }: { params: Params }) {
               )}
 
               <ul className="flex flex-wrap gap-2">
+                {/* אזורי השירות קודמים לעיר ולאזור המושב: זה מה
+                    שהגולש בא לבדוק — האם מגיעים אליו. */}
+                {(b.serviceAreas ?? []).map((a) => (
+                  <li
+                    key={a.id}
+                    className="rounded-full bg-brand-700 px-3 py-1.5 text-2xs font-bold text-white"
+                  >
+                    {a.name}
+                  </li>
+                ))}
                 {b.area && (
                   <li className="rounded-full bg-brand-50 px-3 py-1.5 text-2xs font-bold text-brand-700">
                     {b.area.name}
@@ -518,7 +540,7 @@ export default async function BusinessPage({ params }: { params: Params }) {
               )}
             </div>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {related.map((r) => <BusinessCard key={r.id} business={r} />)}
+              {related.map((r) => <CompanyListCard key={r.id} business={r} />)}
             </div>
           </section>
         )}
@@ -543,12 +565,17 @@ export default async function BusinessPage({ params }: { params: Params }) {
       {/* ================= סרגל פעולה דביק במובייל ================= */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-ink-200 bg-white/95 p-3 backdrop-blur lg:hidden">
         <div className="flex gap-2">
-          <LeadForm
-            businessId={b.id}
-            businessName={b.name}
-            label="הצעת מחיר"
-            className="flex-1 px-4"
-          />
+          {/* במובייל הטלפון תופס את כל הרוחב הפנוי — זו הפעולה
+              היחידה שכמעט תמיד רוצים מהסרגל הדביק. */}
+          {b.phone && (
+            <a
+              href={`tel:${b.phone}`}
+              className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-xs bg-accent-500 px-4 font-bold text-white"
+            >
+              <Phone className="h-5 w-5" aria-hidden="true" />
+              <span dir="ltr">{b.phone}</span>
+            </a>
+          )}
           {b.whatsapp && (
             <a
               href={`https://wa.me/${toWhatsAppNumber(b.whatsapp)}`}
@@ -559,13 +586,14 @@ export default async function BusinessPage({ params }: { params: Params }) {
               <MessageCircle className="h-5 w-5" aria-hidden="true" />
             </a>
           )}
-          {b.phone && (
+          {waze && (
             <a
-              href={`tel:${b.phone}`}
-              aria-label={`חיוג ל${b.name}`}
-              className="grid h-12 w-12 shrink-0 place-items-center rounded-xs border border-ink-200 text-ink-700"
+              href={waze}
+              target="_blank" rel="noopener noreferrer"
+              aria-label={`ניווט ב-Waze אל ${b.name}`}
+              className="grid h-12 w-12 shrink-0 place-items-center rounded-xs border border-[#33CCFF]/50 bg-[#33CCFF]/10 text-[#0a6f91]"
             >
-              <Phone className="h-5 w-5" aria-hidden="true" />
+              <Navigation className="h-5 w-5" aria-hidden="true" />
             </a>
           )}
         </div>

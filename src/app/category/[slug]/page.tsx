@@ -6,7 +6,7 @@ import { SlidersHorizontal, Store } from "lucide-react";
 import { searchBusinesses } from "@/lib/repo/search";
 import { getCategoriesWithCounts } from "@/lib/repo/categories";
 import { getAreas } from "@/lib/repo/taxonomy";
-import { BusinessCard } from "@/components/business/BusinessCard";
+import { CompanyListCard } from "@/components/business/CompanyListCard";
 import { RevealItem, RevealStagger } from "@/components/motion/Reveal";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -188,10 +188,10 @@ export default async function CategoryPage({ params }: { params: Params }) {
                 }
               />
             ) : (
-              <RevealStagger className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                {result.items.map((b, i) => (
+              <RevealStagger className="grid gap-5 xl:grid-cols-2">
+                {result.items.map((b) => (
                   <RevealItem key={b.id}>
-                    <BusinessCard business={b} priority={i === 0} />
+                    <CompanyListCard business={b} />
                   </RevealItem>
                 ))}
               </RevealStagger>

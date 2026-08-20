@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Megaphone } from "lucide-react";
-import { ButtonLink } from "@/components/ui/Button";
+import { AdRequestForm } from "@/components/ads/AdRequestForm";
 import { getBrandSettings } from "@/lib/repo/branding";
 import { InteriorHero } from "@/components/layout/InteriorHero";
 
@@ -19,7 +19,7 @@ export default async function AdvertisePage() {
         באנרים ומודעות מוצגות לגולשים שכבר מחפשים בדיוק את מה שאתם מציעים —
         לצד תוצאות החיפוש ובעמוד הבית. השטח הפרסומי מנוהל ידנית, כדי לשמור על איכות הפרסום שמוצג.
       </p>
-      <ButtonLink href="/contact" variant="accent" size="lg">דברו איתנו על פרסום</ButtonLink>
+      <AdRequestForm />
       </div>
       </div>
     </div>

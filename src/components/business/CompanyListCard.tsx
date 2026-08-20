@@ -1,91 +1,178 @@
 import Link from "next/link";
-import { MapPin, Phone } from "lucide-react";
-import { Rating } from "@/components/ui/Rating";
+import Image from "next/image";
+import { Globe, Heart, MapPin, Phone, Sparkles } from "lucide-react";
+import { InstagramIcon, WazeIcon, WhatsAppIcon } from "@/components/ui/icons";
+import { toWhatsAppNumber, formatCompact } from "@/lib/utils";
 import type { BusinessCard as BusinessCardType } from "@/types/domain";
 
 /**
- * כרטיס חברה ברשת "חברות מומלצות" בעמוד הבית.
+ * כרטיס עסק — הרכיב המשותף לכל רשימה באתר.
  *
- * הלוגו הוא הגיבור של הכרטיס — בדיוק כמו ברפרנס, שבו מזהים את
- * החברה לפי הסמל לפני שקוראים את השם. שתי נקודות שחשוב לשמור:
+ * הפריסה משוחזרת מהדמיה: תמונת נושא במלוא רוחב הכרטיס למעלה, ומתחתיה
+ * גוש מרכוז — שם, תיאור, מיקום, דירוג, ושורת עיגולי רשתות צבעוניים.
  *
- * · הלוגו הוא object-contain בתוך תיבה בגובה קבוע, לא object-cover.
- *   לוגו הוא לא תמונת נוף — חיתוך שלו הורס אותו, וזה מה שקרה כאן
- *   קודם (התיבה לא הגבילה גובה בכלל והלוגו התפרץ על כל הכרטיס).
+ * שתי החלטות שקובעות את המראה:
  *
- * · הכפתור הירוק מציג את המספר האמיתי. "התקשרו" גנרי מסתיר בדיוק
- *   את המידע שמשווה בין ספקים.
+ * · התמונה היא coverUrl ולא logoUrl. לוגו הוא סימן מסחרי ביחס שרירותי,
+ *   ומילוי מלבן 3:2 בלוגו מותח אותו. תמונת נושא היא בדיוק מה שנועד
+ *   למלא מלבן. כשאין coverUrl נופלים ללוגו על רקע בהיר עם object-contain,
+ *   שם החיתוך לא הורס אותו.
  *
- * הכרטיס עצמו אינו רכיב לקוח: הקישור הראשי הוא שכבת ::after על כל
- * הכרטיס, וקישורי הטלפון/הפרטים יושבים מעליו ב-z-index. כך אין
- * צורך ב-onClick ובקינון קישורים לא חוקי.
+ * · עיגולי הרשתות צבועים בצבע המותג של כל רשת ולא בצבע אחיד. זו
+ *   הצורה בהדמיה, והיא גם נכונה: המשתמש מזהה ירוק=וואטסאפ מהר יותר
+ *   משהוא קורא tooltip. הצבעים ליטרליים ולא טוקנים — הם שייכים
+ *   לוואטסאפ ולאינסטגרם, לא למותג של האתר.
+ *
+ * כל אייקון מרונדר רק כשהעסק באמת מילא את השדה בטופס ההרשמה.
+ * עיגול שמוביל לשומקום גרוע מהיעדרו.
+ *
+ * הקישור הראשי הוא שכבת ::after על כל הכרטיס; הפעולות יושבות מעליו
+ * ב-z-index, כך שאין קינון קישורים לא חוקי.
  */
 export function CompanyListCard({ business: b }: { business: BusinessCardType }) {
   const href = `/business/${b.slug}`;
+  const social = b.social ?? {};
+  const isPremium = b.isFeatured || b.isSponsored || b.tier === "enterprise";
+
+  const wazeHref = b.latitude != null && b.longitude != null
+    ? `https://waze.com/ul?ll=${b.latitude},${b.longitude}&navigate=yes`
+    : b.address
+      ? `https://waze.com/ul?q=${encodeURIComponent(`${b.address} ${b.city?.name ?? ""}`)}`
+      : null;
 
   return (
-    <article className="group relative flex min-h-[248px] flex-col rounded-lg border border-ink-200/70 bg-white p-4 shadow-[0_1px_3px_rgba(12,29,64,0.06)] transition-[box-shadow,border-color,transform] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-[0_18px_38px_-18px_rgba(12,29,64,0.28)]">
-      <div className="mb-3 grid h-14 place-items-center">
-        {b.logoUrl ? (
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-lg border border-brand-100/80 bg-[#edf3f9] shadow-[0_2px_8px_rgba(12,29,64,0.06)] transition-[box-shadow,transform,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-[0_14px_28px_-18px_rgba(12,29,64,0.28)]">
+
+      {/* ---------- תמונת נושא ---------- */}
+      <div className="relative aspect-[2/1] w-full overflow-hidden bg-ink-100">
+        {b.coverUrl ? (
+          <Image
+            src={b.coverUrl}
+            alt=""
+            fill
+            sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 340px"
+            className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-105"
+          />
+        ) : b.logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={b.logoUrl}
             alt={`הלוגו של ${b.name}`}
             loading="lazy"
-            className="max-h-14 max-w-[70%] object-contain"
+            className="h-full w-full bg-white/85 object-contain p-4"
           />
         ) : (
-          <span className="grid h-12 w-12 place-items-center rounded-lg bg-brand-50 font-display text-xl font-black text-brand-800">
+          <span className="grid h-full w-full place-items-center bg-gradient-to-br from-brand-100 to-brand-300 text-3xl text-brand-800">
             {b.name.charAt(0).toUpperCase()}
           </span>
         )}
-      </div>
 
-      <h3 className="text-center text-md font-extrabold leading-tight text-ink-900">
-        <Link href={href} className="after:absolute after:inset-0 after:content-['']">
-          {b.name}
+        {/* מועדפים — פינה מתחילת השורה. כרגע מוביל להתחברות; שמירה
+            אמיתית דורשת סשן, וטבלת favorites כבר מוכנה לזה. */}
+        <Link
+          href="/login?next=/search"
+          aria-label={`הוספת ${b.name} למועדפים`}
+          className="absolute top-2 z-10 grid h-8 w-8 place-items-center rounded-full bg-brand-950/25 text-white backdrop-blur-sm transition-colors hover:bg-white hover:text-danger-500"
+          style={{ insetInlineStart: "0.5rem" }}
+        >
+          <Heart className="h-4.5 w-4.5" strokeWidth={2.2} aria-hidden="true" />
         </Link>
-      </h3>
 
-      {b.tagline && (
-        <p className="mt-1.5 line-clamp-2 text-center text-xs leading-relaxed text-ink-500">
-          {b.tagline}
-        </p>
-      )}
-
-      <div className="mt-3 flex flex-col items-center gap-1.5">
-        {b.city && (
-          <span className="inline-flex items-center gap-1 text-xs text-ink-400">
-            <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
-            {b.city.name}
+        {isPremium && (
+          <span
+            className="absolute top-2 z-10 inline-flex items-center gap-1 rounded-md bg-gold-400 px-2 py-0.5 text-2xs font-bold text-brand-950 shadow-sm"
+            style={{ insetInlineEnd: "0.5rem" }}
+          >
+            <Sparkles className="h-3 w-3" aria-hidden="true" />
+            פרימיום
           </span>
         )}
-        {b.reviewCount > 0 ? (
-          <Rating value={b.ratingAvg} count={b.reviewCount} size="sm" />
-        ) : (
-          <span className="text-xs text-ink-400">חברה חדשה</span>
-        )}
       </div>
 
-      <div className="mt-auto flex items-center gap-2 border-t border-ink-100 pt-3.5">
-        {b.phone ? (
-          <a
-            href={`tel:${b.phone}`}
-            className="relative z-10 inline-flex flex-1 items-center justify-center gap-1.5 rounded-xs border border-success-500/35 bg-success-50 px-3 py-2 text-xs font-bold text-success-700 transition-colors hover:bg-success-500 hover:text-white"
-          >
-            <Phone className="h-3.5 w-3.5" strokeWidth={2.4} aria-hidden="true" />
-            <span dir="ltr">{b.phone}</span>
-          </a>
-        ) : (
-          <span className="flex-1" />
+      {/* ---------- גוף ---------- */}
+      <div className="flex flex-1 flex-col items-center px-3 pb-2.5 pt-2.5 text-center">
+        <h3 className="text-md font-bold leading-tight text-ink-900">
+          <Link href={href} className="after:absolute after:inset-0 after:content-['']">
+            {b.name}
+          </Link>
+        </h3>
+
+        {b.tagline && (
+          <p className="mt-1 line-clamp-1 text-2xs leading-snug text-ink-500 sm:text-xs">{b.tagline}</p>
         )}
-        <Link
-          href={href}
-          className="relative z-10 flex-1 rounded-xs border border-ink-200 px-3 py-2 text-center text-xs font-bold text-brand-800 transition-colors hover:border-brand-300 hover:bg-brand-50"
-        >
-          הצג פרטים
-        </Link>
+
+        {b.city && (
+          <p className="mt-1.5 inline-flex items-center gap-1 text-xs text-ink-500">
+            {b.city.name}
+            <MapPin className="h-3.5 w-3.5 shrink-0 text-danger-500" strokeWidth={2} aria-hidden="true" />
+          </p>
+        )}
+
+        {b.reviewCount > 0 && (
+          <p className="mt-1.5 inline-flex items-center gap-1.5">
+            <span className="text-2xs text-ink-500 tabular-nums">({formatCompact(b.reviewCount)})</span>
+            <span className="inline-flex gap-0.5" aria-hidden="true">
+              {Array.from({ length: 5 }, (_, i) => (
+                <svg key={i} viewBox="0 0 24 24"
+                  className={`h-3.5 w-3.5 ${i < Math.round(b.ratingAvg) ? "fill-gold-400" : "fill-ink-300"}`}>
+                  <path d="M12 2.4l2.9 5.9 6.5.95-4.7 4.58 1.11 6.47L12 17.25l-5.81 3.05 1.11-6.47L2.6 9.25l6.5-.95L12 2.4z" />
+                </svg>
+              ))}
+            </span>
+            <span className="text-sm font-bold text-ink-900 tabular-nums">
+              {b.ratingAvg.toFixed(1)}
+            </span>
+          </p>
+        )}
+
+        {/* ---------- רשתות ---------- */}
+        <div className="mt-auto flex items-center justify-center gap-1.5 pt-2.5">
+          {b.website && (
+            <Social href={b.website} label="אתר החברה" bg="#1E3A5F" external>
+              <Globe className="h-3.5 w-3.5" strokeWidth={2} />
+            </Social>
+          )}
+          {wazeHref && (
+            <Social href={wazeHref} label="ניווט ב-Waze" bg="#33CCFF" external>
+              <WazeIcon className="h-3.5 w-3.5" />
+            </Social>
+          )}
+          {social.instagram && (
+            <Social href={social.instagram} label="אינסטגרם" bg="linear-gradient(45deg,#F58529,#DD2A7B,#8134AF)" external>
+              <InstagramIcon className="h-3.5 w-3.5" />
+            </Social>
+          )}
+          {b.whatsapp && (
+            <Social href={`https://wa.me/${toWhatsAppNumber(b.whatsapp)}`} label="וואטסאפ" bg="#25D366" external>
+              <WhatsAppIcon className="h-3.5 w-3.5" />
+            </Social>
+          )}
+          {b.phone && (
+            <Social href={`tel:${b.phone}`} label={`חיוג ל-${b.name}`} bg="#1D6FE0">
+              <Phone className="h-3.5 w-3.5" strokeWidth={2.2} />
+            </Social>
+          )}
+        </div>
       </div>
     </article>
+  );
+}
+
+/** עיגול רשת. z-10 כדי לשבת מעל שכבת הקישור של הכרטיס כולו. */
+function Social({
+  href, label, bg, external, children,
+}: { href: string; label: string; bg: string; external?: boolean; children: React.ReactNode }) {
+  return (
+    <a
+      href={href}
+      aria-label={label}
+      title={label}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noopener noreferrer" : undefined}
+      style={{ background: bg }}
+      className="relative z-10 grid h-7 w-7 place-items-center rounded-full text-white shadow-[0_2px_6px_rgba(12,29,64,0.18)] transition-transform duration-200 hover:-translate-y-0.5 active:scale-95"
+    >
+      {children}
+    </a>
   );
 }

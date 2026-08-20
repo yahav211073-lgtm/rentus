@@ -1,116 +1,193 @@
 import Link from "next/link";
-import { ArrowLeft, PenLine, Quote, Star } from "lucide-react";
-import { Rating } from "@/components/ui/Rating";
-import { getApprovedTestimonials, getTestimonialStats } from "@/lib/repo/testimonials";
+import {
+  ArrowLeft, Building2, CalendarDays, Headphones, Heart, ShieldCheck, Star,
+  TagsIcon, ThumbsUp, Users, Zap,
+} from "lucide-react";
+import { ReviewsCarousel } from "@/components/home/ReviewsCarousel";
+import {
+  getApprovedTestimonials, getRatingBreakdown, getTestimonialStats,
+} from "@/lib/repo/testimonials";
+import { formatNumber } from "@/lib/utils";
 
 /**
- * "מה אומרים על האתר" — ביקורות על הפלטפורמה, והמקום להוסיף ביקורת.
+ * "מה אומרים על Rentus?" — סקשן הביקורות המלא.
  *
- * הסקציה מרונדרת **תמיד**, גם כשאין עדיין ביקורות מאושרות. זה שינוי
- * מכוון מהגרסה הקודמת שהחזירה null: אם כניסת "כתבו ביקורת" יושבת
- * כאן, והסקציה נעלמת כשאין ביקורות, אז אף אחד לא יכול לכתוב את
- * הראשונה — האתר נעול במצב הריק שלו לנצח.
+ * הפריסה משוחזרת מהדמיה: כותרת ממורכזת, שורת סיכום בשלושה בלוקים
+ * (ציון ענק · התפלגות דירוגים · הזמנה לכתוב), קרוסלת ביקורות,
+ * ורצועת מספרים בתחתית. לצידם פאנל כהה עם ארבע סיבות.
  *
- * במצב ריק מוצג רק כרטיס ההזמנה, בלי כותרת שמבטיחה תוכן שאינו קיים
- * ובלי ביקורות דמה. ביקורת בדויה בשם אדם שלא קיים היא בדיוק מה
- * שהופך המלצות לחסרות ערך.
+ * הסקשן מרונדר תמיד, גם בלי ביקורות מאושרות: כניסת "כתבו ביקורת"
+ * יושבת בתוכו, ואם הוא נעלם כשאין ביקורות אף אחד לא יכול לכתוב את
+ * הראשונה והאתר נעול במצב הריק שלו לנצח.
  *
- * כרטיס ההוספה הוא תא ברשת ולא כפתור מעל הסקציה — כך הפעולה יושבת
- * פיזית ליד מה שהיא מייצרת, וזו הבקשה המפורשת.
+ * כל מספר כאן נספר מהמסד. אין ערכי ראווה קבועים — הצהרה שקרית על
+ * גודל האינדקס היא בדיוק מה שהורס אמון ברגע שמישהו סופר בעצמו.
+ * דרגה בהתפלגות שאין בה ביקורות מוצגת כפס ריק ולא נעלמת, אחרת
+ * חמש הדרגות מזיזות זו את זו ומשנות את משמעות התצוגה.
  */
-export async function ReviewsSection() {
-  const [reviews, stats] = await Promise.all([
-    getApprovedTestimonials(3),
+
+const REASONS = [
+  { Icon: ShieldCheck, title: "אלפי עסקים אמינים",     body: "מאומתים ומדורגים על ידי קהילת המשתמשים" },
+  { Icon: Zap,         title: "תהליך פשוט ומהיר",       body: "מוצאים, משווים ומשכירים בקלות" },
+  { Icon: TagsIcon,    title: "הצעות מחיר משתלמות",     body: "משווים בין ספקים ומקבלים את המחיר הטוב ביותר" },
+  { Icon: Headphones,  title: "שירות לקוחות מעולה",     body: "צוות מקצועי זמין עבורכם בכל שאלה" },
+];
+
+export async function ReviewsSection({
+  businessCount, userCount, yearsActive,
+}: {
+  businessCount: number;
+  userCount: number;
+  yearsActive: number;
+}) {
+  const [reviews, stats, breakdown] = await Promise.all([
+    getApprovedTestimonials(12),
     getTestimonialStats(),
+    getRatingBreakdown(),
   ]);
 
-  const shown = reviews.slice(0, 3);
-  const hasReviews = shown.length > 0;
+  const total = breakdown.reduce((sum, b) => sum + b.count, 0);
+  const positive = breakdown.filter((b) => b.stars >= 4).reduce((s, b) => s + b.count, 0);
+  const recommendPct = total > 0 ? Math.round((positive / total) * 100) : 0;
+
+  const bottomStats = [
+    total > 0 && { Icon: ThumbsUp,     value: `${recommendPct}%`,             label: "ממליצים על Rentus" },
+    total > 0 && { Icon: Star,         value: `${formatNumber(total)}`,        label: "ביקורות אמיתיות" },
+    userCount > 0 && { Icon: Users,    value: `${formatNumber(userCount)}`,    label: "משתמשים רשומים" },
+    businessCount > 0 && { Icon: Building2, value: `${formatNumber(businessCount)}`, label: "עסקים פעילים" },
+    yearsActive > 0 && { Icon: CalendarDays, value: `${yearsActive}`,          label: "שנות פעילות" },
+  ].filter(Boolean) as { Icon: typeof Star; value: string; label: string }[];
 
   return (
     <section className="bg-ink-50 pt-4">
       <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
-        <div className="rounded-lg border border-ink-200/80 bg-white p-4 shadow-[0_10px_26px_-18px_rgba(5,25,47,0.45)] sm:p-5">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
 
-          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <h2 className="font-display text-2xl text-ink-900 sm:text-3xl">
-                מה אומרים על האתר
-              </h2>
-              {/* הציון הכולל מוצג רק כשהוא נשען על ביקורות אמיתיות. */}
-              {stats.count > 0 && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-gold-50 px-2.5 py-1 text-xs font-bold text-gold-700">
-                  <Star className="h-3.5 w-3.5 fill-current" aria-hidden="true" />
-                  {stats.avg.toFixed(1)} · {stats.count === 1 ? "ביקורת אחת" : `${stats.count} ביקורות`}
+          {/* ================= לוח ראשי ================= */}
+          <div className="rounded-2xl bg-gradient-to-b from-white to-ink-50 p-5 shadow-[0_2px_14px_rgba(12,29,64,0.06)] sm:p-7">
+
+            <header className="text-center">
+              <h2 className="text-2xl text-ink-900 sm:text-3xl">מה אומרים על Rentus?</h2>
+              <p className="mx-auto mt-2 max-w-[56ch] text-sm leading-relaxed text-ink-500 sm:text-base">
+                אלפי עסקים ולקוחות שכבר נהנים מהשכרת הציוד בקלות ובביטחון
+              </p>
+              <span className="mx-auto mt-4 block h-1 w-14 rounded-full bg-brand-600" aria-hidden="true" />
+            </header>
+
+            {/* ---- שורת הסיכום ---- */}
+            <div className="mt-7 grid items-center gap-6 lg:grid-cols-[200px_minmax(0,1fr)_340px]">
+
+              <div className="text-center">
+                <p className="font-display text-5xl leading-none text-brand-600">
+                  {stats.count > 0 ? stats.avg.toFixed(1) : "—"}
+                </p>
+                <span className="mt-2 flex justify-center gap-1" aria-hidden="true">
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <svg key={i} viewBox="0 0 24 24"
+                      className={`h-5 w-5 ${i < Math.round(stats.avg) ? "fill-gold-400" : "fill-ink-200"}`}>
+                      <path d="M12 2.4l2.9 5.9 6.5.95-4.7 4.58 1.11 6.47L12 17.25l-5.81 3.05 1.11-6.47L2.6 9.25l6.5-.95L12 2.4z" />
+                    </svg>
+                  ))}
                 </span>
-              )}
+                <p className="mt-2 text-xs text-ink-400">
+                  {stats.count > 0 ? `מבוסס על ${formatNumber(stats.count)} ביקורות` : "עדיין אין ביקורות"}
+                </p>
+              </div>
+
+              <ul className="space-y-2">
+                {breakdown.map(({ stars, count }) => (
+                  <li key={stars} className="flex items-center gap-3">
+                    <span className="flex w-9 shrink-0 items-center gap-1 text-xs text-ink-500">
+                      {stars}
+                      <svg viewBox="0 0 24 24" className="h-3 w-3 fill-ink-400" aria-hidden="true">
+                        <path d="M12 2.4l2.9 5.9 6.5.95-4.7 4.58 1.11 6.47L12 17.25l-5.81 3.05 1.11-6.47L2.6 9.25l6.5-.95L12 2.4z" />
+                      </svg>
+                    </span>
+                    <span className="h-2 flex-1 overflow-hidden rounded-full bg-ink-200/70">
+                      <span
+                        className="block h-full rounded-full bg-brand-600"
+                        style={{ width: total > 0 ? `${(count / total) * 100}%` : "0%" }}
+                      />
+                    </span>
+                    <span className="w-12 shrink-0 text-start text-xs tabular-nums text-ink-500">
+                      {formatNumber(count)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="flex items-center gap-4 rounded-xl border border-ink-200/80 bg-white/70 p-4">
+                <span className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-white shadow-[0_4px_14px_rgba(12,29,64,0.12)]">
+                  <Heart className="h-6 w-6 fill-brand-600 text-brand-600" aria-hidden="true" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-bold text-ink-900">יש לכם חוויה לשתף?</span>
+                  <span className="mt-0.5 block text-xs leading-relaxed text-ink-500">
+                    הביקורות שלכם עוזרות לאלפי אנשים
+                  </span>
+                  <Link
+                    href="/review"
+                    className="group mt-2.5 inline-flex items-center gap-1.5 rounded-md border border-ink-200 bg-white px-3.5 py-2 text-xs font-bold text-brand-700 transition-colors hover:border-brand-300 hover:bg-brand-50"
+                  >
+                    כתבו ביקורת
+                    <ArrowLeft className="h-3.5 w-3.5 transition-transform duration-200 group-hover:-translate-x-1" aria-hidden="true" />
+                  </Link>
+                </span>
+              </div>
             </div>
 
-            {hasReviews && (
-              <Link
-                href="/review"
-                className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-bold text-brand-700 transition-colors hover:text-brand-800"
-              >
-                לכל הביקורות
-                <ArrowLeft
-                  className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1"
-                  aria-hidden="true"
-                />
-              </Link>
+            {/* ---- קרוסלה ---- */}
+            {reviews.length > 0 && (
+              <div className="mt-7">
+                <ReviewsCarousel reviews={reviews} />
+              </div>
+            )}
+
+            {/* ---- רצועת מספרים ---- */}
+            {bottomStats.length > 0 && (
+              <div className="mt-7 rounded-xl bg-white/70 p-2">
+                <dl className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+                  {bottomStats.map(({ Icon, value, label }, i) => (
+                    <div
+                      key={label}
+                      className={`flex items-center justify-center gap-3 px-3 py-4 ${i > 0 ? "lg:border-s lg:border-ink-200/70" : ""}`}
+                    >
+                      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-600">
+                        <Icon className="h-5 w-5" aria-hidden="true" />
+                      </span>
+                      <span className="min-w-0">
+                        <dd className="text-lg font-bold tabular-nums text-ink-900">{value}</dd>
+                        <dt className="truncate text-xs text-ink-400">{label}</dt>
+                      </span>
+                    </div>
+                  ))}
+                </dl>
+              </div>
             )}
           </div>
 
-          <div className={`grid gap-3 ${GRID_COLS[shown.length] ?? GRID_COLS[3]}`}>
-            {shown.map((r) => (
-              <figure
-                key={r.id}
-                className="flex flex-col rounded-lg border border-ink-200/70 bg-ink-50 p-4"
-              >
-                <Quote className="mb-2 h-5 w-5 shrink-0 text-brand-300" strokeWidth={2} aria-hidden="true" />
+          {/* ================= פאנל כהה ================= */}
+          <aside className="flex flex-col rounded-2xl bg-brand-900 p-5 sm:p-6">
+            <h3 className="mb-5 text-center text-xl text-white">
+              למה אוהבים את <span className="text-brand-300">Rentus</span>?
+            </h3>
 
-                <blockquote className="flex-1 text-sm leading-relaxed text-ink-700">
-                  {r.quote}
-                </blockquote>
-
-                <figcaption className="mt-3 flex items-center justify-between gap-3 border-t border-ink-200/70 pt-3">
-                  <span className="flex min-w-0 flex-col">
-                    <span className="truncate text-sm font-bold text-ink-900">{r.authorName}</span>
-                    {r.authorRole && (
-                      <span className="truncate text-xs text-ink-400">{r.authorRole}</span>
-                    )}
+            <ul className="flex-1 space-y-3">
+              {REASONS.map(({ Icon, title, body }) => (
+                <li key={title} className="flex items-center gap-3 rounded-xl bg-white/[0.07] p-4">
+                  <span className="min-w-0 flex-1 text-end">
+                    <span className="block text-sm font-bold text-white">{title}</span>
+                    <span className="mt-0.5 block text-xs leading-relaxed text-white/60">{body}</span>
                   </span>
-                  {r.rating != null && <Rating value={r.rating} size="sm" />}
-                </figcaption>
-              </figure>
-            ))}
+                  <Icon className="h-6 w-6 shrink-0 text-brand-300" strokeWidth={1.8} aria-hidden="true" />
+                </li>
+              ))}
+            </ul>
 
-            {/* כרטיס ההוספה — תמיד התא האחרון. */}
-            <Link
-              href="/review"
-              className="group flex flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-brand-300 bg-brand-50/60 p-5 text-center transition-colors hover:border-brand-500 hover:bg-brand-50"
-            >
-              <span className="grid h-11 w-11 place-items-center rounded-full bg-white text-brand-700 shadow-sm transition-transform duration-200 group-hover:-translate-y-0.5">
-                <PenLine className="h-5 w-5" aria-hidden="true" />
-              </span>
-              <span className="text-sm font-bold text-ink-900">
-                {hasReviews ? "כתבו ביקורת על האתר" : "היו הראשונים לכתוב ביקורת"}
-              </span>
-              <span className="max-w-[30ch] text-xs leading-relaxed text-ink-500">
-                השתמשתם ב-Rentus? ספרו איך הייתה החוויה. הביקורת עוברת אישור לפני פרסום.
-              </span>
-            </Link>
-          </div>
+
+          </aside>
         </div>
       </div>
     </section>
   );
 }
-
-/* מספר העמודות לפי מספר הביקורות + כרטיס ההוספה שתמיד נוסף.
-   מחלקות מלאות — Tailwind סורק את הקוד כטקסט. */
-const GRID_COLS: Record<number, string> = {
-  0: "grid-cols-1",
-  1: "grid-cols-1 sm:grid-cols-2",
-  2: "grid-cols-1 sm:grid-cols-3",
-  3: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4",
-};

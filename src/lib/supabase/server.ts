@@ -55,3 +55,23 @@ export function createSupabaseAdminClient() {
     cookies: { getAll: () => [], setAll: () => {} },
   });
 }
+
+/**
+ * לקוח לקריאת תוכן ציבורי — בלי עוגיות.
+ *
+ * זו הנקודה שקובעת אם דף יכול להיות מקושש. כל קריאה ל-cookies()
+ * מסמנת את הרינדור כדינמי ב-Next, ולכן קריאה של רשימת קטגוריות
+ * דרך לקוח הסשן הפכה את כל עמוד הבית לדינמי — כלומר 15 הלוך-ושוב
+ * ל-Supabase בכל טעינה, גם כשאף אחד מהנתונים לא משתנה בין מבקרים.
+ *
+ * הלקוח הזה מריץ כ-anon, כלומר RLS עדיין אוכף בדיוק את אותם כללים.
+ * מה שהוא לא רואה: שורות שגלויות רק למשתמש מסוים. לכן הוא מיועד
+ * אך ורק לתוכן ציבורי — טקסונומיה, מאמרים, הגדרות מותג. כל דבר
+ * שתלוי במי מחובר חייב להישאר על createSupabaseServerClient.
+ */
+export function createSupabasePublicClient() {
+  if (!isSupabaseConfigured) return null;
+  return createServerClient(env.supabaseUrl, env.supabaseAnonKey, {
+    cookies: { getAll: () => [], setAll: () => {} },
+  });
+}

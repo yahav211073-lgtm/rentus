@@ -4,9 +4,8 @@ import { SearchX } from "lucide-react";
 import { parseSearchParams, searchBusinesses, PAGE_SIZE } from "@/lib/repo/search";
 import { SearchBar } from "@/components/search/SearchBar";
 import { FilterRail } from "@/components/search/FilterRail";
-import { GuidesSidebar } from "@/components/home/GuidesSidebar";
 import { SortSelect } from "@/components/search/SortSelect";
-import { BusinessCard } from "@/components/business/BusinessCard";
+import { CompanyListCard } from "@/components/business/CompanyListCard";
 import { RevealItem, RevealStagger } from "@/components/motion/Reveal";
 import { ButtonLink } from "@/components/ui/Button";
 import { getFlatCategories, getCities } from "@/lib/repo/taxonomy";
@@ -76,7 +75,6 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
       <div className="mx-auto max-w-[1480px] px-4 pt-8 sm:px-6 lg:px-8">
         <div className="flex gap-7">
           <FilterRail facets={result.facets} total={result.total} categories={categories} cities={cities}>
-            <GuidesSidebar />
           </FilterRail>
 
           <div className="min-w-0 flex-1">
@@ -95,10 +93,10 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
               <EmptyState query={filters.q} categories={categories} />
             ) : (
               <>
-                <RevealStagger className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                  {result.items.map((b, i) => (
+                <RevealStagger className="grid gap-5 xl:grid-cols-2">
+                  {result.items.map((b) => (
                     <RevealItem key={b.id}>
-                      <BusinessCard business={b} priority={i === 0} />
+                      <CompanyListCard business={b} />
                     </RevealItem>
                   ))}
                 </RevealStagger>

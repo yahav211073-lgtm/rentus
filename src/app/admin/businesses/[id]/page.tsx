@@ -2,9 +2,13 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, ExternalLink } from "lucide-react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { getCities, getFlatCategories } from "@/lib/repo/taxonomy";
+import { getAreas, getCities, getFlatCategories } from "@/lib/repo/taxonomy";
 import { Badge } from "@/components/ui/Badge";
 import { BusinessAdminForm, type AdminBusinessDetail } from "@/components/admin/BusinessAdminForm";
+import { BusinessLogoField } from "@/components/admin/BusinessLogoField";
+import { ServiceAreasEditor } from "@/components/business/ServiceAreasEditor";
+import { OpeningHoursEditor } from "@/components/business/OpeningHoursEditor";
+import { missingVerificationFields } from "@/lib/verification";
 
 export const metadata = { title: "עריכת עסק", robots: { index: false, follow: false } };
 
@@ -15,20 +19,22 @@ export default async function AdminBusinessEditPage({ params }: { params: Params
   const supabase = await createSupabaseServerClient();
   if (!supabase) return null;
 
-  const [{ data: business }, categories, cities] = await Promise.all([
+  const [{ data: business }, categories, cities, areas] = await Promise.all([
     supabase
       .from("businesses")
       .select(`
         id, slug, name, tagline, description, address, latitude, longitude,
-        phone, whatsapp, email, website, social, city_id,
+        phone, whatsapp, email, website, social, city_id, logo_url,
         status, tier, is_featured, is_sponsored, is_verified, boost_score,
         rejection_reason,
-        business_categories(is_primary, category_id)
+        business_categories(is_primary, category_id),
+        business_hours(day_of_week, opens_at, closes_at, is_closed, note)
       `)
       .eq("id", id)
       .maybeSingle(),
     getFlatCategories(),
     getCities(),
+    getAreas(),
   ]);
 
   if (!business) notFound();
@@ -36,6 +42,26 @@ export default async function AdminBusinessEditPage({ params }: { params: Params
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const links = (business.business_categories as any[]) ?? [];
   const primaryLink = links.find((c) => c.is_primary) ?? links[0];
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const hourRows = ((business.business_hours as any[]) ?? []).map((h) => ({
+    dayOfWeek: h.day_of_week,
+    opensAt: h.opens_at,
+    closesAt: h.closes_at,
+    isClosed: h.is_closed,
+    note: h.note,
+  }));
+  /* שאילתה נפרדת ולא embed — ראו ההסבר ב-repo/businesses.ts. */
+  const { data: areaRows } = await supabase
+    .from("business_service_areas")
+    .select("area_id")
+    .eq("business_id", business.id);
+  const selectedAreas = (areaRows ?? []).map((a) => a.area_id);
+
+  const missing = missingVerificationFields({
+    ...business,
+    business_service_areas: selectedAreas.map((id) => ({ id })),
+  });
 
   const detail: AdminBusinessDetail = {
     id: business.id,
@@ -100,7 +126,37 @@ export default async function AdminBusinessEditPage({ params }: { params: Params
         </div>
       )}
 
+      {/* מה חסר לאימות — בראש העמוד ולא בתחתיתו. זו רשימת המשימות
+          של המנהל במסך הזה, והיא צריכה להיות הדבר הראשון שהוא רואה. */}
+      {missing.length > 0 && (
+        <div className="mb-5 rounded-lg border border-warning-500/35 bg-warning-50 p-4">
+          <p className="text-sm font-bold text-ink-900">העסק אינו מאומת</p>
+          <p className="mt-0.5 text-sm text-ink-700">
+            חסר כדי לאמת: {missing.join(", ")}. אחרי ההשלמה אפשר לסמן אותו כמאומת
+            מרשימת העסקים.
+          </p>
+        </div>
+      )}
+
       <BusinessAdminForm business={detail} categories={categories} cities={cities} />
+
+      <section className="mt-6 rounded-lg border border-ink-200/70 bg-white p-5 sm:p-6">
+        <h2 className="mb-4 font-display text-base text-ink-900">לוגו</h2>
+        <BusinessLogoField businessId={business.id} currentUrl={business.logo_url} />
+      </section>
+
+      <section className="mt-6 rounded-lg border border-ink-200/70 bg-white p-5 sm:p-6">
+        <h2 className="mb-1 font-display text-base text-ink-900">אזורי שירות</h2>
+        <p className="mb-4 text-xs text-ink-400">
+          היכן העסק נותן שירות — להבדיל מהעיר שבה הוא יושב.
+        </p>
+        <ServiceAreasEditor businessId={business.id} areas={areas} selected={selectedAreas} />
+      </section>
+
+      <section className="mt-6 rounded-lg border border-ink-200/70 bg-white p-5 sm:p-6">
+        <h2 className="mb-4 font-display text-base text-ink-900">שעות פעילות</h2>
+        <OpeningHoursEditor businessId={business.id} hours={hourRows} />
+      </section>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabasePublicClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/env";
 import { seedCategories, seedCities } from "@/data/seed";
 
@@ -24,7 +24,7 @@ export async function getFlatCategories(): Promise<FlatCategory[]> {
     ]);
   }
 
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabasePublicClient();
   if (!supabase) return [];
 
   const { data } = await supabase
@@ -41,7 +41,7 @@ export async function getCities(): Promise<SimpleCity[]> {
     return seedCities.map((c) => ({ id: c.id, slug: c.slug, name: c.name }));
   }
 
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabasePublicClient();
   if (!supabase) return [];
 
   const { data } = await supabase
@@ -67,7 +67,7 @@ export interface SimpleArea {
 export async function getAreas(): Promise<SimpleArea[]> {
   if (!isSupabaseConfigured) return [];
 
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabasePublicClient();
   if (!supabase) return [];
 
   const { data } = await supabase

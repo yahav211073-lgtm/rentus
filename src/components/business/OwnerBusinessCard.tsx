@@ -1,12 +1,14 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { CheckCircle2, ChevronDown, Clock, Pencil, Wrench } from "lucide-react";
+import { CheckCircle2, ChevronDown, Clock, MapPin, Pencil, Wrench } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
 import { OpeningHoursEditor } from "@/components/business/OpeningHoursEditor";
 import { ServicesEditor } from "@/components/business/ServicesEditor";
+import { ServiceAreasEditor } from "@/components/business/ServiceAreasEditor";
+import type { SimpleArea } from "@/lib/repo/taxonomy";
 import { updateBusiness } from "@/app/business/dashboard/actions";
 import { formatRelative } from "@/lib/utils";
 import type { BusinessHours, BusinessService, BusinessStatus } from "@/types/domain";
@@ -37,9 +39,12 @@ export interface OwnerBusiness {
   leads: { id: string; name: string | null; phone: string | null; message: string | null; createdAt: string }[];
   hours: BusinessHours[];
   services: BusinessService[];
+  serviceAreaIds: string[];
 }
 
-export function OwnerBusinessCard({ business }: { business: OwnerBusiness }) {
+export function OwnerBusinessCard({
+  business, areas,
+}: { business: OwnerBusiness; areas: SimpleArea[] }) {
   const [editing, setEditing] = useState(false);
   const [pending, startTransition] = useTransition();
   const [saved, setSaved] = useState(false);
@@ -129,6 +134,14 @@ export function OwnerBusinessCard({ business }: { business: OwnerBusiness }) {
 
       <CollapsibleSection icon={Clock} title="שעות פעילות">
         <OpeningHoursEditor businessId={business.id} hours={business.hours} />
+      </CollapsibleSection>
+
+      <CollapsibleSection icon={MapPin} title="אזורי שירות">
+        <ServiceAreasEditor
+          businessId={business.id}
+          areas={areas}
+          selected={business.serviceAreaIds}
+        />
       </CollapsibleSection>
 
       <CollapsibleSection icon={Wrench} title="שירותים ומחירון">

@@ -8,7 +8,15 @@ import type { Banner } from "@/types/domain";
  * שמככב בתוך רשת התוכן עצמה, בדיוק כמו בתמונת הרפרנס: עמודה שלמה
  * לצד כרטיסי העסקים, לא רק בשוליים למסכים רחבים במיוחד.
  */
-export function BannerCard({ banner, className }: { banner: Banner; className?: string }) {
+export function BannerCard({
+  banner,
+  compact = false,
+  className,
+}: {
+  banner: Banner;
+  compact?: boolean;
+  className?: string;
+}) {
   const trackedRef = useRef(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -46,7 +54,10 @@ export function BannerCard({ banner, className }: { banner: Banner; className?: 
   }
 
   const content = (
-    <div ref={ref} className="group relative h-full min-h-[280px] overflow-hidden rounded-lg">
+    <div
+      ref={ref}
+      className={`group relative h-full overflow-hidden rounded-lg ${compact ? "min-h-[84px]" : "min-h-[280px]"}`}
+    >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={banner.assetUrl ?? ""}
@@ -55,10 +66,10 @@ export function BannerCard({ banner, className }: { banner: Banner; className?: 
         className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-brand-950/85 via-brand-950/25 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 p-5">
-        <span className="mb-2 inline-block bg-accent-400 px-2 py-0.5 text-2xs font-bold text-brand-950">פרסומת</span>
-        <h3 className="mb-3 text-xl font-extrabold leading-tight text-white">{banner.title}</h3>
-        <span className="inline-flex items-center gap-1.5 bg-white px-4 py-2 text-sm font-bold text-brand-900 transition-transform group-hover:-translate-y-0.5">
+      <div className={`absolute inset-x-0 bottom-0 ${compact ? "p-3" : "p-5"}`}>
+        <span className={`inline-block bg-accent-400 px-2 py-0.5 text-2xs font-bold text-brand-950 ${compact ? "mb-1" : "mb-2"}`}>פרסומת</span>
+        <h3 className={`font-extrabold leading-tight text-white ${compact ? "line-clamp-1 text-sm" : "mb-3 text-xl"}`}>{banner.title}</h3>
+        <span className={`${compact ? "hidden" : "inline-flex"} items-center gap-1.5 bg-white px-4 py-2 text-sm font-bold text-brand-900 transition-transform group-hover:-translate-y-0.5`}>
           לפרטים ←
         </span>
       </div>

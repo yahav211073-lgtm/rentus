@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, SearchX } from "lucide-react";
-import { CategoryIcon } from "@/components/ui/CategoryIcon";
+import { CategoryThumb } from "@/components/ui/CategoryThumb";
 import { RevealItem, RevealStagger } from "@/components/motion/Reveal";
 import { businessCountLabel } from "@/lib/utils";
 import type { CarouselCategory } from "@/components/categories/CategoryCarousel";
@@ -48,9 +48,13 @@ export function CategoryGridSearch({ items }: { items: CarouselCategory[] }) {
                 href={`/category/${cat.slug}`}
                 className="group flex min-h-44 flex-col justify-between overflow-hidden rounded-xl border border-ink-200 bg-white p-5 transition-all hover:-translate-y-1 hover:border-brand-300 hover:shadow-[0_20px_45px_-24px_rgba(11,59,117,.4)]"
               >
-                <span className="grid h-12 w-12 place-items-center rounded-lg bg-brand-50 text-brand-700 transition-colors group-hover:bg-brand-800 group-hover:text-white">
-                  <CategoryIcon name={cat.icon} className="h-6 w-6" strokeWidth={1.8} />
-                </span>
+                <CategoryThumb
+                  imageUrl={cat.imageUrl}
+                  icon={cat.icon}
+                  name={cat.name}
+                  sizes="48px"
+                  className="h-12 w-12 rounded-lg transition-colors group-hover:bg-brand-800 group-hover:text-white"
+                />
                 <span>
                   <span className="block font-display text-lg font-extrabold text-ink-900">{cat.name}</span>
                   <span className="mt-1 block text-xs font-semibold text-ink-400">

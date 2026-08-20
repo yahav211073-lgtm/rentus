@@ -3,6 +3,9 @@ import { getCategoriesWithCounts } from "@/lib/repo/categories";
 import { CategoryCarousel } from "@/components/categories/CategoryCarousel";
 import { CategoryGridSearch } from "@/components/categories/CategoryGridSearch";
 import { InteriorHero } from "@/components/layout/InteriorHero";
+import { AdSlot } from "@/components/home/AdSlot";
+import { AdRequestForm } from "@/components/ads/AdRequestForm";
+import { getActiveAds } from "@/lib/repo/ads";
 
 export const metadata: Metadata = {
   title: "כל הקטגוריות",
@@ -11,7 +14,12 @@ export const metadata: Metadata = {
 };
 
 export default async function CategoriesPage() {
-  const categories = await getCategoriesWithCounts();
+  const [categories, ads] = await Promise.all([
+    getCategoriesWithCounts(),
+    getActiveAds(),
+  ]);
+
+  const adTop = ads.banners.find((b) => b.placementKey === "categories_top" && b.isActive);
 
   // שטוח: קטגוריות-אב ותתי-קטגוריות באותה רשימה, כדי שהחיפוש
   // והסליידר יתייחסו לכולן באותה מידה — לא רק לשלוש קטגוריות-האב.
@@ -34,12 +42,23 @@ export default async function CategoriesPage() {
         compact
       />
 
+      {/* משבצת הפרסום יושבת מעל הרשת ולא מתחתיה: זה המיקום שאפשר
+          למכור, וקריאייטיב הבית שמוצג בו כשאין מפרסם הוא בדיוק
+          הפרסומת שצריכה להופיע כאן. */}
+      <div className="mx-auto max-w-[1480px] px-4 pt-10 sm:px-6 lg:px-8">
+        <AdSlot banner={adTop} />
+      </div>
+
       <div className="mx-auto mb-16 max-w-[1100px] px-4 pt-10 sm:px-6 lg:px-8">
         <CategoryCarousel items={flat} />
       </div>
 
       <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
         <CategoryGridSearch items={flat} />
+      </div>
+
+      <div className="mx-auto mt-14 max-w-2xl px-4 sm:px-6">
+        <AdRequestForm defaultPlacement="באנר בעמוד הקטגוריות" />
       </div>
     </div>
   );

@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import type { BusinessCard as BusinessCardType } from "@/types/domain";
-import { BusinessCard } from "@/components/business/BusinessCard";
+import { CompanyListCard } from "@/components/business/CompanyListCard";
 import { RevealItem, RevealStagger } from "@/components/motion/Reveal";
 import { cn } from "@/lib/utils";
 
@@ -23,12 +23,11 @@ import { cn } from "@/lib/utils";
 
 interface Props {
   businesses: BusinessCardType[];
-  emphasis?: boolean;
   /** רשת במקום רצועה — לסקציות שבהן יש מספיק מקום אנכי */
   layout?: "rail" | "grid";
 }
 
-export function BusinessRail({ businesses, emphasis = false, layout = "rail" }: Props) {
+export function BusinessRail({ businesses, layout = "rail" }: Props) {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const [canStart, setCanStart] = useState(false);
   const [canEnd, setCanEnd] = useState(true);
@@ -64,10 +63,10 @@ export function BusinessRail({ businesses, emphasis = false, layout = "rail" }: 
 
   if (layout === "grid") {
     return (
-      <RevealStagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <RevealStagger className="grid gap-5 xl:grid-cols-2">
         {businesses.map((b) => (
           <RevealItem key={b.id}>
-            <BusinessCard business={b} emphasis={emphasis} />
+            <CompanyListCard business={b} />
           </RevealItem>
         ))}
       </RevealStagger>
@@ -86,9 +85,9 @@ export function BusinessRail({ businesses, emphasis = false, layout = "rail" }: 
         {businesses.map((b) => (
           <div
             key={b.id}
-            className="w-[280px] shrink-0 snap-start sm:w-[300px] lg:w-[320px]"
+            className="w-[320px] shrink-0 snap-start sm:w-[420px] lg:w-[520px]"
           >
-            <BusinessCard business={b} emphasis={emphasis} />
+            <CompanyListCard business={b} />
           </div>
         ))}
       </div>

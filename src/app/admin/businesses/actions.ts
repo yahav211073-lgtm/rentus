@@ -5,6 +5,7 @@ import { requireStaff } from "@/lib/auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 import { uploadPublicImage } from "@/lib/uploads";
 import { slugify } from "@/lib/utils";
+import { missingVerificationFields } from "@/lib/verification";
 
 /**
  * כל הפעולות כאן משתמשות ב-admin client (service role) בכוונה —
@@ -13,6 +14,21 @@ import { slugify } from "@/lib/utils";
  * לא הופך את חיבור ה-DB לתפקיד Postgres שונה. requireStaff() הוא
  * קו ההגנה בפועל כאן, ולכן הוא הדבר הראשון בכל פעולה.
  */
+
+/** פענוח שדה השעות מהטופס. קלט לא תקין מוחזר כרשימה ריקה ולא מפיל
+    את היצירה — עסק בלי שעות עדיף על טופס שנכשל. */
+function parseHours(raw: FormDataEntryValue | null) {
+  if (typeof raw !== "string" || !raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (h) => typeof h?.dayOfWeek === "number" && typeof h?.isClosed === "boolean",
+    ) as { dayOfWeek: number; isClosed: boolean; opensAt: string; closesAt: string }[];
+  } catch {
+    return [];
+  }
+}
 
 /** רענון כל מה שמושפע משינוי סטטוס של עסק — כולל העמוד הציבורי שלו. */
 function refreshBusiness(slug?: string | null) {
@@ -208,8 +224,15 @@ export async function createBusinessAdmin(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   if (!name) return { ok: false, error: "שם העסק הוא שדה חובה." };
 
+  /* לוגו הוא שדה חובה ביצירת עסק. אין יותר אווטאר-אות כגיבוי
+     בכרטיסים, ולכן עסק בלי לוגו היה מופיע ברשת עם חור במקום
+     הסמל — מצב שנראה כתקלה ולא כפרופיל חלקי. */
+  const logo = await uploadPublicImage(formData.get("logo"), "admin");
+  if (!logo.ok) return { ok: false, error: `לוגו: ${logo.error}` };
+
+  /* תמונת הרקע נשארת אופציונלית — עמוד העסק יודע להציג רקע גנרי,
+     ובניגוד ללוגו היא לא מזהה את העסק. */
   const cover = await uploadPublicImage(formData.get("cover"), "admin");
-  if (!cover.ok) return { ok: false, error: cover.error };
 
   const slug = `${slugify(name) || "business"}-${Math.random().toString(36).slice(2, 7)}`;
 
@@ -226,8 +249,17 @@ export async function createBusinessAdmin(formData: FormData) {
       email: String(formData.get("email") ?? "").trim() || null,
       city_id: String(formData.get("cityId") ?? "") || null,
       status: "published",
+      area_id: String(formData.get("areaId") ?? "") || null,
+      /* מאומת ביצירה. טופס היצירה אוסף עכשיו גם שעות פעילות וגם
+         אזור שירות, כלומר כל מה ש-missingVerificationFields דורשת
+         נמצא כאן — ולכן אין סיבה להכריח את המנהל לפתוח את העסק
+         שוב רק כדי ללחוץ על תג. עסק שנוסף ידנית מהניהול הוא בהגדרה
+         עסק שמישהו מהצוות אימת בטלפון.
+         שים לב: זה **לא** דורש owner_id. עסק שנוסף מהניהול נשאר
+         בלי חשבון בעלים, וזה מצב תקין ומכוון. */
       is_verified: true,
-      cover_url: cover.url,
+      logo_url: logo.url,
+      cover_url: cover.ok ? cover.url : null,
     })
     .select("id, slug")
     .single();
@@ -241,6 +273,169 @@ export async function createBusinessAdmin(formData: FormData) {
     });
   }
 
+  /* שעות פעילות. נכתבות רק כשסומן יום פתוח אחד לפחות — שבוע שכולו
+     "סגור" הוא "לא מילאתי", וכתיבתו הייתה גורמת לדף העסק להציג
+     טבלה שאומרת שהעסק סגור תמיד. */
+  const hours = parseHours(formData.get("hours"));
+  if (hours.some((h) => !h.isClosed)) {
+    await supabase.from("business_hours").insert(
+      hours.map((h) => ({
+        business_id: business.id,
+        day_of_week: h.dayOfWeek,
+        is_closed: h.isClosed,
+        opens_at: h.isClosed ? null : h.opensAt,
+        closes_at: h.isClosed ? null : h.closesAt,
+      })),
+    );
+  }
+
+  const areaId = String(formData.get("areaId") ?? "");
+  if (areaId) {
+    await supabase.from("business_service_areas").insert({
+      business_id: business.id, area_id: areaId,
+    });
+  }
+
   refreshBusiness(business.slug as string);
   return { ok: true, businessId: business.id as string };
+}
+
+/**
+ * הוספה/הסרה של עסק מ"חברות מומלצות" בעמוד הבית.
+ *
+ * פעולה נפרדת ולא עוד שדה בטופס העריכה: קידום הוא החלטה שמשנים
+ * לעיתים קרובות ומתוך הרשימה — לא משהו שפותחים בשבילו עמוד עריכה
+ * מלא. is_featured נעול ל-authenticated ברמת העמודה, ולכן גם כאן
+ * admin client אחרי requireStaff().
+ */
+export async function setBusinessFeatured(businessId: string, featured: boolean) {
+  await requireStaff();
+  const supabase = createSupabaseAdminClient();
+  if (!supabase) return { ok: false, error: "אין חיבור למסד הנתונים." };
+
+  const { data, error } = await supabase
+    .from("businesses")
+    .update({ is_featured: featured })
+    .eq("id", businessId)
+    .select("slug")
+    .maybeSingle();
+
+  if (error) return { ok: false, error: error.message };
+
+  refreshBusiness(data?.slug);
+  return { ok: true };
+}
+
+/**
+ * סימון עסק כמאומת.
+ *
+ * "מאומת" באתר הזה פירושו שהפרטים המהותיים הוזנו ונבדקו ידנית —
+ * לוגו, טלפון, כתובת, שעות פעילות ואזורי שירות. לכן הפעולה מסרבת
+ * לסמן עסק שחסר לו אחד מהם, ומחזירה בדיוק מה חסר: תג אמון שאפשר
+ * להדביק על פרופיל ריק הוא תג חסר ערך.
+ */
+export async function setBusinessVerified(businessId: string, verified: boolean) {
+  await requireStaff();
+  const supabase = createSupabaseAdminClient();
+  if (!supabase) return { ok: false, error: "אין חיבור למסד הנתונים." };
+
+  if (verified) {
+    const { data: b } = await supabase
+      .from("businesses")
+      .select("logo_url, phone, address, city_id, business_hours(day_of_week), business_service_areas(area_id)")
+      .eq("id", businessId)
+      .maybeSingle();
+
+    const missing = missingVerificationFields(b);
+    if (missing.length > 0) {
+      return { ok: false, error: `חסר כדי לאמת: ${missing.join(", ")}` };
+    }
+  }
+
+  const { data, error } = await supabase
+    .from("businesses")
+    .update({ is_verified: verified })
+    .eq("id", businessId)
+    .select("slug")
+    .maybeSingle();
+
+  if (error) return { ok: false, error: error.message };
+
+  refreshBusiness(data?.slug);
+  return { ok: true };
+}
+
+/**
+ * עדכון הלוגו של עסק מהניהול.
+ *
+ * פעולה נפרדת מ-updateBusinessAdmin כי היא מקבלת FormData עם קובץ,
+ * בעוד שאר הטופס נוסע כאובייקט. איחוד השניים היה מכריח את כל
+ * הטופס לעבור ל-FormData בשביל שדה אחד.
+ */
+export async function updateBusinessLogo(businessId: string, formData: FormData) {
+  await requireStaff();
+  const supabase = createSupabaseAdminClient();
+  if (!supabase) return { ok: false, error: "אין חיבור למסד הנתונים." };
+
+  const logo = await uploadPublicImage(formData.get("logo"), "admin");
+  if (!logo.ok) return { ok: false, error: logo.error };
+
+  const { data, error } = await supabase
+    .from("businesses")
+    .update({ logo_url: logo.url })
+    .eq("id", businessId)
+    .select("slug")
+    .maybeSingle();
+
+  if (error) return { ok: false, error: error.message };
+
+  refreshBusiness(data?.slug);
+  revalidatePath(`/admin/businesses/${businessId}`);
+  return { ok: true };
+}
+
+/**
+ * מחיקה מוחלטת של עסק.
+ *
+ * נפרד לחלוטין מ-setBusinessArchived: ארכיון מסתיר, מחיקה מוחקת.
+ * שתיהן קיימות בכוונה — רוב המקרים הם "להוריד מהאתר" וארכיון הוא
+ * התשובה הנכונה להם, אבל אין דרך לנקות רשומת בדיקה או כפילות בלי
+ * מחיקה אמיתית.
+ *
+ * מה נמחק יחד עם העסק: כל הטבלאות התלויות שמוגדרות
+ * `on delete cascade` — קטגוריות, שעות, שירותים, מדיה, לידים
+ * וביקורות. זה בלתי הפיך, ולכן הכפתור בממשק דורש הקלדת שם העסק.
+ *
+ * `is_admin` ולא `requireStaff`: מחיקה בלתי הפיכה של נכס מסחרי —
+ * כולל הלידים שנצברו לו — היא לא פעולה שעורך תוכן צריך להחזיק.
+ * זו אותה הפרדה שחסרה ב-deleteUserAccount ותוקנה שם.
+ */
+export async function deleteBusinessAdmin(businessId: string, confirmName: string) {
+  const me = await requireStaff();
+  if (me.role !== "admin") {
+    return { ok: false as const, error: "מחיקת עסק שמורה למנהל ראשי בלבד." };
+  }
+
+  const supabase = createSupabaseAdminClient();
+  if (!supabase) return { ok: false as const, error: "אין חיבור למסד הנתונים." };
+
+  const { data: business } = await supabase
+    .from("businesses")
+    .select("name, slug")
+    .eq("id", businessId)
+    .maybeSingle();
+
+  if (!business) return { ok: false as const, error: "העסק לא נמצא." };
+
+  /* אישור בשם ולא ב-confirm() של הדפדפן: דיאלוג "בטוח?" נלחץ
+     אוטומטית, הקלדת שם דורשת לקרוא מה מוחקים. */
+  if (confirmName.trim() !== business.name.trim()) {
+    return { ok: false as const, error: "השם שהוקלד אינו תואם לשם העסק." };
+  }
+
+  const { error } = await supabase.from("businesses").delete().eq("id", businessId);
+  if (error) return { ok: false as const, error: error.message };
+
+  refreshBusiness(business.slug as string);
+  return { ok: true as const };
 }

@@ -8,8 +8,27 @@ import { formatRelative, toWhatsAppNumber } from "@/lib/utils";
 import { deleteLead, updateLeadNote, updateLeadStatus } from "@/app/admin/leads/actions";
 import { LEAD_STATUS_LABEL, type LeadStatus } from "@/lib/lead-status";
 
+export type LeadKind = "business" | "ad_request" | "contact";
+
+/** תווית וגוון לכל סוג פנייה. בקשת פרסום היא הסוג שדורש טיפול
+ *  אחר לגמרי משאר הפניות, ולכן היא מסומנת בכתום — צבע הפעולה
+ *  של האתר — ולא בגוון ניטרלי שנבלע ברשימה. */
+const KIND_LABEL: Record<LeadKind, string> = {
+  business: "פנייה לעסק",
+  ad_request: "בקשת פרסום",
+  contact: "פנייה כללית",
+};
+
+const KIND_TONE: Record<LeadKind, string> = {
+  business: "bg-ink-100 text-ink-600 border-ink-200",
+  ad_request: "bg-accent-50 text-accent-700 border-accent-300",
+  contact: "bg-brand-50 text-brand-800 border-brand-200",
+};
+
 export interface AdminLead {
   id: string;
+  kind: LeadKind;
+  subject: string | null;
   name: string | null;
   phone: string | null;
   email: string | null;
@@ -66,6 +85,9 @@ function LeadRow({ lead }: { lead: AdminLead }) {
         <div className="min-w-0 flex-1">
           <div className="mb-1 flex flex-wrap items-center gap-2">
             <span className="font-bold text-ink-900">{lead.name ?? "ללא שם"}</span>
+            <span className={`rounded-full border px-2 py-0.5 text-2xs font-bold ${KIND_TONE[lead.kind]}`}>
+              {KIND_LABEL[lead.kind]}
+            </span>
             <span className={`rounded-full border px-2 py-0.5 text-2xs font-bold ${STATUS_TONE[lead.status]}`}>
               {LEAD_STATUS_LABEL[lead.status]}
             </span>
@@ -78,7 +100,7 @@ function LeadRow({ lead }: { lead: AdminLead }) {
                 {lead.business.name}
               </Link>
             ) : (
-              <span className="text-ink-400">פנייה כללית</span>
+              <span className="text-ink-500">{lead.subject ?? KIND_LABEL[lead.kind]}</span>
             )}
             {lead.phone && <span className="text-ink-400"> · {lead.phone}</span>}
             {lead.email && <span className="text-ink-400"> · {lead.email}</span>}

@@ -19,6 +19,7 @@ const CARD_SELECT = `
   id, slug, name, tagline, logo_url, cover_url,
   rating_avg, review_count, is_verified, is_featured, is_sponsored,
   tier, price_range, phone, whatsapp, website, social,
+  address, latitude, longitude,
   city:cities(name, slug),
   business_categories(is_primary, categories(name, slug)),
   business_tags(tags(name, slug))
@@ -68,6 +69,9 @@ function mapCard(row: Row): BusinessCard {
     whatsapp: row.whatsapp,
     website: row.website,
     social: row.social ?? {},
+    address: row.address,
+    latitude: row.latitude,
+    longitude: row.longitude,
     city: row.city ? { name: row.city.name, slug: row.city.slug } : null,
     primaryCategory: primaryCategoryOf(row),
     tags: (row.business_tags ?? []).map((t: Row) => ({ name: t.tags.name, slug: t.tags.slug })),
@@ -170,8 +174,35 @@ export const getBusinessBySlug = cache(async (slug: string): Promise<Business | 
     .maybeSingle();
 
   if (error || !data) return null;
-  return mapDetail(data);
+
+  const business = mapDetail(data);
+  business.serviceAreas = await getServiceAreas(data.id);
+  return business;
 });
+
+/**
+ * אזורי השירות נשלפים בשאילתה נפרדת ולא כ-embed בתוך DETAIL_SELECT.
+ *
+ * ב-PostgREST, embed שנכשל מפיל את **כל** השאילתה — כלומר טבלה
+ * חסרה (מיגרציה שעוד לא הורצה בסביבה מסוימת) הייתה מוחקת את עמוד
+ * העסק כולו, לא רק את שורת אזורי השירות. זה מידע משני, והוא לא
+ * אמור להיות מסוגל להפיל את העמוד.
+ */
+async function getServiceAreas(businessId: string) {
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return [];
+
+  const { data, error } = await supabase
+    .from("business_service_areas")
+    .select("areas(id, slug, name)")
+    .eq("business_id", businessId);
+
+  if (error || !data) return [];
+  return data
+    .map((r: Row) => r.areas)
+    .filter(Boolean)
+    .map((a: Row) => ({ id: a.id, slug: a.slug, name: a.name }));
+}
 
 export async function getRelatedBusinesses(business: Business, limit = 4): Promise<BusinessCard[]> {
   if (!isSupabaseConfigured) {
@@ -279,4 +310,33 @@ export async function getHomeBusinessSlices(): Promise<HomeBusinessSlices> {
     popular: (popular.data ?? []).map(mapCard),
     latest: (latest.data ?? []).map(mapCard),
   };
+}
+
+/** מספר המשתמשים הרשומים — לרצועת המספרים בסקשן הביקורות. */
+export async function countProfiles(): Promise<number> {
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return 0;
+  const { count } = await supabase.from("profiles").select("id", { count: "exact", head: true });
+  return count ?? 0;
+}
+
+/**
+ * שנת ההקמה המוקדמת ביותר מבין העסקים המפורסמים.
+ *
+ * זו העובדה היחידה שיש למערכת על "כמה זמן אנחנו פה", והיא נגזרת
+ * מתוכן אמיתי ולא ממספר שנכתב בקוד. כשאין נתון — מוחזר null,
+ * והרצועה פשוט לא מציגה את הפריט הזה.
+ */
+export async function earliestBusinessYear(): Promise<number | null> {
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return null;
+  const { data } = await supabase
+    .from("businesses")
+    .select("founded_year")
+    .eq("status", "published")
+    .not("founded_year", "is", null)
+    .order("founded_year", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+  return data?.founded_year ?? null;
 }

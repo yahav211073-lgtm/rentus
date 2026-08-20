@@ -6,6 +6,7 @@ import { OwnerBusinessCard, type OwnerBusiness } from "@/components/business/Own
 import { NotificationsPanel, type OwnerNotification } from "@/components/business/NotificationsPanel";
 import { getCurrentUser } from "@/lib/auth";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getAreas } from "@/lib/repo/taxonomy";
 
 export const metadata: Metadata = { title: "אזור בעלי חברות", robots: { index: false, follow: false } };
 
@@ -39,7 +40,7 @@ export default async function BusinessDashboardPage() {
   ]);
 
   const ids = (businesses ?? []).map((b) => b.id);
-  const [{ data: allLeads }, { data: allHours }, { data: allServices }] = ids.length
+  const [{ data: allLeads }, { data: allHours }, { data: allServices }, { data: allAreas }] = ids.length
     ? await Promise.all([
         supabase
           .from("leads")
@@ -56,8 +57,12 @@ export default async function BusinessDashboardPage() {
           .select("business_id, id, name, description, price, price_unit")
           .in("business_id", ids)
           .order("sort_order", { ascending: true }),
+        supabase
+          .from("business_service_areas")
+          .select("business_id, area_id")
+          .in("business_id", ids),
       ])
-    : [{ data: [] }, { data: [] }, { data: [] }];
+    : [{ data: [] }, { data: [] }, { data: [] }, { data: [] }];
 
   const leadsByBusiness = new Map<string, OwnerBusiness["leads"]>();
   for (const l of allLeads ?? []) {
@@ -82,6 +87,17 @@ export default async function BusinessDashboardPage() {
     servicesByBusiness.set(s.business_id, list);
   }
 
+  /* רשימת האזורים האפשריים נטענת פעם אחת לכל העסקים של הבעלים —
+     היא זהה לכולם, ושאילתה לכל כרטיס היא בזבוז. */
+  const areas = await getAreas();
+
+  const areasByBusiness = new Map<string, string[]>();
+  for (const a of allAreas ?? []) {
+    const list = areasByBusiness.get(a.business_id) ?? [];
+    list.push(a.area_id);
+    areasByBusiness.set(a.business_id, list);
+  }
+
   const ownerBusinesses: OwnerBusiness[] = (businesses ?? []).map((b) => ({
     id: b.id,
     name: b.name,
@@ -99,6 +115,7 @@ export default async function BusinessDashboardPage() {
     leads: leadsByBusiness.get(b.id) ?? [],
     hours: hoursByBusiness.get(b.id) ?? [],
     services: servicesByBusiness.get(b.id) ?? [],
+    serviceAreaIds: areasByBusiness.get(b.id) ?? [],
   }));
 
   const notificationItems: OwnerNotification[] = (notifications ?? []).map((n) => ({
@@ -140,7 +157,9 @@ export default async function BusinessDashboardPage() {
         </div>
       ) : (
         <div className="space-y-5">
-          {ownerBusinesses.map((b) => <OwnerBusinessCard key={b.id} business={b} />)}
+          {ownerBusinesses.map((b) => (
+            <OwnerBusinessCard key={b.id} business={b} areas={areas} />
+          ))}
         </div>
       )}
     </div>

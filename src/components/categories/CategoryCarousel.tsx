@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
-import { CategoryIcon } from "@/components/ui/CategoryIcon";
+import { CategoryThumb } from "@/components/ui/CategoryThumb";
 import { businessCountLabel } from "@/lib/utils";
 
 export interface CarouselCategory {
@@ -64,12 +64,31 @@ export function CategoryCarousel({ items }: { items: CarouselCategory[] }) {
                 href={`/category/${cat.slug}`}
                 className="group relative flex aspect-[4/3] w-full overflow-hidden rounded-xl border border-brand-800/10 bg-brand-950"
               >
-                <span className="absolute inset-0 bg-[radial-gradient(circle_at_75%_25%,rgba(74,111,178,.6),transparent_38%),linear-gradient(145deg,#08132c,#142b5c)]" />
-                <span className="absolute -left-10 -top-10 h-40 w-40 rounded-full border border-white/10 transition-transform duration-500 group-hover:scale-125" />
-                <span className="relative flex w-full flex-col justify-between p-6">
-                  <span className="grid h-14 w-14 place-items-center rounded-xl border border-white/15 bg-white/10 text-white backdrop-blur-sm">
-                    <CategoryIcon name={cat.icon} className="h-7 w-7" strokeWidth={1.7} />
-                  </span>
+                {/* התמונה היא רקע הכרטיס ולא אריח בתוכו.
+                    קודם היא ישבה כריבוע 56px על גרדיאנט מומצא, כלומר
+                    התמונה שהמנהל העלה תפסה 4% מהשטח והשאר היה קישוט.
+                    עכשיו היא ממלאת את הכרטיס והגרדיאנט הוא רק שכבת
+                    קריאוּת מעליה. */}
+                {cat.imageUrl ? (
+                  <CategoryThumb
+                    imageUrl={cat.imageUrl}
+                    name=""
+                    sizes="(max-width: 768px) 50vw, 360px"
+                    className="absolute inset-0 h-full w-full"
+                  />
+                ) : (
+                  <span className="absolute inset-0 bg-[radial-gradient(circle_at_75%_25%,rgba(74,111,178,.6),transparent_38%),linear-gradient(145deg,#08132c,#142b5c)]" />
+                )}
+
+                {/* שכבת קריאוּת — כהה בתחתית שם הטקסט, שקופה למעלה
+                    כדי שהתמונה עדיין תיראה. */}
+                <span
+                  className="absolute inset-0 transition-opacity duration-300 group-hover:opacity-90"
+                  style={{ background: "linear-gradient(to top, rgba(5,12,28,0.92) 0%, rgba(5,12,28,0.45) 45%, rgba(5,12,28,0.15) 100%)" }}
+                  aria-hidden="true"
+                />
+
+                <span className="relative flex w-full flex-col justify-end p-6">
                   <span>
                   <span className="mb-1 block font-display text-xl font-extrabold text-white sm:text-2xl">
                     {cat.name}

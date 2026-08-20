@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { ChevronDown, LayoutDashboard, LogIn, LogOut, Menu, Search, X } from "lucide-react";
+import { ChevronDown, ImageOff, LogOut, Menu, Search, UserRound, X } from "lucide-react";
 
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { TopUtilityBar } from "@/components/layout/TopUtilityBar";
@@ -87,6 +87,11 @@ export function Header({
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  /* האות לאווטאר: מהשם המלא אם יש, אחרת מהמייל. trim לפני החיתוך
+     כי שם שמתחיל ברווח היה מייצר עיגול ריק. */
+  const initial =
+    (user?.fullName?.trim()?.[0] ?? user?.email?.trim()?.[0] ?? "").toUpperCase() || null;
+
   return (
     <>
       {/* מעטפת שקופה + סרגל-גלולה בפנים, במבנה של bizspace.digital:
@@ -120,11 +125,6 @@ export function Header({
                 <img src={logoUrl} alt={brandName} className="h-9 w-auto max-w-[190px] object-contain sm:h-10" />
               ) : (
                 <>
-                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-brand-600 to-brand-800 shadow-[0_4px_12px_-2px_rgba(11,59,117,0.45)] sm:h-11 sm:w-11">
-                    <span className="font-display text-lg font-extrabold text-white sm:text-xl">
-                      {brandName.charAt(0).toUpperCase()}
-                    </span>
-                  </span>
                   <span className="flex min-w-0 flex-col leading-none">
                     <span className="truncate font-display text-lg font-extrabold tracking-tight text-brand-900 sm:text-xl">
                       {brandName.toUpperCase()}
@@ -203,10 +203,23 @@ export function Header({
                 <div className="hidden items-center gap-1 lg:flex">
                   <Link
                     href={dashboardHrefFor(user.role)}
-                    className="inline-flex items-center gap-1.5 rounded-xs px-3 py-2 text-base font-semibold text-ink-700 transition-colors hover:bg-ink-100"
+                    title={user.fullName ?? "האזור האישי"}
+                    aria-label={`האזור האישי של ${user.fullName ?? "המשתמש"}`}
+                    className="grid h-10 w-10 place-items-center rounded-full border border-brand-200 bg-brand-50 text-brand-700 transition-colors hover:border-brand-300 hover:bg-brand-100"
                   >
-                    <LayoutDashboard className="h-4 w-4" aria-hidden="true" />
-                    <span className="max-w-[140px] truncate">{user.fullName ?? "האזור האישי"}</span>
+                    {/* האות הראשונה של שם המשתמש, לא אייקון גנרי.
+                        אווטאר אישי הוא הסימן שאומר "אתה מחובר, וזה
+                        החשבון שלך" — אייקון זהה לכולם לא אומר את זה.
+                        נפילה לאות מהמייל כשאין שם מלא (הרשמה עם
+                        Google לא תמיד מחזירה שם), ולאייקון רק כשאין
+                        אפילו מייל. */}
+                    {initial ? (
+                      <span aria-hidden="true" className="text-sm font-bold leading-none">
+                        {initial}
+                      </span>
+                    ) : (
+                      <UserRound className="h-4.5 w-4.5" strokeWidth={2.2} aria-hidden="true" />
+                    )}
                   </Link>
                   <form action="/api/auth/signout" method="post">
                     <button
@@ -219,15 +232,17 @@ export function Header({
                   </form>
                 </div>
               ) : (
-                /* קישור טקסט ולא כפתור ממוסגר: בהדמיה יש בדיוק שני
-                   כפתורים בפינה. שלוש מסגרות זו לצד זו משטחות את
-                   ההיררכיה ואף אחת כבר לא נקראת כפעולה הראשית. */
+                /* אייקון משתמש ולא קישור טקסט: זה הדפוס המוכר לאזור
+                   אישי, והוא משאיר בפינה בדיוק כפתור טקסט אחד — הכתום
+                   — שנקרא כפעולה הראשית. ה-aria-label נושא את המשמעות
+                   שהטקסט נשא קודם, כך שקורא מסך לא מאבד כלום. */
                 <Link
                   href="/login"
-                  className="hidden items-center gap-1.5 rounded-xs px-2.5 py-2 text-base font-semibold text-ink-600 transition-colors hover:text-brand-700 lg:inline-flex"
+                  title="כניסה לאזור האישי"
+                  aria-label="כניסה לאזור האישי"
+                  className="hidden h-10 w-10 place-items-center rounded-full border border-ink-200 text-ink-600 transition-colors hover:border-brand-300 hover:bg-brand-50 hover:text-brand-700 lg:grid"
                 >
-                  <LogIn className="h-4 w-4" aria-hidden="true" />
-                  כניסה
+                  <UserRound className="h-4.5 w-4.5" strokeWidth={2.2} aria-hidden="true" />
                 </Link>
               )}
 
@@ -297,8 +312,8 @@ function MegaMenu({ categories }: { categories: Category[] }) {
                     className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                 ) : (
-                  <span className="grid h-full w-full bg-brand-50 text-sm font-extrabold text-brand-700" aria-hidden="true">
-                    {cat.name.slice(0, 1)}
+                  <span className="grid h-full w-full place-items-center bg-brand-50 text-brand-400" aria-hidden="true">
+                    <ImageOff className="h-4 w-4" strokeWidth={1.8} />
                   </span>
                 )}
               </span>
@@ -399,8 +414,8 @@ function MobileMenu({
                           // eslint-disable-next-line @next/next/no-img-element
                           <img src={cat.imageUrl} alt="" loading="lazy" className="h-full w-full object-cover" />
                         ) : (
-                          <span className="grid h-full w-full bg-brand-50 text-sm font-extrabold text-brand-700" aria-hidden="true">
-                            {cat.name.slice(0, 1)}
+                          <span className="grid h-full w-full place-items-center bg-brand-50 text-brand-400" aria-hidden="true">
+                            <ImageOff className="h-4 w-4" strokeWidth={1.8} />
                           </span>
                         )}
                       </span>

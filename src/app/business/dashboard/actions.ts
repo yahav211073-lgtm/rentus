@@ -148,3 +148,28 @@ export async function markNotificationsRead(ids: string[]) {
   revalidatePath("/business/dashboard");
   return error ? { ok: false, error: error.message } : { ok: true };
 }
+
+/**
+ * אזורי השירות של העסק — היכן הוא נותן שירות, להבדיל מהעיר שבה
+ * הוא יושב. אותה גישת מחיקה-והוספה-מחדש כמו בשעות ובשירותים:
+ * הרשימה קצרה, והיא נשמרת כמכלול ולא שורה-שורה.
+ */
+export async function updateServiceAreas(businessId: string, areaIds: string[]) {
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return { ok: false, error: "החיבור למסד הנתונים לא הוגדר." };
+
+  const { error: delErr } = await supabase
+    .from("business_service_areas").delete().eq("business_id", businessId);
+  if (delErr) return { ok: false, error: "השמירה נכשלה. נסו שוב." };
+
+  if (areaIds.length > 0) {
+    const { error } = await supabase
+      .from("business_service_areas")
+      .insert(areaIds.map((areaId) => ({ business_id: businessId, area_id: areaId })));
+    if (error) return { ok: false, error: "השמירה נכשלה. נסו שוב." };
+  }
+
+  revalidatePath("/business/dashboard");
+  revalidatePath(`/admin/businesses/${businessId}`);
+  return { ok: true };
+}

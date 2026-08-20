@@ -52,7 +52,7 @@ export function TestimonialModerationList({ items }: { items: ModerationTestimon
       {visible.map((t) => (
         <article key={t.id} className="rounded-lg border border-ink-200/70 bg-white p-5">
           <div className="mb-2 flex flex-wrap items-center gap-2.5">
-            {t.rating && <Rating value={t.rating} size="sm" showValue={false} />}
+            {t.rating && <Rating value={t.rating} size="sm" showValue={false} variant="stars" />}
             <span className="font-bold text-ink-900">{t.authorName}</span>
             {t.authorRole && <span className="text-xs text-ink-400">{t.authorRole}</span>}
             <span className="text-2xs text-ink-400">{formatRelative(t.createdAt)}</span>

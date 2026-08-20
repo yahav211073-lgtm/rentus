@@ -62,11 +62,22 @@ export function RegisterBusinessForm({ categories, cities, areas }: Props) {
       }
       className="space-y-5 rounded-lg border border-ink-200/70 bg-white p-5 sm:p-6"
     >
+      {/* לוגו חובה: הוא מזהה את החברה בכל כרטיס באתר, ואין לו
+          יותר גיבוי מיוצר. תמונה ראשית נשארת חובה גם היא — היא
+          הרקע בראש עמוד החברה. */}
+      <ImageUploadField
+        name="logo"
+        label="לוגו החברה"
+        required
+        aspect="1/1"
+        hint="הסמל שיופיע בכל כרטיס של החברה באתר. עדיף PNG עם רקע שקוף."
+      />
+
       <ImageUploadField
         name="cover"
         label="תמונה ראשית של החברה"
         required
-        hint="התמונה שתופיע בראש עמוד החברה ובכרטיס שלה ברשימות"
+        hint="התמונה שתופיע בראש עמוד החברה"
       />
 
       <div className="grid gap-4 sm:grid-cols-2">

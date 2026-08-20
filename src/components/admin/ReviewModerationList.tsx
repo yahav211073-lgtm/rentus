@@ -65,7 +65,7 @@ export function ReviewModerationList({ reviews }: { reviews: ModerationReview[] 
         <article key={r.id} className="rounded-lg border border-ink-200/70 bg-white p-5">
           <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-2.5">
-              <Rating value={r.rating} size="sm" showValue={false} />
+              <Rating value={r.rating} size="sm" showValue={false} variant="stars" />
               <span className="font-bold text-ink-900">{r.authorName}</span>
               <span className="text-2xs text-ink-400">{formatRelative(r.createdAt)}</span>
             </div>

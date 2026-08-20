@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabasePublicClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/env";
 import { seedCategories } from "@/data/seed";
 import type { Category } from "@/types/domain";
@@ -16,7 +16,7 @@ import type { Category } from "@/types/domain";
 export const getCategoriesWithCounts = cache(async (): Promise<Category[]> => {
   if (!isSupabaseConfigured) return seedCategories;
 
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabasePublicClient();
   if (!supabase) return [];
 
   const [{ data: categories }, { data: links }] = await Promise.all([

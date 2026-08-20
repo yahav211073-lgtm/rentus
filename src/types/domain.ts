@@ -119,6 +119,9 @@ export interface Business {
   latitude?: number | null;
   longitude?: number | null;
 
+  /** האזורים שבהם העסק נותן שירות. נפרד מ-city/area, שהם מקום המושב. */
+  serviceAreas?: Pick<Area, "id" | "slug" | "name">[];
+
   /** האם העסק מגיע ללקוח (שירות נייד), ובאיזה רדיוס בק"מ */
   isMobileService?: boolean;
   serviceRadiusKm?: number | null;
@@ -164,6 +167,7 @@ export type BusinessCard = Pick<
   | "id" | "slug" | "name" | "tagline" | "logoUrl" | "coverUrl"
   | "ratingAvg" | "reviewCount" | "isVerified" | "isFeatured" | "isSponsored"
   | "tier" | "priceRange" | "phone" | "whatsapp" | "website" | "social"
+  | "address" | "latitude" | "longitude"
 > & {
   city?: Pick<City, "name" | "slug"> | null;
   primaryCategory?: Pick<Category, "name" | "slug"> | null;
@@ -198,6 +202,9 @@ export interface Testimonial {
   authorAvatarUrl?: string | null;
   quote: string;
   rating?: number | null;
+  createdAt?: string | null;
+  /** נגזר מהקטגוריה הראשית של העסק המקושר — לא עמודה במסד. */
+  categoryName?: string | null;
 }
 
 export interface Partner {

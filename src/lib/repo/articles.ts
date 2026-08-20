@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabasePublicClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/env";
 import type { Article } from "@/types/domain";
 
@@ -56,7 +56,7 @@ function mapArticle(row: Row): Article {
  */
 export const getArticles = cache(async (limit = 24): Promise<Article[]> => {
   if (!isSupabaseConfigured) return [];
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabasePublicClient();
   if (!supabase) return [];
 
   const { data } = await supabase
@@ -76,7 +76,7 @@ export const getArticles = cache(async (limit = 24): Promise<Article[]> => {
  */
 export const getArticleBySlug = cache(async (slug: string): Promise<Article | null> => {
   if (!isSupabaseConfigured) return null;
-  const supabase = await createSupabaseServerClient();
+  const supabase = createSupabasePublicClient();
   if (!supabase) return null;
 
   const { data } = await supabase

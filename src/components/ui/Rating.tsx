@@ -16,6 +16,13 @@ interface RatingProps {
   size?: "sm" | "md" | "lg";
   showValue?: boolean;
   className?: string;
+  /**
+   * "compact" — כוכב אחד, ציון, וספירה. ברירת המחדל, וזו הצורה
+   * שנכונה כמעט בכל מקום: חמישה כוכבים בגודל 14px נקראים כרעש
+   * ולא כמידע, והציון המספרי הוא מה שהעין באמת קוראת. "stars"
+   * שמור לעמוד העסק, שם יש מקום ושם הדירוג הוא נתון ראשי.
+   */
+  variant?: "compact" | "stars";
 }
 
 const SIZES = {
@@ -32,9 +39,31 @@ function Star({ className }: { className?: string }) {
   );
 }
 
-export function Rating({ value, count, size = "md", showValue = true, className }: RatingProps) {
+export function Rating({
+  value, count, size = "md", showValue = true, className, variant = "compact",
+}: RatingProps) {
   const s = SIZES[size];
   const pct = Math.max(0, Math.min(100, (value / 5) * 100));
+
+  if (variant === "compact") {
+    return (
+      <span
+        className={cn(
+          "inline-flex items-center gap-1 rounded-full bg-gold-50 px-2 py-0.5 font-bold text-gold-700 tabular-nums",
+          s.text,
+          className,
+        )}
+        role="img"
+        aria-label={`דירוג ${value.toFixed(1)} מתוך 5${count != null ? `, ${count} ביקורות` : ""}`}
+      >
+        <Star className={cn(s.star, "text-gold-500")} />
+        {showValue && value.toFixed(1)}
+        {count != null && (
+          <span className="font-normal text-gold-700/70">({formatCompact(count)})</span>
+        )}
+      </span>
+    );
+  }
 
   return (
     <div

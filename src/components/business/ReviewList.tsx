@@ -1,7 +1,6 @@
-import { MessageSquareQuote, ThumbsUp } from "lucide-react";
+import { MessageSquareQuote, ThumbsUp, UserRound } from "lucide-react";
 import type { Review } from "@/types/domain";
 import { Rating } from "@/components/ui/Rating";
-import { CoverArt } from "@/components/ui/CoverArt";
 import { ButtonLink } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatRelative } from "@/lib/utils";
@@ -64,7 +63,7 @@ export function ReviewList({ reviews, businessName, ratingAvg, reviewCount }: Pr
             <p className="font-display text-5xl font-extrabold leading-none text-ink-900">
               {ratingAvg.toFixed(1)}
             </p>
-            <Rating value={ratingAvg} size="md" showValue={false} className="mt-2.5 justify-center" />
+            <Rating value={ratingAvg} size="md" showValue={false} variant="stars" className="mt-2.5 justify-center" />
             <p className="mt-2 text-xs text-ink-400">
               {reviewCount === 1 ? "ביקורת אחת" : `${reviewCount} ביקורות`}
             </p>
@@ -95,16 +94,16 @@ export function ReviewList({ reviews, businessName, ratingAvg, reviewCount }: Pr
               <li key={r.id} className="py-5 first:pt-0 last:pb-0">
                 <article>
                   <header className="mb-2.5 flex items-start gap-3">
-                    <CoverArt
-                      seed={r.authorName}
-                      label={r.authorName.charAt(0)}
-                      compact
-                      className="h-10 w-10 shrink-0 rounded-full"
-                    />
+                    <span
+                      aria-hidden="true"
+                      className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ink-100 text-ink-400"
+                    >
+                      <UserRound className="h-5 w-5" strokeWidth={1.8} />
+                    </span>
                     <div className="min-w-0 flex-1">
                       <p className="font-bold text-ink-800">{r.authorName}</p>
                       <div className="flex flex-wrap items-center gap-2">
-                        <Rating value={r.rating} size="sm" showValue={false} />
+                        <Rating value={r.rating} size="sm" showValue={false} variant="stars" />
                         <time dateTime={r.createdAt} className="text-xs text-ink-400">
                           {formatRelative(r.createdAt)}
                         </time>

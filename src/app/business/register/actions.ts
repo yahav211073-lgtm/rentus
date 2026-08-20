@@ -115,6 +115,9 @@ export async function submitBusinessRequest(formData: FormData) {
 
   const { name, category: categoryId, phone, whatsapp, hours } = parsed.data;
 
+  const logo = await uploadPublicImage(formData.get("logo"), `owner/${user.id}`);
+  if (!logo.ok) return { ok: false as const, error: `לוגו: ${logo.error}` };
+
   const cover = await uploadPublicImage(formData.get("cover"), `owner/${user.id}`);
   if (!cover.ok) return { ok: false as const, error: cover.error };
 
@@ -135,6 +138,7 @@ export async function submitBusinessRequest(formData: FormData) {
       phone: phone || null,
       whatsapp: whatsapp || null,
       email: parsed.data.email || null,
+      logo_url: logo.url,
       cover_url: cover.url,
     })
     .select("id")

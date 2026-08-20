@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { Building2, ChevronDown, Clock, MapPin, Search, TrendingUp, X } from "lucide-react";
+import { Building2, ChevronDown, Clock, MapPin, Search, Tag, TrendingUp, X } from "lucide-react";
 import { seedBusinesses, seedTrendingSearches } from "@/data/seed";
 import { useStoredJson, writeStored } from "@/lib/hooks/browser-state";
 import { cn } from "@/lib/utils";
@@ -327,7 +327,7 @@ export function SearchBar({
                       )}>
                         {s.type === "business" ? <Building2 className="h-4 w-4" />
                           : s.type === "city" ? <MapPin className="h-4 w-4" />
-                          : <span className="text-xs font-extrabold" aria-hidden="true">{s.label.slice(0, 1)}</span>}
+                          : <Tag className="h-4 w-4" aria-hidden="true" />}
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-sm font-semibold text-ink-800">{s.label}</span>

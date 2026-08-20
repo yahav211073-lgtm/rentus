@@ -48,12 +48,16 @@ const VARIANTS: Record<Variant, string> = {
   danger: "bg-danger-500 text-white shadow-sm hover:bg-danger-700",
 };
 
+/* רדיוסים גדולים יותר מבעבר (xs/sm → md/lg). הכפתור הכתום
+   "הצטרפות לחברות" נראה חד מדי ליד סרגל הניווט המעוגל, ורדיוס
+   הוא תכונה של הכפתור ולא של מופע בודד — לכן זה כאן ולא כ-className
+   נקודתי, אחרת כל שאר הכפתורים באתר היו נשארים חדים ליד אחד מעוגל. */
 const SIZES: Record<Size, string> = {
-  sm:   "h-9  px-3.5 text-sm gap-1.5 rounded-xs",
-  md:   "h-11 px-5   text-base gap-2 rounded-xs",
-  lg:   "h-13 px-7   text-md gap-2.5 rounded-sm",
-  xl:   "h-15 px-9   text-lg gap-3 rounded-sm",
-  icon: "h-11 w-11 rounded-xs",
+  sm:   "h-9  px-3.5 text-sm gap-1.5 rounded-md",
+  md:   "h-11 px-5   text-base gap-2 rounded-md",
+  lg:   "h-13 px-7   text-md gap-2.5 rounded-lg",
+  xl:   "h-15 px-9   text-lg gap-3 rounded-lg",
+  icon: "h-11 w-11 rounded-md",
 };
 
 interface BaseProps {

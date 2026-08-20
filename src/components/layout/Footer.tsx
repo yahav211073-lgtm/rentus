@@ -17,6 +17,7 @@ import { toWhatsAppNumber } from "@/lib/utils";
  */
 
 const LEGAL_LINKS = [
+  { label: "שאלות ותשובות", href: "/faq" },
   { label: "תנאי שימוש", href: "/terms" },
   { label: "מדיניות פרטיות", href: "/privacy" },
   { label: "הצהרת נגישות", href: "/accessibility" },

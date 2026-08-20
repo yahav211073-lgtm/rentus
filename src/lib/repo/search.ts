@@ -150,6 +150,7 @@ const CARD_SELECT = `
   id, slug, name, tagline, logo_url, cover_url,
   rating_avg, review_count, is_verified, is_featured, is_sponsored,
   tier, price_range, phone, whatsapp, website, social,
+  address, latitude, longitude,
   city:cities(name, slug),
   business_categories(is_primary, categories(name, slug)),
   business_tags(tags(name, slug))
@@ -180,6 +181,9 @@ function mapCard(row: Row): BusinessCard {
     whatsapp: row.whatsapp,
     website: row.website,
     social: row.social ?? {},
+    address: row.address,
+    latitude: row.latitude,
+    longitude: row.longitude,
     city: row.city ? { name: row.city.name, slug: row.city.slug } : null,
     primaryCategory: primaryLink
       ? { name: primaryLink.categories.name, slug: primaryLink.categories.slug }

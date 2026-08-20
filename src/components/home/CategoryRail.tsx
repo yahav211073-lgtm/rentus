@@ -33,7 +33,7 @@ export async function CategoryRail() {
             <Link
               key={cat.id}
               href={`/category/${cat.slug}`}
-              className="group flex h-[74px] w-[158px] shrink-0 snap-start items-center gap-2 overflow-hidden rounded-lg border border-ink-200/80 bg-white p-2.5 shadow-[0_10px_26px_-18px_rgba(5,25,47,0.45)] transition-[transform,border-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:border-brand-300 hover:shadow-[0_18px_34px_-18px_rgba(5,25,47,0.4)] lg:w-auto [direction:rtl]"
+              className="group flex h-[104px] w-[186px] shrink-0 snap-start items-center gap-2 overflow-hidden rounded-lg border border-ink-200/80 bg-white p-2.5 shadow-[0_10px_26px_-18px_rgba(5,25,47,0.45)] transition-[transform,border-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:border-brand-300 hover:shadow-[0_18px_34px_-18px_rgba(5,25,47,0.4)] lg:w-auto [direction:rtl]"
             >
               <span className="flex min-w-0 flex-1 flex-col gap-0.5 text-start">
                 {/* line-clamp ולא truncate: ברשת של שבע עמודות
@@ -54,18 +54,18 @@ export async function CategoryRail() {
                   ריבוע הוא היחס היחיד שנותן לכל שש הקטגוריות להיראות
                   אחיד: התמונות במסד הן צילומים ביחסים שונים, ורצועה
                   אנכית חתכה כל אחת מהן במקום אחר. */}
-              <span className="relative block h-14 w-14 shrink-0 overflow-hidden rounded-md bg-ink-100">
+              <span className="relative block h-[84px] w-[84px] shrink-0 overflow-hidden rounded-lg bg-ink-100">
                 {cat.imageUrl ? (
                   <Image
                     src={cat.imageUrl}
                     alt=""
                     fill
-                    sizes="56px"
+                    sizes="84px"
                     className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110"
                   />
                 ) : (
                   <span className="grid h-full w-full place-items-center bg-brand-50 text-brand-700">
-                    <CategoryIcon name={cat.icon} className="h-5 w-5" />
+                    <CategoryIcon name={cat.icon} className="h-9 w-9" />
                   </span>
                 )}
               </span>
@@ -76,14 +76,14 @@ export async function CategoryRail() {
               בתוכן אמיתי, והמוצא הכללי הוא מה שחותם. */}
           <Link
             href="/categories"
-            className="group flex h-[74px] w-[158px] shrink-0 snap-start items-center gap-3 rounded-lg border border-dashed border-ink-300 bg-white px-3.5 transition-[transform,border-color,background-color] duration-200 hover:-translate-y-1 hover:border-brand-400 hover:bg-brand-50 lg:w-auto [direction:rtl]"
+            className="group flex h-[104px] w-[186px] shrink-0 snap-start items-center gap-3 rounded-lg border border-dashed border-ink-300 bg-white px-3.5 transition-[transform,border-color,background-color] duration-200 hover:-translate-y-1 hover:border-brand-400 hover:bg-brand-50 lg:w-auto [direction:rtl]"
           >
             <span className="flex min-w-0 flex-1 flex-col gap-0.5 text-start">
               <span className="text-xs font-bold leading-[1.3] text-ink-900">כל הקטגוריות</span>
               <span className="truncate text-2xs text-ink-400">צפו בכל הקטגוריות</span>
             </span>
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-brand-50 text-brand-700 transition-colors group-hover:bg-white">
-              <LayoutGrid className="h-4.5 w-4.5" strokeWidth={1.9} aria-hidden="true" />
+            <span className="grid h-[84px] w-[84px] shrink-0 place-items-center rounded-lg bg-brand-50 text-brand-700 transition-colors group-hover:bg-white">
+              <LayoutGrid className="h-8 w-8" strokeWidth={1.9} aria-hidden="true" />
             </span>
           </Link>
         </div>

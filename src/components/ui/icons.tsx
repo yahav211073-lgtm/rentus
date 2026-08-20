@@ -43,6 +43,19 @@ export function WhatsAppIcon({ className }: { className?: string }) {
   );
 }
 
+/**
+ * Waze — צורת הבועה עם החיוך ושתי העיניים, מצוירת כמסלול מלא אחד
+ * כדי שתעבוד ב-currentColor בדיוק כמו שאר האייקונים כאן. אין
+ * ל-lucide אייקון Waze, ואייקון ניווט גנרי לא נקרא כ"Waze".
+ */
+export function WazeIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M12 2.2c-4.9 0-8.9 3.6-8.9 8.1 0 1.2.3 2.3.8 3.4-.5.7-1.3 1.3-2 1.6-.5.2-.7.8-.5 1.3.2.4.5.6.9.6 1.7 0 3.2-.6 4.3-1.4a10 10 0 0 0 2.7.9 3.2 3.2 0 0 0 6.2.5c3.3-1.1 5.5-3.8 5.5-7A8.1 8.1 0 0 0 12 2.2m-2.6 5.3a1.15 1.15 0 1 1 0 2.3 1.15 1.15 0 0 1 0-2.3m5.2 0a1.15 1.15 0 1 1 0 2.3 1.15 1.15 0 0 1 0-2.3m-6.2 4.6h7.2c.4 0 .7.3.7.7 0 2.2-1.9 3.9-4.3 3.9s-4.3-1.7-4.3-3.9c0-.4.3-.7.7-.7" />
+    </svg>
+  );
+}
+
 export function TikTokIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">

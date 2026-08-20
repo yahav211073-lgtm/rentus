@@ -1,15 +1,24 @@
 import { BannerCard } from "@/components/home/BannerCard";
+import { HouseAd } from "@/components/ads/HouseAd";
 import type { Banner } from "@/types/domain";
 
 /**
  * משבצת פרסום בזרימת העמוד.
  *
- * כשאין באנר פעיל עם קריאייטיב — לא מוצג כלום. קודם הייתה כאן
- * מסגרת מקווקוות "מקום פנוי", מתוך רצון לשמור על רשת קבועה; בפועל
- * זה גורם לאתר להיראות כמו תבנית שלא מולאה. רשת שמתכווצת בהתאם
- * לתוכן שקיים נראית טוב יותר מרשת עם חורים.
+ * כשאין באנר פעיל עם קריאייטיב, המשבצת לא נעלמת אלא מציגה את
+ * קריאייטיב הבית של רנטוס ("יש לכם מודעה לפרסם?"). בעל האתר מחליף
+ * אותו בקריאייטיב של מפרסם דרך הניהול — כלומר כל משבצת מוכרת את
+ * עצמה כל עוד היא לא נמכרה.
  */
-export function AdSlot({ banner, className }: { banner?: Banner; className?: string }) {
-  if (!banner?.assetUrl) return null;
-  return <BannerCard banner={banner} className={className} />;
+export function AdSlot({
+  banner,
+  variant = "square",
+  className,
+}: {
+  banner?: Banner;
+  variant?: "square" | "wide" | "compact";
+  className?: string;
+}) {
+  if (!banner?.assetUrl) return <HouseAd variant={variant} className={className} />;
+  return <BannerCard banner={banner} compact={variant === "compact"} className={className} />;
 }

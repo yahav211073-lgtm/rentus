@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { getCities, getFlatCategories } from "@/lib/repo/taxonomy";
+import { getAreas, getCities, getFlatCategories } from "@/lib/repo/taxonomy";
 import { NewBusinessForm } from "@/components/admin/NewBusinessForm";
 
 export const metadata = { title: "הוספת עסק", robots: { index: false, follow: false } };
@@ -12,7 +12,7 @@ export const metadata = { title: "הוספת עסק", robots: { index: false, fo
  * owner_id (אין עדיין חשבון של בעל העסק).
  */
 export default async function NewBusinessPage() {
-  const [categories, cities] = await Promise.all([getFlatCategories(), getCities()]);
+  const [categories, cities, areas] = await Promise.all([getFlatCategories(), getCities(), getAreas()]);
 
   return (
     <div>
@@ -24,7 +24,7 @@ export default async function NewBusinessPage() {
         חזרה לרשימת העסקים
       </Link>
       <h1 className="mb-6 font-display text-2xl text-ink-900">הוספת עסק חדש</h1>
-      <NewBusinessForm categories={categories} cities={cities} />
+      <NewBusinessForm categories={categories} cities={cities} areas={areas} />
     </div>
   );
 }

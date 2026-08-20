@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { CoverArt } from "@/components/ui/CoverArt";
+import { ArticleCover } from "@/components/home/BlogSection";
 import { getArticles } from "@/lib/repo/articles";
 
 /**
@@ -12,6 +12,13 @@ import { getArticles } from "@/lib/repo/articles";
  * בגובה הופך למקום למשבצת הפרסום שמתחת.
  *
  * שלושה פריטים בדיוק, ככלל תוכן קבוע של הפרויקט.
+ *
+ * התמונה עוברת דרך ArticleCover ולא דרך CoverArt ישירות. זה נראה
+ * כמו פרט טכני והוא היה באג גלוי: CoverArt מייצר גרפיקה מופשטת
+ * מתוך ה-slug, כלומר הפאנל הציג ריבועים כחולים מומצאים בזמן שלכל
+ * מאמר יש תמונת שער אמיתית ב-articles.cover_url. ArticleCover בודק
+ * קודם את התמונה האמיתית ונופל לגרפיקה רק כשאין — וזו הנפילה
+ * היחידה שצריכה להתקיים.
  */
 export async function GuidesSidebar({ className }: { className?: string }) {
   const articles = (await getArticles()).slice(0, 3);
@@ -28,7 +35,7 @@ export async function GuidesSidebar({ className }: { className?: string }) {
           <li key={a.id} className="border-b border-ink-100 pb-2.5 last:border-0 last:pb-0">
             <Link href={`/blog/${a.slug}`} className="group flex items-center gap-2.5">
               <span className="relative h-11 w-14 shrink-0 overflow-hidden rounded-sm">
-                <CoverArt seed={a.slug} className="h-full w-full" compact />
+                <ArticleCover article={a} compact />
               </span>
               <span className="line-clamp-2 min-w-0 text-xs font-bold leading-[1.35] text-brand-700 transition-colors group-hover:text-brand-500">
                 {a.title}

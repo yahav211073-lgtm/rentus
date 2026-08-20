@@ -1,8 +1,7 @@
-import { Quote } from "lucide-react";
+import { Quote, UserRound } from "lucide-react";
 import { Section, SectionHeading } from "@/components/home/Section";
 import { RevealItem, RevealStagger } from "@/components/motion/Reveal";
 import { Rating } from "@/components/ui/Rating";
-import { CoverArt } from "@/components/ui/CoverArt";
 import { SiteReviewForm } from "@/components/home/SiteReviewForm";
 import { getApprovedTestimonials, getTestimonialStats } from "@/lib/repo/testimonials";
 import { getCurrentUser } from "@/lib/auth";
@@ -49,19 +48,19 @@ export async function Testimonials() {
                   aria-hidden="true"
                 />
 
-                {t.rating && <Rating value={t.rating} size="sm" showValue={false} className="mb-4" />}
+                {t.rating && <Rating value={t.rating} size="sm" showValue={false} variant="stars" className="mb-4" />}
 
                 <blockquote className="relative mb-5 text-base leading-relaxed text-ink-700">
                   {t.quote}
                 </blockquote>
 
                 <figcaption className="flex items-center gap-3">
-                  <CoverArt
-                    seed={t.authorName}
-                    label={t.authorName.charAt(0)}
-                    compact
-                    className="h-10 w-10 shrink-0 rounded-full"
-                  />
+                  <span
+                    aria-hidden="true"
+                    className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ink-100 text-ink-400"
+                  >
+                    <UserRound className="h-5 w-5" strokeWidth={1.8} />
+                  </span>
                   <span className="flex flex-col">
                     <span className="text-sm font-bold text-ink-800">{t.authorName}</span>
                     {t.authorRole && <span className="text-xs text-ink-400">{t.authorRole}</span>}

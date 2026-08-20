@@ -31,7 +31,7 @@ export function TopUtilityBar({ brandName, tagline, phone }: { brandName: string
         </div>
 
         <div className="flex shrink-0 items-center gap-5">
-          <Link href="/contact" className="transition-colors hover:text-white">שאלות נפוצות</Link>
+          <Link href="/faq" className="transition-colors hover:text-white">שאלות נפוצות</Link>
           <Link href="/about" className="transition-colors hover:text-white">מרכז העזרה</Link>
         </div>
       </div>

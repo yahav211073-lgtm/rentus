@@ -172,3 +172,25 @@ export function jsonLd(schema: unknown): string {
     .replace(/\u2028/g, "\\u2028")
     .replace(/\u2029/g, "\\u2029");
 }
+
+/**
+ * קישור ניווט ב-Waze לעסק.
+ *
+ * קואורדינטות עדיפות על כתובת: `q=` מפעיל חיפוש טקסט ב-Waze, שעל
+ * כתובת עברית חלקית ("הרצל 5") מחזיר לא פעם את העיר הלא נכונה.
+ * `ll=` פותח ישירות על הנקודה. מחזיר null כשאין לא זה ולא זה —
+ * כפתור ניווט שלא יודע לאן לנווט גרוע מהיעדר כפתור.
+ */
+export function wazeLink(target: {
+  latitude?: number | null;
+  longitude?: number | null;
+  address?: string | null;
+  city?: { name: string } | null;
+}): string | null {
+  if (target.latitude != null && target.longitude != null) {
+    return `https://waze.com/ul?ll=${target.latitude},${target.longitude}&navigate=yes`;
+  }
+  const query = [target.address, target.city?.name].filter(Boolean).join(", ");
+  if (!query) return null;
+  return `https://waze.com/ul?q=${encodeURIComponent(query)}&navigate=yes`;
+}
