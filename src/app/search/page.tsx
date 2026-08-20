@@ -60,27 +60,30 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
   const totalPages = Math.ceil(result.total / PAGE_SIZE);
 
   return (
-    <div className="bg-ink-50 pb-20">
+    <div className="bg-ink-50 pb-24 sm:pb-20">
       {/* --- כותרת וחיפוש --- */}
-      <div className="relative isolate overflow-hidden bg-gradient-to-br from-brand-900 to-brand-700 pb-10 pt-8">
+      <div className="relative isolate overflow-hidden bg-gradient-to-br from-brand-900 to-brand-700 pb-6 pt-5 sm:pb-10 sm:pt-8">
         <div className="bg-dots absolute inset-0 opacity-30" aria-hidden="true" />
         <div className="relative mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
-          <h1 className="mb-5 font-display text-2xl text-white sm:text-3xl">
+          <h1 className="mb-3 font-display text-2xl text-white sm:mb-5 sm:text-3xl">
             {filters.q ? <>תוצאות עבור &laquo;{filters.q}&raquo;</> : "חיפוש חברות"}
           </h1>
           <SearchBar variant="compact" defaultQuery={filters.q ?? ""} categories={categories} cities={cities} />
         </div>
       </div>
 
-      <div className="mx-auto max-w-[1480px] px-4 pt-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1480px] px-4 pt-5 sm:px-6 sm:pt-8 lg:px-8">
         <div className="flex gap-7">
           <FilterRail facets={result.facets} total={result.total} categories={categories} cities={cities}>
           </FilterRail>
 
           <div className="min-w-0 flex-1">
             {/* שורת סיכום ומיון */}
-            <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="text-sm text-ink-500" aria-live="polite">
+            {/* שורה אחת גם במובייל: הספירה והמיון הם שני פריטים קצרים,
+                וערימה שלהם יצרה שתי שורות בגובה 90px לפני התוצאה
+                הראשונה. */}
+            <div className="mb-4 flex flex-row items-center justify-between gap-3 sm:mb-5">
+              <p className="text-xs text-ink-500 sm:text-sm" aria-live="polite">
                 נמצאו <strong className="font-bold text-ink-900">{formatNumber(result.total)}</strong> חברות
                 {result.total > PAGE_SIZE && (
                   <> · עמוד {result.page} מתוך {totalPages}</>
@@ -93,7 +96,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
               <EmptyState query={filters.q} categories={categories} />
             ) : (
               <>
-                <RevealStagger className="grid gap-5 xl:grid-cols-2">
+                <RevealStagger className="grid gap-3 sm:gap-5 xl:grid-cols-2">
                   {result.items.map((b) => (
                     <RevealItem key={b.id}>
                       <CompanyListCard business={b} />

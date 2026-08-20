@@ -39,10 +39,10 @@ export function Newsletter() {
   }
 
   return (
-    <section className="py-16 sm:py-20">
+    <section className="py-10 sm:py-16 lg:py-20">
       <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
         <Reveal scale>
-          <div className="relative isolate overflow-hidden rounded-xl bg-brand-900 px-6 py-12 sm:px-12 sm:py-16">
+          <div className="relative isolate overflow-hidden rounded-xl bg-brand-900 px-4 py-8 sm:px-12 sm:py-16">
             {/* רקע */}
             <div className="absolute inset-0 -z-10" aria-hidden="true">
               <div
@@ -56,7 +56,7 @@ export function Newsletter() {
               <div className="bg-dots absolute inset-0 opacity-30" />
             </div>
 
-            <div className="grid items-center gap-8 lg:grid-cols-[1.1fr_1fr]">
+            <div className="grid items-center gap-5 sm:gap-8 lg:grid-cols-[1.1fr_1fr]">
               <div>
                 <span className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5 text-2xs font-bold uppercase tracking-wider text-accent-300">
                   <Mail className="h-3.5 w-3.5" />

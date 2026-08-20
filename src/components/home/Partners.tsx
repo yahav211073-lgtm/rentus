@@ -11,10 +11,10 @@ import { seedPartners } from "@/data/seed";
  */
 export function Partners() {
   return (
-    <section className="border-y border-ink-200/60 bg-white py-12">
+    <section className="border-y border-ink-200/60 bg-white py-8 sm:py-12">
       <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
         <Reveal>
-          <p className="mb-8 text-center text-xs font-bold uppercase tracking-wider text-ink-400">
+          <p className="mb-5 text-center text-xs font-bold uppercase tracking-wider text-ink-400 sm:mb-8">
             בשיתוף ובאישור
           </p>
 

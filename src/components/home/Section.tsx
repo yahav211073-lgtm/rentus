@@ -21,7 +21,12 @@ interface SectionProps {
 
 export function Section({ children, className, id }: SectionProps) {
   return (
-    <section id={id} className={cn("py-16 sm:py-20 lg:py-24", className)}>
+    /* py-10 במובייל ולא py-16.
+       64px למעלה ו-64 למטה על מסך של 844px פירושו ש-15% מהמסך הוא
+       חלל בין סקציות, לפני שנספר את המרווח שבתוכן. ביחס לדסקטופ
+       (96px מתוך 900) זה כמעט פי שניים — כלומר לא "פחות אוויר
+       במובייל" אלא יותר. 40px שומר על ההפרדה ומחזיר את היחס. */
+    <section id={id} className={cn("py-10 sm:py-16 lg:py-24", className)}>
       <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">{children}</div>
     </section>
   );
@@ -44,15 +49,15 @@ export function SectionHeading({
   const dark = tone === "dark";
 
   return (
-    <Reveal className={cn("mb-10 sm:mb-12", className)}>
+    <Reveal className={cn("mb-6 sm:mb-10 lg:mb-12", className)}>
       <div className={cn(
-        "flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between",
+        "flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4",
         align === "center" && "sm:flex-col sm:items-center sm:text-center",
       )}>
         <div className={cn("max-w-2xl", align === "center" && "text-center")}>
           {eyebrow && (
             <span className={cn(
-              "mb-3 inline-flex items-center gap-2 rounded-full px-3 py-1 text-2xs font-bold tracking-wider",
+              "mb-2 inline-flex items-center gap-2 rounded-full px-3 py-1 text-2xs font-bold tracking-wider sm:mb-3",
               dark ? "bg-white/10 text-accent-300" : "bg-brand-50 text-brand-700",
             )}>
               <span className={cn("h-1.5 w-1.5 rounded-full", dark ? "bg-accent-400" : "bg-brand-500")} />
@@ -60,14 +65,14 @@ export function SectionHeading({
             </span>
           )}
           <h2 className={cn(
-            "font-display text-3xl font-extrabold sm:text-4xl",
+            "font-display text-2xl font-extrabold sm:text-3xl lg:text-4xl",
             dark ? "text-white" : "text-ink-900",
           )}>
             {title}
           </h2>
           {subtitle && (
             <p className={cn(
-              "mt-3 text-md leading-relaxed",
+              "mt-2 text-sm leading-relaxed sm:mt-3 sm:text-md",
               dark ? "text-white/65" : "text-ink-500",
             )}>
               {subtitle}

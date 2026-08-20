@@ -157,12 +157,15 @@ export function AccessibilityToolbar() {
         aria-expanded={open}
         aria-haspopup="dialog"
         aria-label={`הגדרות נגישות${activeCount ? `, ${activeCount} הגדרות פעילות` : ""}`}
+        data-floating-ui
         className={cn(
-          "fixed bottom-5 z-[90] grid h-13 w-13 place-items-center rounded-full",
+          /* הכפתור מרחף מעל סרגל הניווט התחתון ולא עליו. bottom נגזר
+             מהטוקן, כך שהוא יורד אוטומטית ל-20px בדסקטופ שבו אין סרגל. */
+          "fixed z-[90] grid h-13 w-13 place-items-center rounded-full",
           "bg-brand-800 text-white shadow-[0_10px_28px_-6px_rgba(11,59,117,0.6)]",
           "transition-transform duration-200 hover:scale-105 active:scale-95",
         )}
-        style={{ insetInlineStart: "1.25rem" }}
+        style={{ insetInlineStart: "1.25rem", bottom: "calc(var(--spacing-bottom-inset) + 1.25rem)" }}
       >
         <Accessibility className="h-6 w-6" strokeWidth={2.2} />
         {activeCount > 0 && (
@@ -184,8 +187,8 @@ export function AccessibilityToolbar() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: reduced ? 0 : 12, scale: reduced ? 1 : 0.98 }}
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed bottom-24 z-[91] w-[min(92vw,340px)] overflow-hidden rounded-lg border border-ink-200 bg-white shadow-[0_28px_64px_-16px_rgba(11,59,117,0.35)]"
-            style={{ insetInlineStart: "1.25rem" }}
+            className="fixed z-[91] max-h-[min(70vh,560px)] w-[min(92vw,340px)] overflow-y-auto overscroll-contain rounded-lg border border-ink-200 bg-white shadow-[0_28px_64px_-16px_rgba(11,59,117,0.35)]"
+            style={{ insetInlineStart: "1.25rem", bottom: "calc(var(--spacing-bottom-inset) + 5.25rem)" }}
           >
             <div className="flex items-center justify-between border-b border-ink-100 bg-ink-50 px-4 py-3">
               <h2 className="text-sm text-ink-900">הגדרות נגישות</h2>

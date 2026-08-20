@@ -78,8 +78,12 @@ export function Hero({
               }}
             />
 
-            <div className="relative px-5 pb-28 pt-14 text-center sm:px-10 sm:pb-32 sm:pt-16">
-              <h1 className="font-display text-[1.9rem] leading-[1.2] text-white drop-shadow-[0_2px_20px_rgba(5,12,28,0.7)] sm:text-4xl lg:text-5xl">
+            {/* הריפוד התחתון מפנה מקום לכרטיס החיפוש הצף שמעליו.
+                גובה הכרטיס במובייל הוא 108px (שורת חיפוש 44 + שני
+                מסננים 40 + ריפוד), ועוד 16 מרווח מתחתיו — ולכן 136.
+                פחות מזה והכרטיס מכסה את שורת נקודות האמון. */}
+            <div className="relative px-4 pb-[8.5rem] pt-7 text-center xs:px-5 sm:px-10 sm:pb-32 sm:pt-16">
+              <h1 className="font-display leading-[1.15] text-white drop-shadow-[0_2px_20px_rgba(5,12,28,0.7)] text-4xl lg:text-5xl">
                 כל מה שצריך להשכרה,
                 <br />
                 {/* שורה שנייה בכחול בהיר — נקודת המבט היחידה בכותרת.
@@ -87,10 +91,14 @@ export function Hero({
                 <span className="text-brand-300">במקום אחד.</span>
               </h1>
 
-              <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-7 gap-y-3">
+              {/* רשת שתי עמודות במובייל ולא flex-wrap: ה-wrap פיזר את
+                  ארבעת הפריטים ל-3+1 עם רווחים לא שווים, שנקרא כתקלה.
+                  שתי עמודות מיושרות = אותו מידע, גובה קבוע, ובלי שורה
+                  יתומה. מ-sm חוזרים לשורה אחת כמו בדסקטופ. */}
+              <ul className="mx-auto mt-4 grid max-w-[19rem] grid-cols-2 gap-x-3 gap-y-2 sm:mt-6 sm:flex sm:max-w-none sm:flex-wrap sm:items-center sm:justify-center sm:gap-x-7 sm:gap-y-3">
                 {TRUST.map(({ Icon, label }) => (
-                  <li key={label} className="inline-flex items-center gap-2 text-sm font-semibold text-white/80">
-                    <Icon className="h-4.5 w-4.5 text-brand-300" strokeWidth={2} aria-hidden="true" />
+                  <li key={label} className="inline-flex items-center gap-1.5 text-xs font-semibold text-white/80 sm:gap-2 sm:text-sm">
+                    <Icon className="h-4 w-4 shrink-0 text-brand-300 sm:h-4.5 sm:w-4.5" strokeWidth={2} aria-hidden="true" />
                     {label}
                   </li>
                 ))}
@@ -99,7 +107,7 @@ export function Hero({
 
             {/* כרטיס החיפוש מרחף וחופף את שולי הבמה התחתונים — הנקודה
                 שממנה העין ממשיכה ישר לרצועת הקטגוריות. */}
-            <div className="absolute inset-x-4 bottom-6 sm:inset-x-10 sm:bottom-8 lg:inset-x-24">
+            <div className="absolute inset-x-3 bottom-4 xs:inset-x-4 sm:inset-x-10 sm:bottom-8 lg:inset-x-24">
               <SearchBar variant="hero" categories={categories} cities={cities} />
             </div>
           </div>

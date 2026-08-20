@@ -35,18 +35,22 @@ export function BenefitsStrip({ banner }: { banner?: Banner }) {
             {BENEFITS.map(({ Icon, label, sub }, i) => (
               <div
                 key={label}
-                className={`flex min-h-16 items-center justify-center gap-2.5 px-3 py-2.5 text-start lg:min-h-[84px] ${
+                className={`flex min-h-[3.25rem] items-center gap-2 px-2.5 py-2 text-start sm:min-h-16 sm:justify-center sm:gap-2.5 sm:px-3 sm:py-2.5 lg:min-h-[84px] ${
                   /* קווי הפרדה בין הפריטים בלבד, לא בקצוות: גבול ימני
                      על כל פריט חוץ מהראשון. divide-x לא עובד כאן כי
                      הרשת מתחלפת בין שתי עמודות לארבע. */
                   i > 0 ? "border-s border-ink-100" : ""
                 } ${i > 1 ? "border-t border-ink-100 sm:border-t-0" : ""}`}
               >
-                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-white text-brand-700 shadow-sm">
-                  <Icon className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-md bg-white text-brand-700 shadow-sm sm:h-8 sm:w-8">
+                  <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" strokeWidth={2} aria-hidden="true" />
                 </span>
+                {/* הגדלים במובייל קטנים בדרגה אחת בכוונה: התווית
+                    הארוכה ביותר ("חינם וללא התחייבות") נשברה לשתי
+                    שורות ב-13.5px, ושורה שבורה בתא אחד מתוך ארבעה
+                    שוברת את יישור הרצועה כולה. */}
                 <span className="flex min-w-0 flex-col gap-0.5">
-                  <span className="text-sm font-bold leading-tight text-ink-900">{label}</span>
+                  <span className="text-xs font-bold leading-tight text-ink-900 sm:text-sm">{label}</span>
                   <span className="text-2xs leading-tight text-ink-500 sm:text-xs">{sub}</span>
                 </span>
               </div>

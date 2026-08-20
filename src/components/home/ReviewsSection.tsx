@@ -75,7 +75,7 @@ export async function ReviewsSection({
             </header>
 
             {/* ---- שורת הסיכום ---- */}
-            <div className="mt-7 grid items-center gap-6 lg:grid-cols-[200px_minmax(0,1fr)_340px]">
+            <div className="mt-5 grid items-center gap-5 sm:mt-7 sm:gap-6 lg:grid-cols-[200px_minmax(0,1fr)_340px]">
 
               <div className="text-center">
                 <p className="font-display text-5xl leading-none text-brand-600">
@@ -138,26 +138,30 @@ export async function ReviewsSection({
 
             {/* ---- קרוסלה ---- */}
             {reviews.length > 0 && (
-              <div className="mt-7">
+              <div className="mt-5 sm:mt-7">
                 <ReviewsCarousel reviews={reviews} />
               </div>
             )}
 
             {/* ---- רצועת מספרים ---- */}
             {bottomStats.length > 0 && (
-              <div className="mt-7 rounded-xl bg-white/70 p-2">
-                <dl className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+              /* במובייל האייקון עובר מעל הטקסט ולא לצידו.
+                 בפריסה האופקית נשארו כ-90px לתווית, ו"ביקורות אמיתיות"
+                 נחתך ל-"ביקורות אמי…" בשלושה תאים מתוך חמישה. מספר בלי
+                 התווית שלו הוא מספר בלי משמעות. */
+              <div className="mt-5 rounded-xl bg-white/70 p-2 sm:mt-7">
+                <dl className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-5">
                   {bottomStats.map(({ Icon, value, label }, i) => (
                     <div
                       key={label}
-                      className={`flex items-center justify-center gap-3 px-3 py-4 ${i > 0 ? "lg:border-s lg:border-ink-200/70" : ""}`}
+                      className={`flex flex-col items-center justify-start gap-1.5 px-1.5 py-3 text-center sm:flex-row sm:justify-center sm:gap-3 sm:px-3 sm:py-4 sm:text-start ${i > 0 ? "lg:border-s lg:border-ink-200/70" : ""}`}
                     >
-                      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-600">
-                        <Icon className="h-5 w-5" aria-hidden="true" />
+                      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-600 sm:h-11 sm:w-11">
+                        <Icon className="h-4.5 w-4.5 sm:h-5 sm:w-5" aria-hidden="true" />
                       </span>
                       <span className="min-w-0">
-                        <dd className="text-lg font-bold tabular-nums text-ink-900">{value}</dd>
-                        <dt className="truncate text-xs text-ink-400">{label}</dt>
+                        <dd className="text-md font-bold tabular-nums text-ink-900 sm:text-lg">{value}</dd>
+                        <dt className="text-2xs leading-tight text-ink-400 sm:truncate sm:text-xs">{label}</dt>
                       </span>
                     </div>
                   ))}
@@ -167,14 +171,14 @@ export async function ReviewsSection({
           </div>
 
           {/* ================= פאנל כהה ================= */}
-          <aside className="flex flex-col rounded-2xl bg-brand-900 p-5 sm:p-6">
-            <h3 className="mb-5 text-center text-xl text-white">
+          <aside className="flex flex-col rounded-2xl bg-brand-900 p-4 sm:p-6">
+            <h3 className="mb-3.5 text-center text-xl text-white sm:mb-5">
               למה אוהבים את <span className="text-brand-300">Rentus</span>?
             </h3>
 
-            <ul className="flex-1 space-y-3">
+            <ul className="flex-1 space-y-2 sm:space-y-3">
               {REASONS.map(({ Icon, title, body }) => (
-                <li key={title} className="flex items-center gap-3 rounded-xl bg-white/[0.07] p-4">
+                <li key={title} className="flex items-center gap-3 rounded-xl bg-white/[0.07] p-3 sm:p-4">
                   <span className="min-w-0 flex-1 text-end">
                     <span className="block text-sm font-bold text-white">{title}</span>
                     <span className="mt-0.5 block text-xs leading-relaxed text-white/60">{body}</span>

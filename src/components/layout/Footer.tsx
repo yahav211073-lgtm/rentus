@@ -51,7 +51,7 @@ export async function Footer({ brandName, logoUrl }: { brandName: string; logoUr
   const popularCities = cities.slice(0, 8);
 
   return (
-    <footer className="relative mt-24 overflow-hidden bg-brand-950 text-white/75">
+    <footer className="relative mt-12 overflow-hidden bg-brand-950 text-white/75 sm:mt-20 lg:mt-24">
       {/* זוהר עדין בקצה העליון — מרכך את המעבר מהתוכן הבהיר */}
       <div
         className="pointer-events-none absolute inset-x-0 top-0 h-64 opacity-40"
@@ -60,10 +60,15 @@ export async function Footer({ brandName, logoUrl }: { brandName: string; logoUr
       />
       <div className="bg-dots pointer-events-none absolute inset-0 opacity-[0.35]" aria-hidden="true" />
 
-      <div className="relative mx-auto max-w-[1480px] px-4 pb-10 pt-16 sm:px-6 lg:px-8">
-        <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div className="relative mx-auto max-w-[1480px] px-4 pb-8 pt-10 sm:px-6 sm:pb-10 sm:pt-16 lg:px-8">
+        {/* שלוש עמודות הקישורים יורדות לשתי עמודות במובייל ולא לאחת.
+            בעמודה אחת שלושת הבלוקים הם 24 שורות קישור בטור — כמעט
+            1,200px של פוטר, יותר מגובה מסך שלם, בשביל תוכן משני.
+            גוש המותג נשאר על שתי העמודות כי הלוגו והטקסט שלצידו
+            צריכים את הרוחב המלא. */}
+        <div className="grid grid-cols-2 gap-x-4 gap-y-7 sm:gap-x-6 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-10">
           {/* מותג */}
-          <div>
+          <div className="col-span-2 lg:col-span-1">
             <Link href="/" className="mb-5 inline-flex items-center gap-2.5">
               {logoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -79,7 +84,7 @@ export async function Footer({ brandName, logoUrl }: { brandName: string; logoUr
               )}
             </Link>
 
-            <p className="mb-6 max-w-sm text-sm leading-relaxed text-white/60">
+            <p className="mb-4 max-w-sm text-sm leading-relaxed text-white/60 sm:mb-6">
               {brandName} — מדריך ההשכרות המוביל בישראל. אנחנו מחברים בין אנשים שצריכים
               לשכור לבין חברות מאומתות — עם ביקורות אמיתיות, מידע מלא והשוואה הוגנת.
             </p>
@@ -105,7 +110,7 @@ export async function Footer({ brandName, logoUrl }: { brandName: string; logoUr
               )}
             </ul>
 
-            <div className="mt-6 flex gap-2">
+            <div className="mt-4 flex gap-2 sm:mt-6">
               {contact.whatsapp && (
                 <a
                   href={`https://wa.me/${toWhatsAppNumber(contact.whatsapp)}`}
@@ -152,11 +157,13 @@ export async function Footer({ brandName, logoUrl }: { brandName: string; logoUr
           </FooterColumn>
         </div>
 
-        <div className="mt-12 flex flex-col gap-4 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-8 flex flex-col gap-3 border-t border-white/10 pt-5 sm:mt-12 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:pt-6">
           <p className="text-xs text-white/45">
             © {new Date().getFullYear()} {brandName}. כל הזכויות שמורות.
           </p>
-          <ul className="flex flex-wrap gap-x-5 gap-y-2 text-xs">
+          {/* ריפוד בצד ההתחלה במובייל: כפתור הנגישות הצף יושב שם
+              בפינה, ובלי הריפוד הוא חופף את הקישור הראשון בשורה. */}
+          <ul className="flex flex-wrap gap-x-5 gap-y-2 ps-16 text-xs sm:ps-0">
             {LEGAL_LINKS.map((l) => (
               <li key={l.href}>
                 <Link href={l.href} className="text-white/55 transition-colors hover:text-white">
@@ -174,8 +181,8 @@ export async function Footer({ brandName, logoUrl }: { brandName: string; logoUr
 function FooterColumn({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h2 className="mb-4 text-sm uppercase tracking-wide text-white">{title}</h2>
-      <ul className="space-y-2.5">{children}</ul>
+      <h2 className="mb-2.5 text-sm uppercase tracking-wide text-white sm:mb-4">{title}</h2>
+      <ul className="space-y-1.5 sm:space-y-2.5">{children}</ul>
     </div>
   );
 }
@@ -185,7 +192,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
     <li>
       <Link
         href={href}
-        className="inline-block text-sm text-white/60 transition-all duration-200 hover:translate-x-[-3px] hover:text-white"
+        className="inline-block text-xs text-white/60 transition-all duration-200 hover:translate-x-[-3px] hover:text-white sm:text-sm"
       >
         {children}
       </Link>

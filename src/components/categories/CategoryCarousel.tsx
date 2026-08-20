@@ -31,7 +31,11 @@ export function CategoryCarousel({ items }: { items: CarouselCategory[] }) {
   const [start, setStart] = useState(0);
 
   useEffect(() => {
-    const update = () => setPerView(window.innerWidth >= 1024 ? 3 : window.innerWidth >= 640 ? 2 : 1);
+    /* שניים במובייל ולא אחד.
+       כרטיס אחד ביחס 4:3 על רוחב מלא הוא 268px — כלומר קטגוריה אחת
+       לכל שליש מסך, מול שלוש שנראות יחד בדסקטופ. שניים זה 130px
+       לכרטיס, וזה גם מה שמסגיר שיש כאן סליידר ולא תמונה בודדת. */
+    const update = () => setPerView(window.innerWidth >= 1024 ? 3 : window.innerWidth >= 640 ? 2 : 2);
     update();
     window.addEventListener("resize", update);
     return () => window.removeEventListener("resize", update);
@@ -55,14 +59,14 @@ export function CategoryCarousel({ items }: { items: CarouselCategory[] }) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: reduced ? 0 : -24 }}
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="grid gap-5"
+            className="grid gap-3 sm:gap-5"
             style={{ gridTemplateColumns: `repeat(${visible.length}, minmax(0, 1fr))` }}
           >
             {visible.map((cat) => (
               <Link
                 key={cat.id}
                 href={`/category/${cat.slug}`}
-                className="group relative flex aspect-[4/3] w-full overflow-hidden rounded-xl border border-brand-800/10 bg-brand-950"
+                className="group relative flex aspect-square w-full overflow-hidden rounded-xl border border-brand-800/10 bg-brand-950 sm:aspect-[4/3]"
               >
                 {/* התמונה היא רקע הכרטיס ולא אריח בתוכו.
                     קודם היא ישבה כריבוע 56px על גרדיאנט מומצא, כלומר
@@ -104,7 +108,7 @@ export function CategoryCarousel({ items }: { items: CarouselCategory[] }) {
         </AnimatePresence>
       </div>
 
-      <div className="mt-6 flex items-center justify-center gap-3">
+      <div className="mt-4 flex items-center justify-center gap-3 sm:mt-6">
         <button
           type="button"
           onClick={() => go(1)}

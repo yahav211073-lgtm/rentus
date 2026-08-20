@@ -6,6 +6,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { MediaItem } from "@/types/domain";
 import { cn } from "@/lib/utils";
+import { useModalLock } from "@/lib/hooks/modal";
 
 /**
  * גלריית התמונות של העסק + לייטבוקס.
@@ -27,6 +28,7 @@ export function BusinessGallery({
   const [openAt, setOpenAt] = useState<number | null>(null);
   const reduced = useReducedMotion();
   const isOpen = openAt !== null;
+  useModalLock(isOpen);
 
   const go = useCallback(
     (delta: number) => {
@@ -47,12 +49,11 @@ export function BusinessGallery({
       if (e.key === "ArrowRight") go(-1);
     };
 
-    document.body.style.overflow = "hidden";
+    /* נעילת הגלילה עברה ל-useModalLock למעלה — שני מקומות שכותבים
+       ל-body.style.overflow דורסים זה את זה כשמודאל אחד נסגר בזמן
+       שהשני עדיין פתוח. */
     window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", onKey);
-    };
+    return () => window.removeEventListener("keydown", onKey);
   }, [isOpen, go]);
 
   if (images.length === 0) return null;
@@ -104,7 +105,9 @@ export function BusinessGallery({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[70] flex flex-col bg-brand-950/94 backdrop-blur-sm"
+            /* z-[86]: לייטבוקס במסך מלא חייב לכסות גם את סרגל הניווט
+               התחתון (z-70) ואת סרגל הפעולה של העסק (z-71). */
+            className="fixed inset-0 z-[86] flex flex-col bg-brand-950/94 backdrop-blur-sm"
             onClick={() => setOpenAt(null)}
           >
             <div className="flex items-center justify-between p-4 text-white">

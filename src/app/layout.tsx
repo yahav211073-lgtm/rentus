@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Heebo, Inter, Secular_One } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { MobileTabBar } from "@/components/layout/MobileTabBar";
 import { AccessibilityToolbar } from "@/components/a11y/AccessibilityToolbar";
 import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 import { PopupManager } from "@/components/ads/PopupManager";
@@ -215,8 +216,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           categories={categories}
           phone={contact.phone}
         />
+        {/* הריפוד התחתון הוא גובה סרגל הניווט התחתון (0 בדסקטופ, ראו
+            --spacing-tabbar ב-globals.css). בלעדיו השורה האחרונה של
+            הפוטר יושבת מתחת לסרגל ולא ניתן להגיע אליה. */}
         <main id="main" className="flex-1" style={{ paddingTop: "var(--spacing-header)" }}>{children}</main>
         <Footer brandName={brand.name} logoUrl={brand.logoUrl} />
+        <div aria-hidden="true" style={{ height: "var(--spacing-tabbar)" }} />
+
+        <MobileTabBar isLoggedIn={Boolean(user)} />
 
         <AccessibilityToolbar />
         <ServiceWorkerRegister />

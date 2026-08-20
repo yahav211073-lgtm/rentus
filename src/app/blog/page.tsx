@@ -36,14 +36,14 @@ export default async function BlogIndexPage() {
           <p className="mt-1 text-sm text-ink-500">המדריכים הראשונים יעלו כאן בקרוב.</p>
         </div>
       ) : (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
           {articles.map((a) => (
             <Link
               key={a.id}
               href={`/blog/${a.slug}`}
               className="group flex flex-col overflow-hidden rounded-lg border border-ink-200/70 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-[0_20px_44px_-16px_rgba(11,59,117,0.2)]"
             >
-              <div className="relative aspect-[16/9] overflow-hidden">
+              <div className="relative aspect-[2/1] overflow-hidden sm:aspect-[16/9]">
                 <div className="absolute inset-0 transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]">
                   <ArticleCover article={a} />
                 </div>
@@ -53,11 +53,11 @@ export default async function BlogIndexPage() {
                   </span>
                 )}
               </div>
-              <div className="flex flex-1 flex-col gap-2.5 p-5">
-                <h2 className="font-display text-lg leading-snug text-ink-900 transition-colors group-hover:text-brand-700">
+              <div className="flex flex-1 flex-col gap-2 p-4 sm:gap-2.5 sm:p-5">
+                <h2 className="font-display text-md leading-snug text-ink-900 transition-colors group-hover:text-brand-700 sm:text-lg">
                   {a.title}
                 </h2>
-                {a.excerpt && <p className="line-clamp-2 text-sm leading-relaxed text-ink-500">{a.excerpt}</p>}
+                {a.excerpt && <p className="line-clamp-2 text-xs leading-relaxed text-ink-500 sm:text-sm">{a.excerpt}</p>}
                 {a.readingMin && (
                   <span className="mt-auto inline-flex items-center gap-1.5 pt-2 text-xs text-ink-400">
                     <Clock className="h-3.5 w-3.5" aria-hidden="true" />

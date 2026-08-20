@@ -9,6 +9,7 @@ import { ChevronDown, ImageOff, LogOut, Menu, Search, UserRound, X } from "lucid
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { TopUtilityBar } from "@/components/layout/TopUtilityBar";
 import { useScrolledPast } from "@/lib/hooks/browser-state";
+import { useModalLock } from "@/lib/hooks/modal";
 import { businessCountLabel, cn } from "@/lib/utils";
 import type { CurrentUser } from "@/lib/auth";
 import type { Category } from "@/types/domain";
@@ -74,10 +75,9 @@ export function Header({
     setMegaOpen(false);
   }
 
-  useEffect(() => {
-    document.body.style.overflow = mobileOpen ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [mobileOpen]);
+  /* נעילת גלילה + סימון מודאלי גלובלי. הסימון הוא מה שמוריד
+     מהמסך את הכפתורים הצפים שאחרת יושבים על המגירה. */
+  useModalLock(mobileOpen);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -109,7 +109,11 @@ export function Header({
         <div className="px-3 pt-2 sm:px-5 sm:pt-3">
           <div
             className={cn(
-              "mx-auto flex h-[62px] max-w-[1480px] items-center gap-3 rounded-full ps-6 pe-1.5 backdrop-blur-xl transition-[background-color,box-shadow] duration-300 sm:h-[66px] sm:gap-4 sm:ps-7",
+              /* 52px במובייל ולא 62: הגלולה היא רצועה קבועה שגונבת גובה
+                 מכל גלילה בעמוד, וב-390px היא הייתה תופסת כמעט 8% מהמסך
+                 בשביל לוגו ושני אייקונים. 52 עדיין נותן יעד מגע של 44px
+                 לכפתורים שבתוכה. */
+              "mx-auto flex h-[52px] max-w-[1480px] items-center gap-2 rounded-full ps-4 pe-1.5 backdrop-blur-xl transition-[background-color,box-shadow] duration-300 xs:gap-3 xs:ps-5 sm:h-[66px] sm:gap-4 sm:ps-7",
               scrolled
                 ? "bg-white/92 shadow-[0_10px_34px_-14px_rgba(11,59,117,0.34)]"
                 : "bg-white/72 shadow-[0_6px_24px_-14px_rgba(11,59,117,0.22)]",
@@ -122,7 +126,7 @@ export function Header({
             <Link href="/" className="flex min-w-0 shrink items-center gap-2.5" aria-label="לעמוד הבית">
               {logoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={logoUrl} alt={brandName} className="h-9 w-auto max-w-[190px] object-contain sm:h-10" />
+                <img src={logoUrl} alt={brandName} className="h-7 w-auto max-w-[132px] object-contain xs:h-8 xs:max-w-[150px] sm:h-10 sm:max-w-[190px]" />
               ) : (
                 <>
                   <span className="flex min-w-0 flex-col leading-none">
@@ -194,9 +198,9 @@ export function Header({
               <Link
                 href="/search"
                 aria-label="חיפוש"
-                className="grid h-10 w-10 place-items-center rounded-xs text-ink-600 transition-colors hover:bg-ink-100 lg:hidden"
+                className="grid h-10 w-10 place-items-center rounded-full text-ink-600 transition-colors hover:bg-ink-100 lg:hidden"
               >
-                <Search className="h-5 w-5" aria-hidden="true" />
+                <Search className="h-[1.15rem] w-[1.15rem]" aria-hidden="true" />
               </Link>
 
               {user ? (
@@ -260,9 +264,9 @@ export function Header({
                 onClick={() => setMobileOpen(true)}
                 aria-label="פתיחת תפריט"
                 aria-expanded={mobileOpen}
-                className="grid h-10 w-10 place-items-center rounded-xs text-ink-700 transition-colors hover:bg-ink-100 lg:hidden"
+                className="grid h-10 w-10 place-items-center rounded-full text-ink-700 transition-colors hover:bg-ink-100 lg:hidden"
               >
-                <Menu className="h-5.5 w-5.5" aria-hidden="true" />
+                <Menu className="h-[1.3rem] w-[1.3rem]" aria-hidden="true" />
               </button>
             </div>
           </div>
@@ -373,7 +377,10 @@ function MobileMenu({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             onClick={onClose}
-            className="fixed inset-0 z-[60] bg-brand-950/50 backdrop-blur-sm lg:hidden"
+            /* מעל סרגל הניווט התחתון (z-70): מגירה שנפתחת מלוא הגובה
+               אבל נחתכת ב-58px התחתונים בגלל סרגל שיושב מעליה נראית
+               כמו באג רינדור. */
+            className="fixed inset-0 z-[84] bg-brand-950/50 backdrop-blur-sm lg:hidden"
             aria-hidden="true"
           />
 
@@ -385,7 +392,7 @@ function MobileMenu({
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: reduced ? 0 : "100%", opacity: reduced ? 0 : 1 }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed inset-y-0 z-[61] flex w-[min(92vw,400px)] flex-col bg-white shadow-2xl lg:hidden"
+            className="fixed inset-y-0 z-[85] flex w-[min(92vw,400px)] flex-col bg-white shadow-2xl lg:hidden"
             style={{ insetInlineEnd: 0 }}
           >
             <div className="flex items-center justify-between border-b border-ink-100 p-4">

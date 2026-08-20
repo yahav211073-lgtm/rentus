@@ -8,6 +8,7 @@ import type { PopupBanner, PopupLayout } from "@/types/domain";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { detectDevice, isWithinSchedule, matchesTargeting } from "@/lib/ads/targeting";
 import { cn } from "@/lib/utils";
+import { useModalLock } from "@/lib/hooks/modal";
 
 /**
  * מנוע הפופאפים.
@@ -235,13 +236,15 @@ const LAYOUTS: Record<PopupLayout, {
     backdrop: true,
   },
   bottom_bar: {
-    wrapper: "inset-x-0 bottom-0 p-3 sm:p-4",
+    /* מעל סרגל הניווט התחתון ולא עליו: פס פרסומי שמסתיר את הניווט
+       הוא בדיוק מה שגורם לגולש לנטוש במקום לסגור. */
+    wrapper: "inset-x-0 bottom-[var(--spacing-tabbar)] p-3 sm:p-4",
     panel: "w-full rounded-lg",
     from: { opacity: 0, y: "110%" },
     backdrop: false,
   },
   corner: {
-    wrapper: "bottom-4 end-4 max-w-full",
+    wrapper: "bottom-[calc(var(--spacing-tabbar)+1rem)] end-4 max-w-full",
     panel: "w-[min(92vw,380px)] rounded-lg",
     from: { opacity: 0, y: 28, scale: 0.96 },
     backdrop: false,
@@ -255,6 +258,10 @@ function PopupView({
   const layout = LAYOUTS[p.layout];
   const panelRef = useRef<HTMLDivElement>(null);
   const isBar = p.layout === "bottom_bar";
+
+  /* פופאפ עם כיסוי הוא מודאל לכל דבר: נועל את גלילת הרקע ומוריד
+     מהמסך את הכפתורים הצפים, שאחרת מרחפים מעליו. */
+  useModalLock(layout.backdrop);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onDismiss("close"); };
@@ -317,7 +324,7 @@ function PopupView({
               </div>
             )}
 
-            <div className={cn(isBar ? "flex flex-1 items-center gap-5" : "p-6")}>
+            <div className={cn(isBar ? "flex flex-1 items-center gap-5" : "p-4 sm:p-6")}>
               <div className={cn(isBar && "flex-1")}>
                 {p.heading && (
                   <h2

@@ -77,7 +77,7 @@ export function BusinessRail({ businesses, layout = "rail" }: Props) {
     <div className="relative">
       <div
         ref={scrollerRef}
-        className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0"
+        className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:gap-5 sm:px-0"
         role="region"
         aria-label="רשימת חברות, ניתן לגלול"
         tabIndex={0}
@@ -85,7 +85,11 @@ export function BusinessRail({ businesses, layout = "rail" }: Props) {
         {businesses.map((b) => (
           <div
             key={b.id}
-            className="w-[320px] shrink-0 snap-start sm:w-[420px] lg:w-[520px]"
+            /* 86vw ולא 320px: ברוחב קבוע כרטיס אחד מילא כמעט את כל
+               המסך ולא נראה שיש עוד, כי הקצה של הכרטיס הבא נפל מחוץ
+               לתצוגה. 86vw משאיר בכוונה רצועה של הכרטיס הבא — זה
+               הרמז היחיד שאומר לאצבע שיש לאן לגלול. */
+            className="w-[86vw] max-w-[340px] shrink-0 snap-start sm:w-[420px] sm:max-w-none lg:w-[520px]"
           >
             <CompanyListCard business={b} />
           </div>

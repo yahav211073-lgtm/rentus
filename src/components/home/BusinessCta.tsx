@@ -36,7 +36,7 @@ const CHECKLIST = [
 
 export function BusinessCta() {
   return (
-    <section className="bg-white py-16 sm:py-24">
+    <section className="bg-white py-10 sm:py-16 lg:py-24">
       <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
         <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.05fr] lg:gap-20">
           <Reveal direction="start">
@@ -55,7 +55,7 @@ export function BusinessCta() {
               הרלוונטיים, עם ביקורות, גלריה, שעות פעילות וכפתור חיוג ישיר.
             </p>
 
-            <ul className="mb-8 space-y-2.5">
+            <ul className="mb-6 space-y-2.5 sm:mb-8">
               {CHECKLIST.map((item) => (
                 <li key={item} className="flex items-center gap-2.5 text-base text-ink-600">
                   <CheckCircle2 className="h-5 w-5 shrink-0 text-success-500" strokeWidth={2.2} />

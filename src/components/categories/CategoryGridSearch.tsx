@@ -41,22 +41,25 @@ export function CategoryGridSearch({ items }: { items: CarouselCategory[] }) {
           <p className="font-bold text-ink-800">לא נמצאה קטגוריה בשם &laquo;{query}&raquo;</p>
         </div>
       ) : (
-        <RevealStagger className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        /* שתי עמודות כבר במובייל. בעמודה אחת כל אריח הוא 176px
+           ברוחב מלא — 20 קטגוריות פירושן 3,500px של גלילה עבור רשימה
+           שכל תפקידה הוא סריקה מהירה. */
+        <RevealStagger className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4">
           {filtered.map((cat) => (
             <RevealItem key={cat.id}>
               <Link
                 href={`/category/${cat.slug}`}
-                className="group flex min-h-44 flex-col justify-between overflow-hidden rounded-xl border border-ink-200 bg-white p-5 transition-all hover:-translate-y-1 hover:border-brand-300 hover:shadow-[0_20px_45px_-24px_rgba(11,59,117,.4)]"
+                className="group flex min-h-32 flex-col justify-between overflow-hidden rounded-xl border border-ink-200 bg-white p-3.5 transition-all hover:-translate-y-1 hover:border-brand-300 hover:shadow-[0_20px_45px_-24px_rgba(11,59,117,.4)] sm:min-h-44 sm:p-5"
               >
                 <CategoryThumb
                   imageUrl={cat.imageUrl}
                   icon={cat.icon}
                   name={cat.name}
                   sizes="48px"
-                  className="h-12 w-12 rounded-lg transition-colors group-hover:bg-brand-800 group-hover:text-white"
+                  className="h-10 w-10 rounded-lg transition-colors group-hover:bg-brand-800 group-hover:text-white sm:h-12 sm:w-12"
                 />
                 <span>
-                  <span className="block font-display text-lg font-extrabold text-ink-900">{cat.name}</span>
+                  <span className="block font-display text-sm font-extrabold leading-tight text-ink-900 sm:text-lg">{cat.name}</span>
                   <span className="mt-1 block text-xs font-semibold text-ink-400">
                     {businessCountLabel(cat.businessCount)}
                   </span>

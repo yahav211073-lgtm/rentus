@@ -57,7 +57,7 @@ export function ReviewList({ reviews, businessName, ratingAvg, reviewCount }: Pr
           }
         />
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-8">
+        <div className="grid gap-4 sm:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-8">
           {/* סיכום */}
           <div className="rounded-lg bg-ink-50 p-5 text-center lg:h-fit">
             <p className="font-display text-5xl font-extrabold leading-none text-ink-900">

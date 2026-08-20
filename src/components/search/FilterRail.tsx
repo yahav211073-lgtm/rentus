@@ -8,6 +8,7 @@ import type { SearchResult } from "@/types/domain";
 import { seedTags } from "@/data/seed";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import { useModalLock } from "@/lib/hooks/modal";
 import type { FlatCategory, SimpleCity } from "@/lib/repo/taxonomy";
 
 /**
@@ -48,6 +49,7 @@ export function FilterRail({ facets, total, categories, cities, children }: Prop
   const params = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [mobileOpen, setMobileOpen] = useState(false);
+  useModalLock(mobileOpen);
 
   /** כותב ערך ל-URL. null מוחק את הפרמטר. תמיד מאפס לעמוד 1. */
   const setParam = useCallback((key: string, value: string | null) => {
@@ -218,12 +220,20 @@ export function FilterRail({ facets, total, categories, cities, children }: Prop
         {children && <div className="mt-5">{children}</div>}
       </aside>
 
-      {/* מובייל — כפתור צף + מגירה תחתונה */}
+      {/* מובייל — גלולה צפה מעל סרגל הניווט התחתון + מגירה תחתונה.
+          קודם היא ישבה ב-bottom-5 בפינה, כלומר בדיוק מתחת לסרגל
+          הניווט שנוסף — ולא נראתה בכלל. עכשיו היא ממורכזת ויושבת
+          מעליו: זו הפעולה השנייה בחשיבותה בעמוד תוצאות, והמרכז
+          התחתון הוא המקום שהאגודל מגיע אליו בלי לשנות אחיזה. */}
       <button
         type="button"
         onClick={() => setMobileOpen(true)}
-        className="fixed bottom-5 z-40 inline-flex items-center gap-2 rounded-full bg-brand-800 px-5 py-3 text-sm font-bold text-white shadow-[0_10px_28px_-6px_rgba(11,59,117,0.6)] lg:hidden"
-        style={{ insetInlineEnd: "1.25rem" }}
+        data-floating-ui
+        className="fixed z-[72] inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-brand-800 px-5 py-3 text-sm font-bold text-white shadow-[0_10px_28px_-6px_rgba(11,59,117,0.6)] transition-transform active:scale-95 lg:hidden"
+        /* left פיזי ולא insetInlineStart: ב-RTL הקיצור מתמפה ל-right,
+           ואילו translateX(-50%) הוא חסר-כיוון תמיד — הצירוף שלהם
+           הזיז את הגלולה חצי-רוחב שמאלה מהמרכז במקום למרכז. */
+        style={{ left: "50%", bottom: "calc(var(--spacing-bottom-inset) + 0.75rem)" }}
       >
         <SlidersHorizontal className="h-4 w-4" />
         סינון
@@ -240,14 +250,14 @@ export function FilterRail({ facets, total, categories, cities, children }: Prop
             <motion.div
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setMobileOpen(false)}
-              className="fixed inset-0 z-[70] bg-brand-950/50 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-[80] bg-brand-950/50 backdrop-blur-sm lg:hidden"
               aria-hidden="true"
             />
             <motion.div
               role="dialog" aria-modal="true" aria-label="מסנני חיפוש"
               initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 32, stiffness: 320 }}
-              className="fixed inset-x-0 bottom-0 z-[71] max-h-[86vh] overflow-hidden rounded-t-xl bg-white lg:hidden"
+              className="fixed inset-x-0 bottom-0 z-[81] max-h-[86vh] overflow-hidden rounded-t-xl bg-white pb-[env(safe-area-inset-bottom,0px)] lg:hidden"
             >
               <div className="flex items-center justify-between border-b border-ink-100 p-4">
                 <h2 className="text-base text-ink-900">סינון תוצאות</h2>

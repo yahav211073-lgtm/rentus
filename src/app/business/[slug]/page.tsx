@@ -27,6 +27,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { env } from "@/lib/env";
 import { decodeParam, formatNumber, toWhatsAppNumber, wazeLink, jsonLd } from "@/lib/utils";
 import { BusinessMap } from "@/components/business/BusinessMapLazy";
+import { BottomInset } from "@/components/layout/BottomInset";
 
 /**
  * עמוד פרופיל עסק.
@@ -101,7 +102,9 @@ export default async function BusinessPage({ params }: { params: Params }) {
   );
 
   return (
-    <div className="bg-ink-50 pb-16 sm:pb-20">
+    /* הריפוד התחתון במובייל מפנה מקום לשני סרגלים קבועים שיושבים
+       זה מעל זה: סרגל הפעולה של העסק (72px) וסרגל הניווט של האתר. */
+    <div className="bg-ink-50 pb-[calc(var(--spacing-tabbar)+5.5rem)] sm:pb-20">
       <JsonLd business={b} />
 
       <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
@@ -132,7 +135,11 @@ export default async function BusinessPage({ params }: { params: Params }) {
           <section className="overflow-hidden rounded-xl border border-ink-200/70 bg-white shadow-[0_18px_44px_-24px_rgba(12,29,64,0.28)]">
             <div className="grid gap-0 lg:grid-cols-[minmax(0,46%)_minmax(0,54%)]">
               {/* תמונה */}
-              <div className="relative aspect-16/10 lg:aspect-auto lg:min-h-[340px]">
+              {/* 2:1 במובייל ולא 16:10. כשאין תמונת נושא (המצב הנפוץ
+                  ברוב הכרטיסים) זה 195px של גרדיאנט ריק בראש העמוד,
+                  לפני שם החברה. 2:1 מוריד את זה ל-179 ומרוויח שורה
+                  שלמה של מידע אמיתי מעל הקיפול. */}
+              <div className="relative aspect-2/1 lg:aspect-auto lg:min-h-[340px] sm:aspect-16/10">
                 {b.coverUrl ? (
                   <Image
                     src={b.coverUrl}
@@ -563,7 +570,17 @@ export default async function BusinessPage({ params }: { params: Params }) {
       </div>
 
       {/* ================= סרגל פעולה דביק במובייל ================= */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-ink-200 bg-white/95 p-3 backdrop-blur lg:hidden">
+      {/* סרגל הפעולה מרים את הטוקן שכל האלמנטים הצפים נגזרים ממנו,
+          כדי שכפתור הנגישות לא יישב עליו. */}
+      <BottomInset extra="72px" />
+
+      {/* יושב מעל סרגל הניווט התחתון ולא מתחתיו. שני סרגלים קבועים
+          באותו bottom:0 פירושם שהחזק ב-z מסתיר את השני לגמרי —
+          וכאן דווקא זה של העסק הוא הפעולה שהגולש הגיע בשבילה. */}
+      <div
+        className="fixed inset-x-0 z-[71] border-t border-ink-200 bg-white/95 p-3 backdrop-blur lg:hidden"
+        style={{ bottom: "var(--spacing-tabbar)" }}
+      >
         <div className="flex gap-2">
           {/* במובייל הטלפון תופס את כל הרוחב הפנוי — זו הפעולה
               היחידה שכמעט תמיד רוצים מהסרגל הדביק. */}

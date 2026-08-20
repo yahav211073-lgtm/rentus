@@ -172,81 +172,110 @@ export function SearchBar({
 
   return (
     <div ref={rootRef} className={cn("relative w-full", className)}>
+      {/*
+        מבנה מובייל שונה מהותית מדסקטופ, לא ערימה שלו.
+
+        בדסקטופ שלושת השדות והכפתור יושבים בשורה אחת. הערימה הישירה של
+        אותו מבנה במובייל ייצרה ארבע שורות בגובה מלא — כרטיס חיפוש שתפס
+        שני-שליש מהמסך והציג בדיוק את אותו מידע.
+
+        במקום זה: שורה אחת של שדה חיפוש + כפתור, ומתחתיה שני מסנני
+        גלולה בשתי עמודות. אותם שלושה שדות בדיוק, בשליש מהגובה.
+        md:contents מבטל את שתי המעטפות מ-768 ומעלה, כך שהילדים
+        חוזרים להיות ילדים ישירים של ה-flex ושורת הדסקטופ נשארת
+        בדיוק כפי שהייתה — בלי DOM כפול ובלי חוקי דריסה.
+      */}
       <form
         onSubmit={submit}
         role="search"
         aria-label="חיפוש להשכרה"
         className={cn(
-          "relative flex flex-col gap-2 bg-white p-2 md:flex-row md:items-center md:gap-0",
+          "relative flex flex-col gap-2 bg-white p-2 md:flex-row md:items-center md:gap-0 md:p-0",
           isHero
-            ? "rounded-lg p-0 shadow-[0_24px_60px_-16px_rgba(5,25,47,0.5)]"
+            ? "rounded-lg shadow-[0_24px_60px_-16px_rgba(5,25,47,0.5)]"
             : "rounded-lg border border-ink-200 shadow-md",
         )}
       >
-        {/* מה מחפשים */}
-        <div className="relative flex flex-1 items-center gap-2.5 px-3 py-1">
-          <input
-            ref={inputRef}
-            type="search"
-            value={query}
-            onChange={(e) => { setQuery(e.target.value); setOpen(true); setActiveIndex(-1); }}
-            onFocus={() => setOpen(true)}
-            onKeyDown={onKeyDown}
-            placeholder="מה אתם מחפשים?"
-            aria-label="מה אתם מחפשים"
-            role="combobox"
-            aria-expanded={open}
-            aria-controls="search-suggestions"
-            aria-autocomplete="list"
-            aria-activedescendant={activeIndex >= 0 ? `suggestion-${activeIndex}` : undefined}
-            className="w-full bg-transparent py-2.5 text-base text-ink-900 outline-none placeholder:text-ink-400"
-          />
-          {query && (
-            <button
-              type="button"
-              onClick={() => { setQuery(""); inputRef.current?.focus(); }}
-              aria-label="ניקוי החיפוש"
-              className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-ink-400 transition-colors hover:bg-ink-100 hover:text-ink-600"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
+        <div className="flex items-center gap-2 md:contents">
+          {/* מה מחפשים */}
+          <div className="relative flex flex-1 items-center gap-2.5 rounded-md bg-ink-50 px-3 md:rounded-none md:bg-transparent md:py-1">
+            <input
+              ref={inputRef}
+              type="search"
+              value={query}
+              onChange={(e) => { setQuery(e.target.value); setOpen(true); setActiveIndex(-1); }}
+              onFocus={() => setOpen(true)}
+              onKeyDown={onKeyDown}
+              placeholder="מה אתם מחפשים?"
+              aria-label="מה אתם מחפשים"
+              role="combobox"
+              aria-expanded={open}
+              aria-controls="search-suggestions"
+              aria-autocomplete="list"
+              aria-activedescendant={activeIndex >= 0 ? `suggestion-${activeIndex}` : undefined}
+              /* 16px מפורש במובייל: ספארי מזייף זום על כל שדה שגופנו
+                 קטן מ-16px בפוקוס, והזום הזה לא חוזר לאחור. */
+              className="w-full bg-transparent py-2.5 text-[1rem] text-ink-900 outline-none placeholder:text-ink-400 md:text-base"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => { setQuery(""); inputRef.current?.focus(); }}
+                aria-label="ניקוי החיפוש"
+                className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-ink-400 transition-colors hover:bg-ink-100 hover:text-ink-600"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
+          {/* כפתור מובייל — ריבוע צמוד לשדה, כמו בכל אפליקציית חיפוש */}
+          <button
+            type="submit"
+            aria-label="חיפוש"
+            className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-brand-800 text-white transition-colors hover:bg-brand-700 active:scale-95 md:hidden"
+          >
+            <Search className="h-5 w-5" aria-hidden="true" />
+          </button>
         </div>
 
         <Divider />
 
-        <SelectField
-          icon={<Building2 className="h-4.5 w-4.5 text-ink-400" />}
-          value={category}
-          onChange={setCategory}
-          label="כל הקטגוריות"
-          ariaLabel="בחירת קטגוריה"
-          options={categories.map((c) => ({ value: c.slug, label: c.parentId ? `— ${c.name}` : c.name }))}
-        />
+        <div className="grid grid-cols-2 gap-2 md:contents">
+          <SelectField
+            icon={<Building2 className="h-4.5 w-4.5 shrink-0 text-ink-400" />}
+            value={category}
+            onChange={setCategory}
+            label="כל הקטגוריות"
+            ariaLabel="בחירת קטגוריה"
+            options={categories.map((c) => ({ value: c.slug, label: c.parentId ? `— ${c.name}` : c.name }))}
+          />
 
-        <Divider />
+          <Divider />
 
-        <SelectField
-          icon={<MapPin className="h-4.5 w-4.5 text-ink-400" />}
-          value={city}
-          onChange={setCity}
-          label="כל האזורים"
-          ariaLabel="בחירת אזור"
-          options={cities.map((c) => ({ value: c.slug, label: c.name }))}
-        />
+          <SelectField
+            icon={<MapPin className="h-4.5 w-4.5 shrink-0 text-ink-400" />}
+            value={city}
+            onChange={setCity}
+            label="כל האזורים"
+            ariaLabel="בחירת אזור"
+            options={cities.map((c) => ({ value: c.slug, label: c.name }))}
+          />
+        </div>
 
         {/* בהירו זה כפתור עם מילים ולא ריבוע אייקון. הפעולה הראשית
             של העמוד ראויה לתווית: "חפש עכשיו" אומר מה יקרה, זכוכית
             מגדלת לבדה מבקשת מהגולש לנחש. בשורה הקומפקטית אין מקום
-            לטקסט, ושם האייקון נשאר. */}
+            לטקסט, ושם האייקון נשאר. במובייל הכפתור הזה מוסתר לגמרי
+            לטובת הריבוע שצמוד לשדה. */}
         <button
           type="submit"
           aria-label="חיפוש"
           className={cn(
-            "shrink-0 bg-brand-700 font-bold text-white transition-colors hover:bg-brand-600",
+            "hidden shrink-0 bg-brand-700 font-bold text-white transition-colors hover:bg-brand-600 md:block",
             isHero
-              ? "m-1.5 inline-flex h-11 items-center justify-center gap-2 rounded-md px-6 text-base"
-              : "grid h-11 w-11 place-items-center rounded-md",
+              ? "m-1.5 md:inline-flex md:h-11 md:items-center md:justify-center md:gap-2 md:rounded-md md:px-6 md:text-base"
+              : "md:grid md:h-11 md:w-11 md:place-items-center md:rounded-md",
           )}
         >
           <Search className={isHero ? "h-4.5 w-4.5" : "h-5 w-5"} />
@@ -376,9 +405,12 @@ function SelectField({
   const selected = options.find((o) => o.value === value);
 
   return (
-    <div className="relative flex items-center gap-2.5 px-3 py-1 md:min-w-[168px]">
+    /* במובייל זו גלולה עצמאית בתוך רשת שתי עמודות — גבול משלה, רקע
+       משלה, גובה 40px. בדסקטופ היא חוזרת להיות מקטע שקוף בתוך השורה
+       הרציפה, מופרד בקו אנכי בלבד. */
+    <div className="relative flex h-10 items-center gap-1.5 rounded-md border border-ink-200 bg-white px-2.5 md:h-auto md:min-w-[168px] md:gap-2.5 md:rounded-none md:border-0 md:px-3 md:py-1">
       {icon}
-      <span className={cn("flex-1 truncate text-base", selected ? "text-ink-900" : "text-ink-400")}>
+      <span className={cn("min-w-0 flex-1 truncate text-sm md:text-base", selected ? "text-ink-900" : "text-ink-400")}>
         {selected?.label ?? label}
       </span>
       <ChevronDown className="h-4 w-4 shrink-0 text-ink-400" aria-hidden="true" />
