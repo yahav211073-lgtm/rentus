@@ -42,3 +42,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# גופנים מסחריים בתשלום (Ploni / Anomalia).
+# לא נכנסים לריפו ולא לפרודקשן: public/ מוגש סטטית, כלומר קובץ שיושב
+# כאן ניתן להורדה מהדומיין הציבורי וניתן לזהות אותו בבקשת רשת אחת.
+# אין קוד שמפנה אליהם — האתר רץ על Heebo ו-Secular One מ-next/font.
+# אם יירכש רישיון: להסיר את השורה הזו ולהוסיף @font-face ב-globals.css.
+/public/fonts/

@@ -23,7 +23,7 @@ export default async function NewBusinessPage() {
         <ArrowRight className="h-4 w-4" aria-hidden="true" />
         חזרה לרשימת העסקים
       </Link>
-      <h1 className="mb-6 font-display text-2xl font-extrabold text-ink-900">הוספת עסק חדש</h1>
+      <h1 className="mb-6 font-display text-2xl text-ink-900">הוספת עסק חדש</h1>
       <NewBusinessForm categories={categories} cities={cities} />
     </div>
   );

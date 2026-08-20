@@ -29,7 +29,7 @@ export default async function AboutPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-brand-950/92 via-brand-950/55 to-brand-950/35" />
 
         <div className="relative mx-auto flex h-full max-w-3xl flex-col items-center justify-center px-4 text-center sm:px-6">
-          <h1 className="mb-3 font-display text-3xl font-extrabold text-white sm:text-4xl">
+          <h1 className="mb-3 font-display text-3xl text-white sm:text-4xl">
             אודות {brand.name}
           </h1>
           <p className="max-w-xl text-white/80">
@@ -48,7 +48,7 @@ export default async function AboutPage() {
                 <span className="mb-3 grid h-11 w-11 place-items-center rounded-full bg-brand-800/10 text-brand-700">
                   <Icon className="h-5.5 w-5.5" />
                 </span>
-                <h2 className="mb-1.5 font-bold text-ink-900">{point.title}</h2>
+                <h2 className="mb-1.5 text-ink-900">{point.title}</h2>
                 <p className="text-sm leading-relaxed text-ink-500">{point.body}</p>
               </div>
             );

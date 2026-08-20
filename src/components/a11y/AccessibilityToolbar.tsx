@@ -188,7 +188,7 @@ export function AccessibilityToolbar() {
             style={{ insetInlineStart: "1.25rem" }}
           >
             <div className="flex items-center justify-between border-b border-ink-100 bg-ink-50 px-4 py-3">
-              <h2 className="text-sm font-bold text-ink-900">הגדרות נגישות</h2>
+              <h2 className="text-sm text-ink-900">הגדרות נגישות</h2>
               <button
                 type="button"
                 onClick={() => { setOpen(false); triggerRef.current?.focus(); }}

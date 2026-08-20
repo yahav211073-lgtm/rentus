@@ -40,7 +40,7 @@ export default async function AdminTestimonialsPage({
 
   return (
     <div>
-      <h1 className="mb-1 font-display text-2xl font-extrabold text-ink-900">ביקורות על האתר</h1>
+      <h1 className="mb-1 font-display text-2xl text-ink-900">ביקורות על האתר</h1>
       <p className="mb-6 text-sm text-ink-500">
         ביקורות שגולשים מחוברים כתבו על הפלטפורמה. מוצגות בעמוד הבית רק אחרי אישור.
       </p>

@@ -1,23 +1,21 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { Hero } from "@/components/home/Hero";
 import { CategoryRail } from "@/components/home/CategoryRail";
-import { CategoryShowcase } from "@/components/home/CategoryShowcase";
 import { BenefitsStrip } from "@/components/home/BenefitsStrip";
-import { GuidesSidebar } from "@/components/home/GuidesSidebar";
-import { Section, SectionHeading } from "@/components/home/Section";
-import { BusinessRail } from "@/components/home/BusinessRail";
 import { CompanyListCard } from "@/components/business/CompanyListCard";
 import { StatsBand } from "@/components/home/StatsBand";
-import { Testimonials } from "@/components/home/Testimonials";
-import { BlogSection } from "@/components/home/BlogSection";
-import { ButtonLink } from "@/components/ui/Button";
-import { SlidersHorizontal } from "lucide-react";
 import { env } from "@/lib/env";
 import { getHomeBusinessSlices } from "@/lib/repo/businesses";
-import { getArticles } from "@/lib/repo/articles";
 import { getBrandSettings } from "@/lib/repo/branding";
 import { getCategoriesWithCounts } from "@/lib/repo/categories";
 import { getCities } from "@/lib/repo/taxonomy";
+import { getActiveAds } from "@/lib/repo/ads";
+import { GuidesSidebar } from "@/components/home/GuidesSidebar";
+import { AdSlot } from "@/components/home/AdSlot";
+import { ReviewsSection } from "@/components/home/ReviewsSection";
+import { jsonLd } from "@/lib/utils";
 
 /**
  * עמוד הבית.
@@ -39,117 +37,109 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-  const [{ topRated, featured, sponsored, popular, latest }, brand, categories, cities, articles] = await Promise.all([
+  const [{ topRated, featured }, brand, categories, cities, ads] = await Promise.all([
     getHomeBusinessSlices(),
     getBrandSettings(),
     getCategoriesWithCounts(),
     getCities(),
-    getArticles(),
+    getActiveAds(),
   ]);
 
-  const recommended = [...featured, ...topRated].filter(
-    (business, index, all) => all.findIndex((candidate) => candidate.id === business.id) === index,
-  );
+  /* "מומלצות" = מקודמות ידנית, ואחריהן המדורגות גבוה. הסינון מוודא
+     שעסק שנמצא בשתי הרשימות לא ייספר פעמיים. ההדמיה מציגה ארבע. */
+  const recommended = [...featured, ...topRated]
+    .filter((b, i, all) => all.findIndex((c) => c.id === b.id) === i)
+    .slice(0, 4);
+
+  const adStart = ads.banners.find((b) => b.placementKey === "side_start" && b.isActive);
+  const adEnd = ads.banners.find((b) => b.placementKey === "side_end" && b.isActive);
+  const adSidebar = ads.banners.find((b) => b.placementKey === "home_sidebar" && b.isActive);
 
   return (
     <>
       <JsonLd brandName={brand.name} />
 
-      <Hero categories={categories} cities={cities} imageUrl={brand.heroImageUrl} />
+      <Hero
+        categories={categories}
+        cities={cities}
+        imageUrl={brand.heroImageUrl}
+        adStart={adStart}
+        adEnd={adEnd}
+      />
       <CategoryRail />
       <BenefitsStrip />
 
-      {(recommended.length > 0 || articles.length > 0) && (
-        <section className="bg-ink-50 pb-8 pt-0 sm:pb-10">
-          <div className="mx-auto grid max-w-[1480px] gap-4 px-4 sm:px-6 lg:grid-cols-[1fr_377px] lg:px-8 [direction:ltr]">
-            <div className="rounded-lg border border-ink-200 bg-white p-4 shadow-sm sm:p-5 [direction:rtl]">
-              <div className="mb-4 flex items-center justify-between gap-4">
-                <h2 className="font-display text-xl font-extrabold text-ink-900 sm:text-2xl">חברות מומלצות</h2>
-                <ButtonLink href="/search" variant="ghost" size="sm">צפו בכל החברות</ButtonLink>
+      {/* ---- חברות מומלצות + סיידבר מדריכים ----
+          שורה אחת בהדמיה, ולכן רשת אחת ולא שתי סקציות: הסיידבר
+          צריך להיות באותו גובה כמו העמודה שלצידו, וזה מה שרשת
+          אחת נותנת בחינם. */}
+      {recommended.length > 0 && (
+        <section className="bg-ink-50 pt-4">
+          <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
+            <div className="grid gap-4 lg:grid-cols-[300px_minmax(0,1fr)]">
+              {/* עמודת הצד: מדריכים ומתחתיהם משבצת פרסום מרובעת.
+                  קיצור המדריכים הוא מה שפינה את המקום לזה — קודם
+                  הפאנל לבדו היה גבוה מהרשת שלצידו. */}
+              <div className="flex flex-col gap-4">
+                <GuidesSidebar />
+                <AdSlot banner={adSidebar} />
               </div>
-              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                {recommended.slice(0, 4).map((b) => <CompanyListCard key={b.id} business={b} />)}
+
+              <div className="flex flex-col gap-4">
+                <div className="rounded-lg border border-ink-200/80 bg-white p-4 shadow-[0_10px_26px_-18px_rgba(5,25,47,0.45)] sm:p-5">
+                  <div className="mb-4 flex items-end justify-between gap-4">
+                    <h2 className="font-display text-2xl text-ink-900 sm:text-3xl">
+                      חברות מומלצות
+                    </h2>
+                    <Link
+                      href="/search"
+                      className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-bold text-brand-700 transition-colors hover:text-brand-800"
+                    >
+                      צפו בכל החברות
+                      <ArrowLeft
+                        className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1"
+                        aria-hidden="true"
+                      />
+                    </Link>
+                  </div>
+
+                  {/* מספר העמודות נגזר ממספר הכרטיסים בפועל. רשת של
+                      ארבע עם שני כרטיסים משאירה שני חורים לבנים, וזה
+                      נקרא כתקלה ולא כאתר עם מעט תוכן. */}
+                  <div className={`grid gap-3 ${RECOMMENDED_COLS[recommended.length] ?? RECOMMENDED_COLS[4]}`}>
+                    {recommended.map((b) => (
+                      <CompanyListCard key={b.id} business={b} />
+                    ))}
+                  </div>
+                </div>
+
+                {/* רצועת המספרים יושבת בתוך העמודה הראשית ומיושרת עם
+                    רשת הכרטיסים שמעליה — כמו בהדמיה, ולא כפס שנוגע
+                    בקצות המסך. */}
+                <StatsBand />
               </div>
             </div>
-            <GuidesSidebar className="h-full [direction:rtl]" />
           </div>
         </section>
       )}
 
-      <CategoryShowcase categories={categories} />
-      <BlogSection />
+      <ReviewsSection />
 
-      {/* פופולריים */}
-      {popular.length > 0 && (
-        <Section className="bg-white">
-          <SectionHeading
-            eyebrow="הכי מבוקשים"
-            title="החברות עם הכי הרבה ביקורות"
-            subtitle="חברות להשכרה עם פעילות מתמשכת ודירוגים מאומתים."
-            action={{ label: "לכל התוצאות", href: "/search?sort=reviews" }}
-          />
-          <BusinessRail businesses={popular} layout="grid" />
-        </Section>
-      )}
-
-      <StatsBand />
-
-      {/* ממומנים */}
-      {sponsored.length > 0 && (
-        <Section className="bg-ink-50">
-          <SectionHeading
-            eyebrow="שיתופי פעולה"
-            title="חברות בקידום"
-            subtitle="מיקומים מקודמים מסומנים בבירור, כדי לשמור על חוויית חיפוש שקופה."
-          />
-          <BusinessRail businesses={sponsored} />
-        </Section>
-      )}
-
-      {/* כל העסקים, עם סינון וקטגוריות — למטה, אחרי שכבר ראו את המומלצים */}
-      <Section className="bg-white">
-        <div className="flex flex-col items-center gap-5 rounded-lg border border-ink-200/70 bg-ink-50 px-6 py-12 text-center">
-          <span className="grid h-14 w-14 place-items-center rounded-full bg-brand-800 text-white">
-            <SlidersHorizontal className="h-6 w-6" />
-          </span>
-          <div>
-            <h2 className="mb-2 font-display text-2xl font-extrabold text-ink-900">
-              רוצים לראות את כל החברות?
-            </h2>
-            <p className="mx-auto max-w-md text-ink-500">
-              סננו לפי קטגוריה, עיר, דירוג ומאפיינים — ומצאו בדיוק את מי שאתם מחפשים.
-            </p>
-          </div>
-          <div className="flex flex-wrap justify-center gap-2">
-            {categories.slice(0, 6).map((c) => (
-              <ButtonLink key={c.id} href={`/category/${c.slug}`} variant="secondary" size="sm">
-                {c.name}
-              </ButtonLink>
-            ))}
-          </div>
-          <ButtonLink href="/search" variant="primary" size="lg">
-            סינון וחיפוש בכל החברות
-          </ButtonLink>
-        </div>
-      </Section>
-
-      {/* חדשים — בסוף */}
-      {latest.length > 0 && (
-        <Section className="bg-ink-50">
-          <SectionHeading
-            eyebrow={`חדש ב-${brand.name}`}
-            title="הצטרפו לאחרונה"
-            subtitle="חברות להשכרה שנוספו לאחרונה ומוכנות לקבל פניות."
-            action={{ label: "לכל החדשים", href: "/search?sort=newest" }}
-          />
-          <BusinessRail businesses={latest} />
-        </Section>
-      )}
-
-      <Testimonials />
+      {/* ריווח תחתון לפני הפוטר. יושב כאן ולא כ-padding על כל סקציה,
+          כדי שהמרווח בין הרצועות יישאר אחיד לאורך כל העמוד. */}
+      <div className="h-10 bg-ink-50 sm:h-12" />
     </>
   );
 }
+
+/* מחלקות מלאות ולא מחרוזת מורכבת: Tailwind סורק את הקוד כטקסט,
+   ו-`lg:grid-cols-${n}` פשוט לא ייוצר. */
+const RECOMMENDED_COLS: Record<number, string> = {
+  1: "grid-cols-1 sm:max-w-xs",
+  2: "grid-cols-1 sm:grid-cols-2",
+  3: "grid-cols-1 sm:grid-cols-2 xl:grid-cols-3",
+  4: "grid-cols-1 sm:grid-cols-2 xl:grid-cols-4",
+};
 
 /**
  * נתונים מובנים לעמוד הבית: Organization ו-WebSite עם SearchAction
@@ -189,7 +179,7 @@ function JsonLd({ brandName }: { brandName: string }) {
   return (
     <script
       type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      dangerouslySetInnerHTML={{ __html: jsonLd(schema) }}
     />
   );
 }

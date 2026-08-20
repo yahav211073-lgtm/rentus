@@ -40,7 +40,7 @@ export default async function AdminReviewsPage({
 
   return (
     <div>
-      <h1 className="mb-1 font-display text-2xl font-extrabold text-ink-900">ביקורות על עסקים</h1>
+      <h1 className="mb-1 font-display text-2xl text-ink-900">ביקורות על עסקים</h1>
       <p className="mb-6 text-sm text-ink-500">
         ביקורת מתפרסמת בעמוד העסק רק אחרי אישור כאן. דחייה משאירה אותה במערכת אבל מסתירה אותה מהאתר.
       </p>

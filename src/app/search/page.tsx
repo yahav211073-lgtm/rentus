@@ -66,7 +66,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
       <div className="relative isolate overflow-hidden bg-gradient-to-br from-brand-900 to-brand-700 pb-10 pt-8">
         <div className="bg-dots absolute inset-0 opacity-30" aria-hidden="true" />
         <div className="relative mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
-          <h1 className="mb-5 font-display text-2xl font-extrabold text-white sm:text-3xl">
+          <h1 className="mb-5 font-display text-2xl text-white sm:text-3xl">
             {filters.q ? <>תוצאות עבור &laquo;{filters.q}&raquo;</> : "חיפוש חברות"}
           </h1>
           <SearchBar variant="compact" defaultQuery={filters.q ?? ""} categories={categories} cities={cities} />
@@ -129,7 +129,7 @@ function EmptyState({ query, categories }: { query?: string; categories: { slug:
         <SearchX className="h-7 w-7" />
       </span>
 
-      <h2 className="mb-2 font-display text-xl font-bold text-ink-900">
+      <h2 className="mb-2 font-display text-xl text-ink-900">
         {query ? <>לא מצאנו חברות עבור &laquo;{query}&raquo;</> : "אין תוצאות עם המסננים האלה"}
       </h2>
       <p className="mx-auto mb-7 max-w-md text-base leading-relaxed text-ink-500">

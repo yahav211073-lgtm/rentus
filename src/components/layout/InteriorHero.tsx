@@ -24,7 +24,7 @@ export function InteriorHero({
       <div className="relative mx-auto flex max-w-[1480px] flex-col gap-5 px-4 sm:px-6 lg:flex-row lg:items-end lg:justify-between lg:px-8">
         <div className="max-w-3xl">
           {eyebrow && <p className="mb-2 text-xs font-bold tracking-wide text-accent-300">{eyebrow}</p>}
-          <h1 className="font-display text-3xl font-extrabold leading-tight text-white sm:text-4xl">{title}</h1>
+          <h1 className="font-display text-3xl leading-tight text-white sm:text-4xl">{title}</h1>
           {description && <p className="mt-3 max-w-2xl text-base leading-relaxed text-white/72 sm:text-lg">{description}</p>}
         </div>
         {action && (

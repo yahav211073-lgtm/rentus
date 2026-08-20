@@ -148,3 +148,27 @@ export function pickWeighted<T extends { weight: number }>(items: T[]): T | null
   }
   return items[items.length - 1];
 }
+
+/**
+ * סריאליזציה בטוחה של JSON-LD להטמעה בתוך תגית <script>.
+ *
+ * JSON.stringify לבדו **לא** מספיק כאן. הוא לא מברִיח `<` ולא `/`, ולכן
+ * ערך תוכן שמכיל את הרצף `</script>` סוגר את התגית והדפדפן מתחיל לפרש
+ * את מה שאחריו כ-HTML. ב-schema של עמוד עסק יושבים name, description
+ * ו-tagline — כולם נערכים חופשית על ידי בעל העסק מהדשבורד — כלומר זה
+ * היה נתיב XSS מאוחסן על מקור האתר עצמו, בעמוד ציבורי שגם מנהל גולש בו.
+ *
+ * ההברחה היא ל-\uXXXX ולא לישויות HTML: בתוך <script> הדפדפן לא מפענח
+ * ישויות, אבל JSON כן מפענח \u — כך הפלט נשאר JSON תקין וקריא לגוגל.
+ *
+ * U+2028/U+2029 נכללים כי הם מפרידי שורה חוקיים ב-JavaScript אך לא
+ * ב-JSON, ובלעדיהם אפשר לשבור את הסקריפט.
+ */
+export function jsonLd(schema: unknown): string {
+  return JSON.stringify(schema)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+}

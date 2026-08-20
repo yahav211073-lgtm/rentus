@@ -45,10 +45,13 @@ export function SideBanner({
   const ref = useRef<HTMLDivElement>(null);
   const trackedRef = useRef(false);
 
-  // מקום פנוי בשוליים. 1440px = רוחב לפטופ רגיל (למשל MacBook Air/Pro
-  // בזום ברירת מחדל) — מתחת לזה השוליים צרים מדי לעמודה בלי לדחוק תוכן.
+  /* מקום פנוי בשוליים.
+     הסף היה 1440px, וזו הייתה טעות חשבונית: מעטפת התוכן היא 1480px,
+     ושתי העמודות הן 160px כל אחת. במסך 1440 אין שוליים בכלל, ולכן
+     הבאנרים כיסו 160px מהתוכן משני הצדדים בכל עמוד באתר.
+     1480 + 320 + מרווח נשימה של 40 = 1840.                              */
   useEffect(() => {
-    const check = () => setHasRoom(window.innerWidth >= 1440);
+    const check = () => setHasRoom(window.innerWidth >= 1840);
     const frame = requestAnimationFrame(check);
     window.addEventListener("resize", check);
     return () => {
@@ -140,7 +143,7 @@ export function SideBanner({
     <aside
       ref={ref}
       aria-label="אזור פרסום"
-      className="fixed top-1/2 z-30 hidden -translate-y-1/2 [@media(min-width:1440px)]:block"
+      className="fixed top-1/2 z-30 hidden -translate-y-1/2 [@media(min-width:1840px)]:block"
       style={side === "start" ? { insetInlineStart: 0 } : { insetInlineEnd: 0 }}
     >
       <div className="relative w-[160px]">

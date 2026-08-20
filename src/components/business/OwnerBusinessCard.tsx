@@ -65,7 +65,7 @@ export function OwnerBusinessCard({ business }: { business: OwnerBusiness }) {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="mb-1 flex items-center gap-2">
-            <h2 className="font-display text-lg font-bold text-ink-900">{business.name}</h2>
+            <h2 className="font-display text-lg text-ink-900">{business.name}</h2>
             <Badge variant={status.variant}>{status.label}</Badge>
           </div>
           {business.status === "pending" && (

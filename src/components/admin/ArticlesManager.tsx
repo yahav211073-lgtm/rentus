@@ -199,7 +199,7 @@ function ArticleForm({
       className="rounded-lg border border-brand-200 bg-white p-5 shadow-sm"
     >
       <div className="mb-4 flex items-center justify-between gap-3">
-        <h2 className="font-display text-base font-bold text-ink-900">
+        <h2 className="font-display text-base text-ink-900">
           {article ? "עריכת מאמר" : "מאמר חדש"}
         </h2>
         <button

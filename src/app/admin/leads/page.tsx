@@ -58,7 +58,7 @@ export default async function AdminLeadsPage({
   return (
     <div>
       <div className="mb-1 flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-display text-2xl font-extrabold text-ink-900">פניות</h1>
+        <h1 className="font-display text-2xl text-ink-900">פניות</h1>
       </div>
       <p className="mb-6 text-sm text-ink-500">
         כל הפניות שהתקבלו דרך טפסי יצירת הקשר באתר ובעמודי העסקים.

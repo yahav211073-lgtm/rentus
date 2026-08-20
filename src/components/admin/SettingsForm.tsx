@@ -83,7 +83,7 @@ function AboutContentSection({ content }: { content: Props["aboutContent"] }) {
 
   return (
     <form onSubmit={onSubmit} className="rounded-lg border border-ink-200/70 bg-white p-6">
-      <h2 className="mb-1 font-display text-base font-bold text-ink-900">עמוד אודות</h2>
+      <h2 className="mb-1 font-display text-base text-ink-900">עמוד אודות</h2>
       <p className="mb-4 text-xs text-ink-400">
         הטקסט המרכזי ו-4 נקודות החוזק שמוצגות בעמוד /about.
       </p>
@@ -145,7 +145,7 @@ function BrandIdentitySection({ identity }: { identity: Props["brandIdentity"] }
       }
       className="rounded-lg border border-ink-200/70 bg-white p-6"
     >
-      <h2 className="mb-1 font-display text-base font-bold text-ink-900">זהות המותג</h2>
+      <h2 className="mb-1 font-display text-base text-ink-900">זהות המותג</h2>
       <p className="mb-4 text-xs text-ink-400">
         השם והסלוגן מופיעים בכותרת האתר, בכותרת הדפדפן ובתגיות השיתוף.
       </p>
@@ -220,7 +220,7 @@ function SocialLinksSection({ links }: { links: Record<string, string> }) {
       }
       className="rounded-lg border border-ink-200/70 bg-white p-6"
     >
-      <h2 className="mb-1 font-display text-base font-bold text-ink-900">רשתות חברתיות</h2>
+      <h2 className="mb-1 font-display text-base text-ink-900">רשתות חברתיות</h2>
       <p className="mb-4 text-xs text-ink-400">
         רשת שנשארת ריקה פשוט לא מוצגת בפוטר — לא יוצג אייקון מת.
       </p>
@@ -276,7 +276,7 @@ function SettingsSection({
 
   return (
     <form onSubmit={onSubmit} className="rounded-lg border border-ink-200/70 bg-white p-6">
-      <h2 className="mb-1 font-display text-base font-bold text-ink-900">{title}</h2>
+      <h2 className="mb-1 font-display text-base text-ink-900">{title}</h2>
       {note && <p className="mb-4 text-xs text-ink-400">{note}</p>}
 
       <div className="grid gap-4 sm:grid-cols-2">

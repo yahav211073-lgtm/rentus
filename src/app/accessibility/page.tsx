@@ -8,7 +8,7 @@ export default async function AccessibilityPage() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6">
-      <h1 className="mb-6 font-display text-3xl font-extrabold text-ink-900">הצהרת נגישות</h1>
+      <h1 className="mb-6 font-display text-3xl text-ink-900">הצהרת נגישות</h1>
 
       <div className="space-y-5 text-base leading-relaxed text-ink-600">
         <p>
@@ -18,7 +18,7 @@ export default async function AccessibilityPage() {
         </p>
 
         <div>
-          <h2 className="mb-2 font-bold text-ink-900">מה עשינו</h2>
+          <h2 className="mb-2 text-ink-900">מה עשינו</h2>
           <ul className="list-inside list-disc space-y-1.5">
             <li>סרגל נגישות צף עם שינוי גודל גופן, מצבי ניגודיות, ומצב ידידותי לדיסלקציה</li>
             <li>ניווט מלא במקלדת עם טבעת פוקוס גלויה בכל האתר</li>

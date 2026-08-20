@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { ShieldCheck, Trash2 } from "lucide-react";
+import { ShieldCheck, Store, Trash2 } from "lucide-react";
 import { formatRelative } from "@/lib/utils";
 import { deleteUserAccount, updateUserRole } from "@/app/admin/users/actions";
 
@@ -82,8 +82,15 @@ export function UsersTable({ users, currentUserId }: { users: UserRow[]; current
                       {u.fullName ?? "—"}
                       {isMe && <span className="text-2xs font-normal text-ink-400">(אתם)</span>}
                     </span>
+                    {/* תגית ולא שורת טקסט אפורה: "בעל עסק" הוא מידע
+                        שמסננים לפיו בעין כשעוברים על הטבלה, ולכן הוא
+                        צריך להיות סימן שנתפס בסריקה ולא הערה קטנה. */}
                     {u.businessCount > 0 && (
-                      <span className="text-2xs text-ink-400">{u.businessCount} עסקים בבעלותו</span>
+                      <span className="mt-0.5 inline-flex w-fit items-center gap-1 rounded-full bg-brand-50 px-2 py-0.5 text-2xs font-bold text-brand-700">
+                        <Store className="h-3 w-3" aria-hidden="true" />
+                        בעל עסק
+                        {u.businessCount > 1 && ` · ${u.businessCount} עסקים`}
+                      </span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-ink-500" dir="ltr">{u.email ?? "—"}</td>

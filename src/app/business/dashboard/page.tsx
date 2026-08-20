@@ -115,7 +115,7 @@ export default async function BusinessDashboardPage() {
     <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
       <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="mb-1 font-display text-2xl font-extrabold text-ink-900">
+          <h1 className="mb-1 font-display text-2xl text-ink-900">
             שלום, {user.fullName ?? user.email}
           </h1>
           <p className="text-ink-500">אזור בעלי החברות שלכם</p>

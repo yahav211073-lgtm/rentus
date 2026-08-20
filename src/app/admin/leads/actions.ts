@@ -12,7 +12,7 @@ import { STATUSES, type LeadStatus } from "@/lib/lead-status";
  * הערך שהגיע מהלקוח — Server Action היא נקודת קצה לכל דבר, וכל מי
  * שיש לו סשן יכול לקרוא לה עם כל מחרוזת.
  */
-
+  
 export async function updateLeadStatus(leadId: string, status: string) {
   await requireStaff();
   if (!STATUSES.includes(status as LeadStatus)) {

@@ -1,114 +1,111 @@
 import Link from "next/link";
-import { ArrowLeft, Clock } from "lucide-react";
-import { Section, SectionHeading } from "@/components/home/Section";
-import { RevealItem, RevealStagger } from "@/components/motion/Reveal";
+import { ArrowLeft } from "lucide-react";
 import { CoverArt } from "@/components/ui/CoverArt";
-import { Badge } from "@/components/ui/Badge";
 import { getArticles } from "@/lib/repo/articles";
 import type { Article } from "@/types/domain";
 
 /**
- * מדריכים.
+ * מודול המדריכים.
  *
- * הכתבה הראשונה מקבלת כרטיס גדול והשאר קטנים. רשת של שלושה
- * כרטיסים זהים לא אומרת למשתמש במה להתחיל; היררכיה כן.
+ * שלושה כרטיסים שווים בשורה — לא כרטיס ראשי ושניים משניים. זה כלל
+ * תוכן קבוע של הפרויקט ולא בחירת פריסה: אותו מודול חוזר בעמוד הבית,
+ * בעמוד הקטגוריה ובעמוד העסק, ובכל אחד מהם בדיוק שלושה פריטים. פריסה
+ * אחת לכולם היא מה שמאפשר לזה להיות מודול ולא שלוש וריאציות.
  *
- * התוכן מגיע מטבלת articles ונערך ב-/admin/articles. כשאין מאמרים
- * מפורסמים הסקציה לא מרונדרת בכלל — סקציה עם כותרת ובלי תוכן
- * גרועה יותר מסקציה שלא קיימת.
+ * הכרטיס אופקי: תמונה בצד וטקסט לצידה. אנכי היה דורש גובה כפול
+ * לאותו מידע, והמודול הזה יושב תמיד ליד תוכן אחר ולא לבדו.
+ *
+ * כשאין מאמרים מפורסמים המודול לא מרונדר. כותרת מעל אזור ריק גרועה
+ * מהיעדר הסקציה.
  */
 export async function BlogSection() {
-  const articles = await getArticles(4);
-  const [lead, ...rest] = articles;
-  if (!lead) return null;
+  const articles = await getArticles(3);
+  if (articles.length === 0) return null;
 
   return (
-    <Section className="bg-white">
-      <SectionHeading
-        eyebrow="מדריכים"
-        title="לפני שבוחרים — כדאי לקרוא"
-        subtitle="מדריכים מעשיים שנכתבו כדי לחסוך טעויות יקרות, בלי תוכן שיווקי."
-        action={{ label: "לכל המדריכים", href: "/blog" }}
-      />
-
-      <RevealStagger className="grid gap-5 lg:grid-cols-[1.25fr_1fr]">
-        {/* כתבה ראשית */}
-        <RevealItem>
+    <section className="bg-ink-50 pt-8 sm:pt-10">
+      <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
+        <div className="mb-4 flex items-end justify-between gap-4">
+          <h2 className="font-display text-2xl text-ink-900 sm:text-3xl">
+            מדריכים וטיפים
+          </h2>
           <Link
-            href={`/blog/${lead.slug}`}
-            className="group relative flex h-full flex-col overflow-hidden rounded-lg border border-ink-200/70 bg-white transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-[0_24px_50px_-18px_rgba(11,59,117,0.24)]"
+            href="/blog"
+            className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-bold text-brand-700 transition-colors hover:text-brand-800"
           >
-            <div className="relative aspect-[16/9] overflow-hidden">
-              <div className="absolute inset-0 transition-transform duration-[600ms] ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.05]">
-                <ArticleCover article={lead} />
-              </div>
-              {lead.categoryName && (
-                <span className="absolute top-4" style={{ insetInlineStart: "1rem" }}>
-                  <Badge variant="accent" size="md">{lead.categoryName}</Badge>
-                </span>
-              )}
-            </div>
-
-            <div className="flex flex-1 flex-col gap-3 p-6">
-              <h3 className="font-display text-xl font-bold leading-snug text-ink-900 transition-colors group-hover:text-brand-700 sm:text-2xl">
-                {lead.title}
-              </h3>
-              {lead.excerpt && (
-                <p className="text-base leading-relaxed text-ink-500">{lead.excerpt}</p>
-              )}
-              <ArticleMeta readingMin={lead.readingMin} author={lead.authorName} />
-            </div>
+            לכל המדריכים
+            <ArrowLeft
+              className="h-4 w-4 transition-transform duration-200 group-hover:-translate-x-1"
+              aria-hidden="true"
+            />
           </Link>
-        </RevealItem>
-
-        {/* כתבות משניות */}
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-1">
-          {rest.map((a) => (
-            <RevealItem key={a.id}>
-              <Link
-                href={`/blog/${a.slug}`}
-                className="group flex h-full gap-4 overflow-hidden rounded-lg border border-ink-200/70 bg-white p-3 transition-all duration-300 hover:-translate-y-1 hover:border-brand-200 hover:shadow-[0_18px_40px_-16px_rgba(11,59,117,0.2)]"
-              >
-                <div className="relative w-28 shrink-0 overflow-hidden rounded-sm sm:w-32">
-                  <ArticleCover article={a} compact />
-                </div>
-                <div className="flex min-w-0 flex-1 flex-col gap-2 py-1">
-                  {a.categoryName && (
-                    <span className="text-2xs font-bold tracking-wide text-brand-600">
-                      {a.categoryName}
-                    </span>
-                  )}
-                  <h3 className="line-clamp-2 text-base font-bold leading-snug text-ink-900 transition-colors group-hover:text-brand-700">
-                    {a.title}
-                  </h3>
-                  {a.readingMin && (
-                    <span className="mt-auto inline-flex items-center gap-1.5 text-xs text-ink-400">
-                      <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-                      {a.readingMin} דקות קריאה
-                    </span>
-                  )}
-                </div>
-              </Link>
-            </RevealItem>
-          ))}
-
-          {rest.length > 0 && (
-            <RevealItem>
-              <Link
-                href="/blog"
-                className="group flex items-center justify-between gap-3 rounded-lg border border-dashed border-ink-300 p-5 transition-all duration-300 hover:border-brand-400 hover:bg-brand-50"
-              >
-                <span className="text-sm font-bold text-ink-600 group-hover:text-brand-700">
-                  לכל המדריכים בארכיון
-                </span>
-                <ArrowLeft className="h-4 w-4 text-ink-400 transition-transform duration-200 group-hover:-translate-x-1 group-hover:text-brand-600" aria-hidden="true" />
-              </Link>
-            </RevealItem>
-          )}
         </div>
-      </RevealStagger>
-    </Section>
+
+        <div className="grid gap-3 md:grid-cols-3">
+          {articles.map((article) => (
+            <ArticleCard key={article.id} article={article} />
+          ))}
+        </div>
+      </div>
+    </section>
   );
+}
+
+function ArticleCard({ article }: { article: Article }) {
+  return (
+    <Link
+      href={`/blog/${article.slug}`}
+      className="group flex gap-3 overflow-hidden rounded-lg border border-ink-200/80 bg-white p-3 shadow-[0_10px_26px_-18px_rgba(5,25,47,0.45)] transition-[transform,border-color,box-shadow] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 hover:border-brand-300 hover:shadow-[0_18px_34px_-18px_rgba(5,25,47,0.4)]"
+    >
+      <span className="relative block h-[104px] w-[124px] shrink-0 overflow-hidden rounded-md bg-ink-100">
+        <span className="absolute inset-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-108">
+          <ArticleCover article={article} compact />
+        </span>
+      </span>
+
+      <span className="flex min-w-0 flex-1 flex-col py-0.5">
+        {article.categoryName && (
+          <span className="mb-1 block text-2xs font-bold tracking-wide text-brand-600">
+            {article.categoryName}
+          </span>
+        )}
+
+        <span className="line-clamp-2 block text-sm font-bold leading-snug text-ink-900 transition-colors group-hover:text-brand-700">
+          {article.title}
+        </span>
+
+        {article.excerpt && (
+          <span className="mt-1 line-clamp-2 block text-xs leading-relaxed text-ink-500">
+            {article.excerpt}
+          </span>
+        )}
+
+        <span className="mt-auto flex items-center gap-2 pt-2 text-2xs text-ink-400">
+          {article.publishedAt && (
+            <time dateTime={article.publishedAt}>{formatDate(article.publishedAt)}</time>
+          )}
+          {article.publishedAt && article.readingMin && <span aria-hidden="true">·</span>}
+          {article.readingMin && <span>{article.readingMin} דק׳ קריאה</span>}
+          <span className="ms-auto inline-flex items-center gap-1 font-bold text-brand-700">
+            קרא עוד
+            <ArrowLeft
+              className="h-3 w-3 transition-transform duration-200 group-hover:-translate-x-0.5"
+              aria-hidden="true"
+            />
+          </span>
+        </span>
+      </span>
+    </Link>
+  );
+}
+
+/* תאריך מספרי קצר. בכרטיס ברוחב 124px טקסט כמו "12 במאי 2025" נשבר
+   לשתי שורות ודוחף את שורת המטא — הפורמט הקצר נשאר בשורה אחת. */
+function formatDate(iso: string) {
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? ""
+    : new Intl.DateTimeFormat("he-IL", { day: "2-digit", month: "2-digit", year: "numeric" }).format(d);
 }
 
 /** תמונת שער אמיתית כשיש; אחרת גרפיקה יציבה שנגזרת מה-slug. */
@@ -125,22 +122,4 @@ export function ArticleCover({ article, compact }: { article: Article; compact?:
     );
   }
   return <CoverArt seed={article.slug} className="h-full w-full" compact={compact} />;
-}
-
-function ArticleMeta({ readingMin, author }: { readingMin?: number | null; author?: string | null }) {
-  if (!readingMin && !author) return null;
-  return (
-    <div className="mt-auto flex items-center gap-3 border-t border-ink-100 pt-4 text-xs text-ink-400">
-      {author && <span>{author}</span>}
-      {readingMin && (
-        <>
-          {author && <span aria-hidden="true">·</span>}
-          <span className="inline-flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-            {readingMin} דקות קריאה
-          </span>
-        </>
-      )}
-    </div>
-  );
 }

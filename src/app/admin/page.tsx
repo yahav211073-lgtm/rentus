@@ -127,7 +127,7 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-2xl font-extrabold text-ink-900">דשבורד</h1>
+        <h1 className="font-display text-2xl text-ink-900">דשבורד</h1>
         <p className="mt-1 text-sm text-ink-500">
           {needsAttention.length > 0
             ? `${needsAttention.length} סוגי פריטים ממתינים לטיפול.`
@@ -137,7 +137,7 @@ export default async function AdminDashboardPage() {
 
       {/* דורש טיפול */}
       <section aria-labelledby="needs-action">
-        <h2 id="needs-action" className="mb-3 text-xs font-bold tracking-wide text-ink-400">
+        <h2 id="needs-action" className="mb-3 text-xs tracking-wide text-ink-400">
           דורש טיפול
         </h2>
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -167,7 +167,7 @@ export default async function AdminDashboardPage() {
 
       {/* מדדי הפלטפורמה */}
       <section aria-labelledby="platform-stats">
-        <h2 id="platform-stats" className="mb-3 text-xs font-bold tracking-wide text-ink-400">
+        <h2 id="platform-stats" className="mb-3 text-xs tracking-wide text-ink-400">
           מצב הפלטפורמה
         </h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -245,7 +245,7 @@ function Panel({
   return (
     <section className="rounded-lg border border-ink-200/70 bg-white p-5">
       <div className="mb-2 flex items-center justify-between gap-3">
-        <h2 className="font-display text-base font-bold text-ink-900">{title}</h2>
+        <h2 className="font-display text-base text-ink-900">{title}</h2>
         <Link href={href} className="text-xs font-bold text-brand-700 hover:text-brand-500">
           {linkLabel} ←
         </Link>

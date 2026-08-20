@@ -45,7 +45,7 @@ export function BusinessCta() {
               לבעלי חברות
             </span>
 
-            <h2 className="mb-5 font-display text-3xl font-extrabold leading-tight text-ink-900 sm:text-4xl lg:text-5xl">
+            <h2 className="mb-5 font-display text-3xl leading-tight text-ink-900 sm:text-4xl lg:text-5xl">
               הלקוחות שלכם כבר מחפשים.
               <span className="block text-brand-600">שיהיה להם את מי למצוא.</span>
             </h2>

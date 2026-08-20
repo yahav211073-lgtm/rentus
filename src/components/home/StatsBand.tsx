@@ -12,8 +12,12 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
  *
  * כשאין עדיין תוכן אמיתי הרצועה לא מוצגת בכלל. רצועת אפסים לא
  * מוסיפה כלום — היא רק מכריזה שהאתר ריק.
+ *
+ * הרצועה לא פורשת את עצמה על רוחב המסך אלא מקבלת className מבחוץ.
+ * בהדמיה היא יושבת בתוך רוחב העמודה הראשית, מיושרת עם רשת הכרטיסים
+ * שמעליה ולא עם קצות המסך — ולכן המעטפת היא באחריות מי שממקם אותה.
  */
-export async function StatsBand() {
+export async function StatsBand({ className }: { className?: string } = {}) {
   const supabase = await createSupabaseServerClient();
   if (!supabase) return null;
 
@@ -39,25 +43,28 @@ export async function StatsBand() {
   if (stats.length < 2) return null;
 
   return (
-    <section className="bg-brand-950 py-10 sm:py-12">
-      <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
-        <RevealStagger
-          className={`grid divide-y divide-white/10 sm:grid-cols-2 lg:divide-y-0 lg:divide-x lg:divide-x-reverse ${
-            stats.length >= 4 ? "lg:grid-cols-4" : "lg:grid-cols-3"
-          }`}
-        >
-          {stats.map((stat) => (
-            <RevealItem key={stat.id}>
-              <div className="flex flex-col items-center gap-1 px-4 py-5 text-center">
-                <p className="font-display text-3xl font-extrabold text-white sm:text-4xl">
-                  <Counter value={stat.value} />
-                </p>
-                <p className="text-sm text-white/55">{stat.label}</p>
-              </div>
-            </RevealItem>
-          ))}
-        </RevealStagger>
-      </div>
+    <section className={`overflow-hidden rounded-lg bg-brand-950 ${className ?? ""}`}>
+      <RevealStagger
+        className={`grid divide-y divide-white/10 sm:grid-cols-2 sm:divide-y-0 ${STATS_COLS[stats.length] ?? "sm:grid-cols-4"} sm:divide-x sm:divide-x-reverse sm:divide-white/10`}
+      >
+        {stats.map((stat) => (
+          <RevealItem key={stat.id}>
+            <div className="flex flex-col items-center gap-1 px-4 py-6 text-center">
+              <p className="font-display text-2xl font-extrabold text-white sm:text-3xl">
+                <Counter value={stat.value} />
+              </p>
+              <p className="text-sm text-white/55">{stat.label}</p>
+            </div>
+          </RevealItem>
+        ))}
+      </RevealStagger>
     </section>
   );
 }
+
+/* מחלקות מלאות — Tailwind סורק טקסט ולא מייצר מחרוזת מורכבת. */
+const STATS_COLS: Record<number, string> = {
+  2: "sm:grid-cols-2",
+  3: "sm:grid-cols-3",
+  4: "sm:grid-cols-4",
+};

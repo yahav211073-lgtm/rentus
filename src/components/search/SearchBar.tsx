@@ -235,15 +235,22 @@ export function SearchBar({
           options={cities.map((c) => ({ value: c.slug, label: c.name }))}
         />
 
+        {/* בהירו זה כפתור עם מילים ולא ריבוע אייקון. הפעולה הראשית
+            של העמוד ראויה לתווית: "חפש עכשיו" אומר מה יקרה, זכוכית
+            מגדלת לבדה מבקשת מהגולש לנחש. בשורה הקומפקטית אין מקום
+            לטקסט, ושם האייקון נשאר. */}
         <button
           type="submit"
           aria-label="חיפוש"
           className={cn(
-            "grid shrink-0 place-items-center bg-brand-700 text-white transition-colors hover:bg-brand-600",
-            isHero ? "h-14 w-16 rounded-none rounded-s-lg md:min-h-14" : "h-11 w-11 rounded-md",
+            "shrink-0 bg-brand-700 font-bold text-white transition-colors hover:bg-brand-600",
+            isHero
+              ? "m-1.5 inline-flex h-11 items-center justify-center gap-2 rounded-md px-6 text-base"
+              : "grid h-11 w-11 place-items-center rounded-md",
           )}
         >
-          <Search className={isHero ? "h-5.5 w-5.5" : "h-5 w-5"} />
+          <Search className={isHero ? "h-4.5 w-4.5" : "h-5 w-5"} />
+          {isHero && <span className="hidden sm:inline">חפש עכשיו</span>}
         </button>
       </form>
 

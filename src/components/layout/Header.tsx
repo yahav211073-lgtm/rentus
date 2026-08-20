@@ -89,16 +89,27 @@ export function Header({
 
   return (
     <>
-      <header
-        className={cn(
-          "fixed inset-x-0 top-0 z-50 bg-white transition-shadow duration-300",
-          scrolled ? "shadow-[0_4px_20px_-8px_rgba(11,59,117,0.15)]" : "shadow-none",
-        )}
-      >
+      {/* מעטפת שקופה + סרגל-גלולה בפנים, במבנה של bizspace.digital:
+          ה-header עצמו לא צבוע והוא רק המחזיק הדביק, והצבע, הרדיוס
+          והצל יושבים על הסרגל שבתוכו. זה מה שגורם לניווט להיראות
+          כמו רכיב שמרחף מעל העמוד ולא כמו פס שמודבק לראש המסך.
+
+          רקע חצי-שקוף עם backdrop-blur ולא לבן מלא — כך התוכן נראה
+          זולג מתחתיו בגלילה, וזו כל התחושה של הדפוס הזה. הרקע מתהדק
+          בגלילה כי טקסט מעל תמונה בהירה דרך שכבה של 72% לא עומד
+          בניגודיות. */}
+      <header className="fixed inset-x-0 top-0 z-50">
         <TopUtilityBar brandName={brandName} tagline={tagline} phone={phone} />
 
-        <div className="border-b border-ink-100">
-          <div className="mx-auto flex h-[72px] max-w-[1480px] items-center gap-3 px-4 sm:h-[78px] sm:gap-4 sm:px-6 lg:px-8">
+        <div className="px-3 pt-2 sm:px-5 sm:pt-3">
+          <div
+            className={cn(
+              "mx-auto flex h-[62px] max-w-[1480px] items-center gap-3 rounded-full ps-6 pe-1.5 backdrop-blur-xl transition-[background-color,box-shadow] duration-300 sm:h-[66px] sm:gap-4 sm:ps-7",
+              scrolled
+                ? "bg-white/92 shadow-[0_10px_34px_-14px_rgba(11,59,117,0.34)]"
+                : "bg-white/72 shadow-[0_6px_24px_-14px_rgba(11,59,117,0.22)]",
+            )}
+          >
             {/* לוגו */}
             {/* כשיש לוגו מוצג רק הלוגו. הלוגו כבר מכיל את שם המותג,
                 והצמדת שם טקסטואלי לצידו יוצרת כפילות — ובמקרה של שם
@@ -106,7 +117,7 @@ export function Header({
             <Link href="/" className="flex min-w-0 shrink items-center gap-2.5" aria-label="לעמוד הבית">
               {logoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={logoUrl} alt={brandName} className="h-10 w-auto max-w-[210px] object-contain sm:h-12" />
+                <img src={logoUrl} alt={brandName} className="h-9 w-auto max-w-[190px] object-contain sm:h-10" />
               ) : (
                 <>
                   <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-gradient-to-br from-brand-600 to-brand-800 shadow-[0_4px_12px_-2px_rgba(11,59,117,0.45)] sm:h-11 sm:w-11">
@@ -177,10 +188,13 @@ export function Header({
 
             {/* פעולות */}
             <div className="ms-auto flex shrink-0 items-center gap-1.5 lg:ms-0">
+              {/* אייקון החיפוש הוא מובייל בלבד. בדסקטופ שורת החיפוש
+                  המלאה יושבת בהירו מיד מתחת, ואייקון שמוביל לאותו
+                  מקום רק גונב תשומת לב משני כפתורי הפעולה שלצידו. */}
               <Link
                 href="/search"
                 aria-label="חיפוש"
-                className="grid h-10 w-10 place-items-center rounded-xs text-ink-600 transition-colors hover:bg-ink-100"
+                className="grid h-10 w-10 place-items-center rounded-xs text-ink-600 transition-colors hover:bg-ink-100 lg:hidden"
               >
                 <Search className="h-5 w-5" aria-hidden="true" />
               </Link>
@@ -205,22 +219,22 @@ export function Header({
                   </form>
                 </div>
               ) : (
+                /* קישור טקסט ולא כפתור ממוסגר: בהדמיה יש בדיוק שני
+                   כפתורים בפינה. שלוש מסגרות זו לצד זו משטחות את
+                   ההיררכיה ואף אחת כבר לא נקראת כפעולה הראשית. */
                 <Link
                   href="/login"
-                  className="hidden items-center gap-1.5 rounded-xs border border-ink-200 px-3.5 py-2 text-base font-semibold text-ink-700 transition-colors hover:border-brand-300 hover:bg-brand-50 lg:inline-flex"
+                  className="hidden items-center gap-1.5 rounded-xs px-2.5 py-2 text-base font-semibold text-ink-600 transition-colors hover:text-brand-700 lg:inline-flex"
                 >
                   <LogIn className="h-4 w-4" aria-hidden="true" />
                   כניסה
                 </Link>
               )}
 
-              <div className="hidden items-center gap-2 lg:flex">
-                <Link
-                  href="/business/login"
-                  className="inline-flex items-center rounded-xs border border-ink-200 px-3.5 py-2 text-sm font-semibold text-ink-700 transition-colors hover:border-brand-300 hover:bg-brand-50"
-                >
-                  כניסה לבעלי חברות
-                </Link>
+              {/* כפתור אחד, לא שניים. "כניסה לבעלי עסקים" הוסר לבקשת
+                  בעל האתר — בעל עסק קיים נכנס דרך "כניסה" הרגילה,
+                  ו-/business/dashboard מנתב אותו משם לפי התפקיד. */}
+              <div className="hidden items-center lg:flex">
                 <ButtonLink href="/business/register" variant="accent" size="sm">
                   הצטרפות לחברות
                 </ButtonLink>
@@ -431,9 +445,6 @@ function MobileMenu({
                 <>
                   <ButtonLink href="/login" variant="primary" size="lg" fullWidth>
                     כניסה לחשבון
-                  </ButtonLink>
-                  <ButtonLink href="/business/login" variant="secondary" size="lg" fullWidth>
-                    כניסה לבעלי חברות
                   </ButtonLink>
                   <ButtonLink href="/business/register" variant="accent" size="lg" fullWidth>
                     הצטרפות לחברות

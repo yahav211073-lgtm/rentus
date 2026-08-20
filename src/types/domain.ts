@@ -104,6 +104,8 @@ export interface Business {
   name: string;
   tagline?: string | null;
   description?: string | null;
+  /** שנת הקמה. מזינה את "שנות ניסיון" — מחושב, לא מוזן ידנית. */
+  foundedYear?: number | null;
 
   status: BusinessStatus;
   tier: BusinessTier;
@@ -117,7 +119,13 @@ export interface Business {
   latitude?: number | null;
   longitude?: number | null;
 
+  /** האם העסק מגיע ללקוח (שירות נייד), ובאיזה רדיוס בק"מ */
+  isMobileService?: boolean;
+  serviceRadiusKm?: number | null;
+  addressNote?: string | null;
+
   phone?: string | null;
+  phoneSecondary?: string | null;
   whatsapp?: string | null;
   email?: string | null;
   website?: string | null;
@@ -133,6 +141,8 @@ export interface Business {
   tags?: Tag[];
 
   priceRange?: 1 | 2 | 3 | 4 | null;
+  priceNote?: string | null;
+  acceptsOnlineBooking?: boolean;
   ratingAvg: number;
   reviewCount: number;
   viewCount?: number;

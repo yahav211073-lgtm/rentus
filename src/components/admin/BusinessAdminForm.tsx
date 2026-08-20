@@ -108,7 +108,7 @@ export function BusinessAdminForm({
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <section className="rounded-lg border border-ink-200/70 bg-white p-5 sm:p-6">
-        <h2 className="mb-4 font-display text-base font-bold text-ink-900">פרטים כלליים</h2>
+        <h2 className="mb-4 font-display text-base text-ink-900">פרטים כלליים</h2>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <TextField name="name" label="שם העסק" defaultValue={business.name} required />
@@ -184,7 +184,7 @@ export function BusinessAdminForm({
       </section>
 
       <section className="rounded-lg border border-ink-200/70 bg-white p-5 sm:p-6">
-        <h2 className="mb-1 font-display text-base font-bold text-ink-900">רשתות חברתיות</h2>
+        <h2 className="mb-1 font-display text-base text-ink-900">רשתות חברתיות</h2>
         <p className="mb-4 text-xs text-ink-400">
           רשת שנשארת ריקה לא מוצגת בעמוד העסק — לא יוצג כפתור שלא מוביל לשום מקום.
         </p>
@@ -204,7 +204,7 @@ export function BusinessAdminForm({
       </section>
 
       <section className="rounded-lg border border-ink-200/70 bg-white p-5 sm:p-6">
-        <h2 className="mb-4 font-display text-base font-bold text-ink-900">סטטוס וקידום (ניהול בלבד)</h2>
+        <h2 className="mb-4 font-display text-base text-ink-900">סטטוס וקידום (ניהול בלבד)</h2>
         <div className="grid gap-4 sm:grid-cols-3">
           <div>
             <label htmlFor="admin-status" className="mb-1.5 block text-xs font-bold text-ink-600">סטטוס</label>

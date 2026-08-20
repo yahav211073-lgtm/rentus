@@ -1,83 +1,110 @@
-"use client";
-
 import Image from "next/image";
-import { motion, useReducedMotion } from "framer-motion";
+import { BadgeCheck, ShieldCheck, Star, Truck } from "lucide-react";
 import { SearchBar } from "@/components/search/SearchBar";
-import type { Category } from "@/types/domain";
+import { AdSlot } from "@/components/home/AdSlot";
+import type { Banner, Category } from "@/types/domain";
 import type { SimpleCity } from "@/lib/repo/taxonomy";
 
 /**
- * ההירו.
+ * ההירו של עמוד הבית.
  *
- * תמונת רקע פוטוגרפית של ציוד להשכרה בגוון כחול כהה. הכותרת והחיפוש
- * ממורכזים מעל שכבת האפלה; הניסוח מבהיר כבר בשנייה הראשונה שזהו
- * מרקטפלייס להשכרות, ולא אינדקס שירותים כללי.
+ * פס ההירו מגיע מההדמיה עם הבאנרים בצדדים: שלוש עמודות — משבצת
+ * פרסום, במה כהה, משבצת פרסום. המשבצות משתמשות באותם מפתחות מיקום
+ * (side_start / side_end) שהאדמין כבר מנהל, כך שבאנר שהועלה שם
+ * מופיע כאן בלי הגדרה נוספת.
+ *
+ * כשאין באנר פעיל העמודה לא מרונדרת בכלל והבמה נמתחת על כל הרוחב.
+ * מסגרת אפורה עם "מקום לפרסום" הייתה גורמת לאתר להיראות כמו תבנית
+ * שלא מולאה — זו אותה החלטה שכבר מתועדת ב-AdSlot.
+ *
+ * אין כאן אנימציית כניסה, ולכן גם אין "use client": תוכן ההירו הוא
+ * ה-LCP של העמוד. פייד-אין שמתחיל מ-opacity:0 אומר שהכותרת לא קיימת
+ * עד שה-JS עולה ורץ, ובלשונית מווסתת הוא פשוט נתקע באמצע.
  */
+
+const TRUST = [
+  { Icon: BadgeCheck,  label: "אלפי חברות" },
+  { Icon: ShieldCheck, label: "מחירים משתלמים" },
+  { Icon: Truck,       label: "שירות בפריסה ארצית" },
+  { Icon: Star,        label: "ציוד מבוטח" },
+];
+
 export function Hero({
-  categories, cities, imageUrl,
+  categories, cities, imageUrl, adStart, adEnd,
 }: {
   categories: Category[];
   cities: SimpleCity[];
   imageUrl: string;
+  adStart?: Banner;
+  adEnd?: Banner;
 }) {
-  const reduced = useReducedMotion();
-
   return (
-    <section className="relative isolate h-[310px] overflow-hidden bg-brand-950">
-      {/* priority + fetchPriority: זו התמונה הראשונה שנטענת בעמוד הבית
-          (LCP), ולכן היא היחידה באתר שלא נטענת lazy. */}
-      <Image
-        src={imageUrl}
-        alt=""
-        fill
-        priority
-        sizes="100vw"
-        className="object-cover"
-      />
+    <section className="bg-ink-50 pt-4 sm:pt-5">
+      <div className="mx-auto max-w-[1480px] px-4 sm:px-6 lg:px-8">
+        {/* המשבצות נכנסות לרשת רק מ-xl. מתחת לזה אין שוליים אמיתיים,
+            ודחיסת באנר 160px לצד הבמה גונבת רוחב מהתוכן העיקרי. */}
+        <div className="grid gap-4 xl:grid-cols-[160px_minmax(0,1fr)_160px]">
+          <AdSlot banner={adStart} className="hidden xl:block" />
 
-      {/* שכבת האפלה — הכי כהה למטה, בגובה הטקסט, ובהירה יותר בקצוות
-          כדי שהציוד בתמונה עדיין ייראה */}
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to top, rgba(5,12,28,0.94), rgba(5,12,28,0.72) 45%, rgba(5,12,28,0.55) 75%, rgba(5,12,28,0.62))",
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute inset-0"
-        style={{ background: "radial-gradient(60% 55% at 50% 38%, rgba(29,59,120,0.35), transparent 70%)" }}
-        aria-hidden="true"
-      />
+          {/* ---------- הבמה ---------- */}
+          <div className="relative isolate overflow-hidden rounded-lg bg-brand-950">
+            <Image
+              src={imageUrl}
+              alt=""
+              fill
+              priority
+              sizes="(max-width: 1280px) 100vw, 1140px"
+              className="object-cover"
+            />
 
-      <div className="relative mx-auto max-w-[1480px] px-4 pt-[48px] sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-[840px] text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: reduced ? 0 : 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55 }}
-            className="mb-2 font-display text-3xl font-extrabold leading-[1.15] text-white sm:text-4xl lg:text-[2.35rem]"
-          >
-            מחפשים ציוד? המקום הנכון.
-          </motion.h1>
+            {/* שתי שכבות ולא אחת: הראשונה מכהה מלמטה כדי שכרטיס
+                החיפוש הלבן יישב על רקע יציב, השנייה מוסיפה הילה
+                כחולה מאחורי הכותרת. גרדיאנט אחד לא עושה את שניהם
+                בלי להשטיח את התמונה לגמרי. */}
+            <div
+              className="pointer-events-none absolute inset-0"
+              aria-hidden="true"
+              style={{
+                background:
+                  "linear-gradient(to top, rgba(5,12,28,0.90) 0%, rgba(5,12,28,0.58) 40%, rgba(5,12,28,0.38) 72%, rgba(5,12,28,0.55) 100%)",
+              }}
+            />
+            <div
+              className="pointer-events-none absolute inset-0"
+              aria-hidden="true"
+              style={{
+                background:
+                  "radial-gradient(56% 52% at 50% 32%, rgba(42,79,151,0.45), transparent 72%)",
+              }}
+            />
 
-          <motion.p
-            initial={{ opacity: 0, y: reduced ? 0 : 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.08 }}
-            className="mb-6 text-base text-white/80 sm:text-lg"
-          >
-            השוו מחירים, קבלו הצעות ובחרו את החברה המתאימה לכם
-          </motion.p>
+            <div className="relative px-5 pb-28 pt-14 text-center sm:px-10 sm:pb-32 sm:pt-16">
+              <h1 className="font-display text-[1.9rem] leading-[1.2] text-white drop-shadow-[0_2px_20px_rgba(5,12,28,0.7)] sm:text-4xl lg:text-5xl">
+                כל מה שצריך להשכרה,
+                <br />
+                {/* שורה שנייה בכחול בהיר — נקודת המבט היחידה בכותרת.
+                    שני צבעים בכותרת אחת זה הגבול; שלושה זה קישוט. */}
+                <span className="text-brand-300">במקום אחד.</span>
+              </h1>
 
-          <motion.div
-            initial={{ opacity: 0, y: reduced ? 0 : 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.55, delay: 0.16 }}
-          >
-            <SearchBar variant="hero" categories={categories} cities={cities} />
-          </motion.div>
+              <ul className="mt-6 flex flex-wrap items-center justify-center gap-x-7 gap-y-3">
+                {TRUST.map(({ Icon, label }) => (
+                  <li key={label} className="inline-flex items-center gap-2 text-sm font-semibold text-white/80">
+                    <Icon className="h-4.5 w-4.5 text-brand-300" strokeWidth={2} aria-hidden="true" />
+                    {label}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* כרטיס החיפוש מרחף וחופף את שולי הבמה התחתונים — הנקודה
+                שממנה העין ממשיכה ישר לרצועת הקטגוריות. */}
+            <div className="absolute inset-x-4 bottom-6 sm:inset-x-10 sm:bottom-8 lg:inset-x-24">
+              <SearchBar variant="hero" categories={categories} cities={cities} />
+            </div>
+          </div>
+
+          <AdSlot banner={adEnd} className="hidden xl:block" />
         </div>
       </div>
     </section>

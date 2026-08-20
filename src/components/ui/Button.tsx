@@ -27,11 +27,14 @@ const VARIANTS: Record<Variant, string> = {
     "hover:from-brand-600 hover:to-brand-700",
     "hover:shadow-[0_1px_0_0_rgba(255,255,255,0.22)_inset,0_14px_28px_-10px_rgba(11,59,117,0.55)]",
   ),
+  /* כתום מלא עם טקסט לבן, כמו ברפרנס. הרקע הוא --accent-strong ולא
+     accent-400 עצמו: לבן על הכתום שנבחר בלוח הבקרה נותן 2.8:1 בלבד,
+     והגוון הכהה יותר מעלה את זה מעל 4.5:1 בלי לשנות את הגוון. */
   accent: cn(
-    "bg-gradient-to-b from-accent-300 to-accent-400 text-brand-950 font-bold",
-    "shadow-[0_1px_0_0_rgba(255,255,255,0.5)_inset,0_8px_20px_-8px_rgba(237,175,0,0.65)]",
-    "hover:from-accent-200 hover:to-accent-300",
-    "hover:shadow-[0_1px_0_0_rgba(255,255,255,0.6)_inset,0_14px_30px_-10px_rgba(237,175,0,0.6)]",
+    "bg-[var(--accent-strong)] text-white font-bold",
+    "shadow-[0_1px_0_0_rgba(255,255,255,0.22)_inset,0_8px_20px_-8px_var(--accent-strong)]",
+    "hover:bg-[var(--accent-stronger)]",
+    "hover:shadow-[0_1px_0_0_rgba(255,255,255,0.28)_inset,0_14px_30px_-10px_var(--accent-strong)]",
   ),
   secondary: cn(
     "bg-white text-brand-800 border border-ink-200",

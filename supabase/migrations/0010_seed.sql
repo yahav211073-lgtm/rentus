@@ -60,10 +60,7 @@ on conflict do nothing;
 insert into public.ad_placements (key, label, description, width, height) values
   ('side_start',     'באנר צדדי — ימין',  'צף ודביק. מוצג רק ממסכים רחבים מ-1600px.', 160, 500),
   ('side_end',       'באנר צדדי — שמאל',  'צף ודביק. מוצג רק ממסכים רחבים מ-1600px.', 160, 500),
-  ('home_hero',      'מתחת להירו',        'רצועה רחבה בעמוד הבית.',                   1200, 200),
-  ('inline_results', 'בתוך תוצאות חיפוש', 'כרטיס ממומן אחרי התוצאה השלישית.',          360, 420),
-  ('category_top',   'ראש עמוד קטגוריה',  'רצועה מעל רשימת העסקים בקטגוריה.',          1200, 160),
-  ('business_side',  'עמוד עסק — צד',     'מתחת לטופס הפנייה בעמוד העסק.',             360, 300)
+
 on conflict (key) do update
   set label = excluded.label, description = excluded.description;
 

@@ -21,6 +21,7 @@ const LEGAL_LINKS = [
   { label: "מדיניות פרטיות", href: "/privacy" },
   { label: "הצהרת נגישות", href: "/accessibility" },
   { label: "מדיניות ביקורות", href: "/review-policy" },
+  { label: "כתבו ביקורת על האתר", href: "/review" },
 ];
 
 const BUSINESS_LINKS = [
@@ -172,7 +173,7 @@ export async function Footer({ brandName, logoUrl }: { brandName: string; logoUr
 function FooterColumn({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h2 className="mb-4 text-sm font-bold uppercase tracking-wide text-white">{title}</h2>
+      <h2 className="mb-4 text-sm uppercase tracking-wide text-white">{title}</h2>
       <ul className="space-y-2.5">{children}</ul>
     </div>
   );

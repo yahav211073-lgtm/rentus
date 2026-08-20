@@ -31,7 +31,7 @@ export default async function PricingPage() {
             key={plan.name}
             className={`flex flex-col overflow-hidden rounded-xl border p-7 shadow-[0_14px_34px_-24px_rgba(11,59,117,.35)] ${plan.highlight ? "border-brand-700 bg-brand-900 text-white" : "border-ink-200/70 bg-white"}`}
           >
-            <h2 className={`mb-1 font-display text-xl font-bold ${plan.highlight ? "text-white" : "text-ink-900"}`}>{plan.name}</h2>
+            <h2 className={`mb-1 font-display text-xl ${plan.highlight ? "text-white" : "text-ink-900"}`}>{plan.name}</h2>
             <p className={`mb-6 font-display text-3xl font-extrabold ${plan.highlight ? "text-accent-400" : "text-brand-800"}`}>{plan.price}</p>
             <ul className="mb-8 flex-1 space-y-2.5">
               {plan.features.map((f) => (

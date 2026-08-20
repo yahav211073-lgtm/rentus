@@ -57,7 +57,7 @@ export function BannerCard({ banner, className }: { banner: Banner; className?: 
       <div className="absolute inset-0 bg-gradient-to-t from-brand-950/85 via-brand-950/25 to-transparent" />
       <div className="absolute inset-x-0 bottom-0 p-5">
         <span className="mb-2 inline-block bg-accent-400 px-2 py-0.5 text-2xs font-bold text-brand-950">פרסומת</span>
-        <h3 className="mb-3 font-display text-xl font-extrabold leading-tight text-white">{banner.title}</h3>
+        <h3 className="mb-3 text-xl font-extrabold leading-tight text-white">{banner.title}</h3>
         <span className="inline-flex items-center gap-1.5 bg-white px-4 py-2 text-sm font-bold text-brand-900 transition-transform group-hover:-translate-y-0.5">
           לפרטים ←
         </span>

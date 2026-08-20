@@ -25,9 +25,10 @@ const CARD_SELECT = `
 `;
 
 const DETAIL_SELECT = `
-  id, slug, name, tagline, description, status, tier,
+  id, slug, name, tagline, description, founded_year, status, tier,
   is_verified, is_featured, is_sponsored,
   address, address_note, latitude, longitude,
+  is_mobile_service, service_radius_km,
   phone, phone_secondary, whatsapp, email, website, social,
   logo_url, cover_url, video_url,
   price_range, price_note, accepts_online_booking,
@@ -83,6 +84,7 @@ function mapDetail(row: Row): Business {
     name: row.name,
     tagline: row.tagline,
     description: row.description,
+    foundedYear: row.founded_year,
     status: row.status,
     tier: row.tier,
     isVerified: row.is_verified,
@@ -91,9 +93,13 @@ function mapDetail(row: Row): Business {
     city: row.city ? { id: row.city.id, slug: row.city.slug, name: row.city.name } : null,
     area: row.area ? { id: row.area.id, slug: row.area.slug, name: row.area.name } : null,
     address: row.address,
+    addressNote: row.address_note,
     latitude: row.latitude != null ? Number(row.latitude) : null,
     longitude: row.longitude != null ? Number(row.longitude) : null,
+    isMobileService: Boolean(row.is_mobile_service),
+    serviceRadiusKm: row.service_radius_km != null ? Number(row.service_radius_km) : null,
     phone: row.phone,
+    phoneSecondary: row.phone_secondary,
     whatsapp: row.whatsapp,
     email: row.email,
     website: row.website,
@@ -122,6 +128,8 @@ function mapDetail(row: Row): Business {
       : null,
     tags: (row.business_tags ?? []).map((t: Row) => ({ id: t.tags.id, slug: t.tags.slug, name: t.tags.name })),
     priceRange: row.price_range,
+    priceNote: row.price_note,
+    acceptsOnlineBooking: Boolean(row.accepts_online_booking),
     ratingAvg: Number(row.rating_avg ?? 0),
     reviewCount: row.review_count ?? 0,
     viewCount: row.view_count,
@@ -176,12 +184,17 @@ export async function getRelatedBusinesses(business: Business, limit = 4): Promi
   const supabase = await createSupabaseServerClient();
   if (!supabase) return [];
 
+  /* ‎!inner‎ הוא לא קישוט. בלעדיו התנאי על business_categories מסנן רק
+     את השורות המשובצות ולא את העסקים עצמם — כלומר "חברות דומות" החזיר
+     את כל העסקים המפורסמים באתר, מכל קטגוריה שהיא. */
   const { data } = await supabase
     .from("businesses")
-    .select(CARD_SELECT)
+    .select(CARD_SELECT.replace("business_categories(", "business_categories!inner("))
     .eq("status", "published")
     .neq("slug", business.slug)
     .eq("business_categories.category_id", business.primaryCategory.id)
+    .order("rating_avg", { ascending: false })
+    .order("review_count", { ascending: false })
     .limit(limit);
 
   return (data ?? []).map(mapCard);
@@ -253,7 +266,9 @@ export async function getHomeBusinessSlices(): Promise<HomeBusinessSlices> {
     base().gt("review_count", 0).order("rating_avg", { ascending: false }).order("review_count", { ascending: false }).limit(8),
     base().eq("is_featured", true).order("boost_score", { ascending: false }).limit(8),
     base().eq("is_sponsored", true).order("boost_score", { ascending: false }).limit(8),
-    base().order("review_count", { ascending: false }).limit(8),
+    // "הכי מבוקשים" חייב להישען על ביקורות אמיתיות. בלי התנאי הזה
+    // עסק חדש עם 0 ביקורות מדורג שם באותה מידה, והרשימה חסרת משמעות.
+    base().gt("review_count", 0).order("review_count", { ascending: false }).limit(8),
     base().order("published_at", { ascending: false, nullsFirst: false }).limit(8),
   ]);
 

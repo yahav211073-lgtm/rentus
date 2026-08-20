@@ -24,7 +24,7 @@ export default async function AdminUsersPage() {
 
   return (
     <div>
-      <h1 className="mb-1 font-display text-2xl font-extrabold text-ink-900">משתמשים</h1>
+      <h1 className="mb-1 font-display text-2xl text-ink-900">משתמשים</h1>
       <p className="mb-6 text-sm text-ink-500">
         שינוי תפקיד נשמר במסד ונכנס לתוקף בטעינת העמוד הבאה של אותו משתמש — גם בלי התנתקות.
       </p>

@@ -6,7 +6,7 @@ import { BusinessCta } from "@/components/home/BusinessCta";
 import { RegisterBusinessForm } from "@/components/business/RegisterBusinessForm";
 import { getCurrentUser } from "@/lib/auth";
 import { getContactDetails } from "@/lib/repo/settings";
-import { getFlatCategories, getCities } from "@/lib/repo/taxonomy";
+import { getFlatCategories, getCities, getAreas } from "@/lib/repo/taxonomy";
 import { toWhatsAppNumber } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -24,11 +24,12 @@ export const metadata: Metadata = {
  * הבית מציג עסקים, לא מוכר רישום. זה העמוד היחיד שאמור לשכנע.
  */
 export default async function BusinessRegisterPage() {
-  const [user, contact, categories, cities] = await Promise.all([
+  const [user, contact, categories, cities, areas] = await Promise.all([
     getCurrentUser(),
     getContactDetails(),
     getFlatCategories(),
     getCities(),
+    getAreas(),
   ]);
 
   const whatsappHref = `https://wa.me/${toWhatsAppNumber(contact.whatsapp)}?text=${encodeURIComponent("היי, אני רוצה לרשום את החברה שלי ב-Rentus")}`;
@@ -39,7 +40,7 @@ export default async function BusinessRegisterPage() {
 
       <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
         <div className="mb-8 text-center">
-          <h1 className="mb-2 font-display text-3xl font-extrabold text-ink-900">רישום החברה שלכם</h1>
+          <h1 className="mb-2 font-display text-3xl text-ink-900">רישום החברה שלכם</h1>
           <p className="text-ink-500">
             פרופיל בסיסי ללא עלות. הטופס נבדק ידנית ומאושר תוך יום עסקים אחד.
           </p>
@@ -64,11 +65,11 @@ export default async function BusinessRegisterPage() {
         </a>
 
         {user ? (
-          <RegisterBusinessForm categories={categories} cities={cities} />
+          <RegisterBusinessForm categories={categories} cities={cities} areas={areas} />
         ) : (
           <div className="border border-ink-200/70 bg-white p-7 text-center">
             <UserPlus className="mx-auto mb-3 h-9 w-9 text-brand-600" />
-            <h2 className="mb-1.5 font-display text-lg font-bold text-ink-900">קודם צריך חשבון</h2>
+            <h2 className="mb-1.5 font-display text-lg text-ink-900">קודם צריך חשבון</h2>
             <p className="mb-5 text-sm leading-relaxed text-ink-600">
               כדי שהחברה תשויך אליכם ותוכלו לנהל אותה בהמשך, צריך להתחבר או להירשם קודם. לוקח דקה.
             </p>

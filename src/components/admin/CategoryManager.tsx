@@ -155,7 +155,7 @@ export function CategoryManager({
         <section className="rounded-lg border border-ink-200/70 bg-white p-5 sm:p-6">
           <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h2 className="font-display text-base font-bold text-ink-900">קטגוריות</h2>
+              <h2 className="font-display text-base text-ink-900">קטגוריות</h2>
               <p className="mt-0.5 text-xs text-ink-400">
                 {missingImages > 0
                   ? `${missingImages} קטגוריות עדיין בלי תמונה.`
@@ -179,7 +179,7 @@ export function CategoryManager({
               className="mb-5 grid gap-3 rounded-md border border-brand-200 bg-brand-50/40 p-4"
             >
               <div className="flex items-center justify-between">
-                <h3 className="font-display text-sm font-bold text-ink-900">קטגוריה חדשה</h3>
+                <h3 className=" text-sm font-bold text-ink-900">קטגוריה חדשה</h3>
                 <button
                   type="button" onClick={() => setAddingCategory(false)} aria-label="סגירה"
                   className="grid h-8 w-8 place-items-center rounded-xs text-ink-400 hover:bg-white"
@@ -220,7 +220,7 @@ export function CategoryManager({
         </section>
 
         <section className="rounded-lg border border-ink-200/70 bg-white p-5 sm:p-6">
-          <h2 className="mb-4 font-display text-base font-bold text-ink-900">ערים</h2>
+          <h2 className="mb-4 font-display text-base text-ink-900">ערים</h2>
 
           <form
             action={(fd) => run(() => createCity(fd))}

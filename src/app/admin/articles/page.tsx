@@ -33,7 +33,7 @@ export default async function AdminArticlesPage() {
 
   return (
     <div>
-      <h1 className="mb-1 font-display text-2xl font-extrabold text-ink-900">מאמרים ומדריכים</h1>
+      <h1 className="mb-1 font-display text-2xl text-ink-900">מאמרים ומדריכים</h1>
       <p className="mb-6 text-sm text-ink-500">
         מאמר במצב ״מפורסם״ מופיע מיד ב-/blog ובעמוד הבית. טיוטה נשמרת אבל אינה גלויה לגולשים.
       </p>

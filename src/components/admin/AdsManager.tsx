@@ -69,7 +69,7 @@ export function AdsManager({
       <section className="rounded-lg border border-ink-200/70 bg-white p-5 sm:p-6">
         <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="font-display text-base font-bold text-ink-900">באנרים</h2>
+            <h2 className="font-display text-base text-ink-900">באנרים</h2>
             <p className="mt-0.5 text-xs text-ink-400">
               באנרי הצד מוצגים רק במסכים רחבים מ-1600 פיקסלים, כדי שלא ידחפו את התוכן.
               אם אין באנר פעיל — לא מוצג כלום, בלי מסגרת ריקה.
@@ -167,7 +167,7 @@ export function AdsManager({
       </section>
 
       <section className="rounded-lg border border-ink-200/70 bg-white p-5 sm:p-6">
-        <h2 className="mb-1 font-display text-base font-bold text-ink-900">מודעות קופצות (פופאפ)</h2>
+        <h2 className="mb-1 font-display text-base text-ink-900">מודעות קופצות (פופאפ)</h2>
         <p className="mb-4 text-xs text-ink-400">
           כבויות כברירת מחדל בכוונה — הפעילו רק כשהתוכן מוכן. מוצג פופאפ אחד לכל היותר בכל טעינת עמוד.
         </p>
@@ -274,7 +274,7 @@ function BannerForm({
       className="grid gap-4 rounded-md border border-brand-200 bg-brand-50/40 p-4 sm:grid-cols-2"
     >
       <div className="flex items-center justify-between sm:col-span-2">
-        <h3 className="font-display text-sm font-bold text-ink-900">
+        <h3 className=" text-sm font-bold text-ink-900">
           {banner ? `עריכת "${banner.title}"` : "באנר חדש"}
         </h3>
         <button

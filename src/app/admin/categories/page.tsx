@@ -21,7 +21,7 @@ export default async function AdminCategoriesPage() {
 
   return (
     <div>
-      <h1 className="mb-1 font-display text-2xl font-extrabold text-ink-900">קטגוריות וערים</h1>
+      <h1 className="mb-1 font-display text-2xl text-ink-900">קטגוריות וערים</h1>
       <p className="mb-6 text-sm text-ink-500">
         תמונת הקטגוריה מוצגת בעמוד הבית, בתפריט הקטגוריות ובעמוד ״כל הקטגוריות״.
       </p>

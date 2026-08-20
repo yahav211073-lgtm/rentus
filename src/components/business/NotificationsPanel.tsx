@@ -41,7 +41,7 @@ export function NotificationsPanel({ notifications }: { notifications: OwnerNoti
   return (
     <section className="mb-6 rounded-lg border border-ink-200/70 bg-white p-5">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="flex items-center gap-2 font-display text-base font-bold text-ink-900">
+        <h2 className="flex items-center gap-2 font-display text-base text-ink-900">
           <Bell className="h-4 w-4 text-brand-600" aria-hidden="true" />
           עדכונים
           {unread.length > 0 && (

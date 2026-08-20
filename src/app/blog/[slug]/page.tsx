@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/Badge";
 import { ArticleCover } from "@/components/home/BlogSection";
 import { env } from "@/lib/env";
 import { getArticleBySlug, getArticles } from "@/lib/repo/articles";
-import { decodeParam } from "@/lib/utils";
+import { decodeParam, jsonLd } from "@/lib/utils";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -64,7 +64,7 @@ export default async function ArticlePage({ params }: Props) {
           <Badge variant="accent" size="md" className="mb-4">{article.categoryName}</Badge>
         )}
 
-        <h1 className="mb-4 font-display text-3xl font-extrabold leading-tight text-ink-900 sm:text-4xl">
+        <h1 className="mb-4 font-display text-3xl leading-tight text-ink-900 sm:text-4xl">
           {article.title}
         </h1>
 
@@ -103,7 +103,7 @@ export default async function ArticlePage({ params }: Props) {
       {related.length > 0 && (
         <div className="border-t border-ink-100 bg-ink-50">
           <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
-            <h2 className="mb-5 font-display text-xl font-extrabold text-ink-900">מדריכים נוספים</h2>
+            <h2 className="mb-5 font-display text-xl text-ink-900">מדריכים נוספים</h2>
             <div className="grid gap-4 sm:grid-cols-3">
               {related.map((a) => (
                 <Link
@@ -143,6 +143,6 @@ function JsonLd({
     mainEntityOfPage: `${env.siteUrl}/blog/${slug}`,
   };
   return (
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(schema) }} />
   );
 }

@@ -31,7 +31,7 @@ export function WriteReviewForm({ businessId, businessName, currentUserName, ret
     return (
       <section id="write-review" className="rounded-lg border border-ink-200/70 bg-white p-6 text-center">
         <LogIn className="mx-auto mb-3 h-8 w-8 text-brand-600" aria-hidden="true" />
-        <h2 className="mb-1.5 font-display text-lg font-bold text-ink-900">רוצים לכתוב ביקורת?</h2>
+        <h2 className="mb-1.5 font-display text-lg text-ink-900">רוצים לכתוב ביקורת?</h2>
         <p className="mx-auto mb-5 max-w-sm text-sm leading-relaxed text-ink-600">
           ביקורות נכתבות מחשבון מזוהה בלבד. זה מה ששומר על הדירוגים אמינים — ומונע ביקורות
           מזויפות על חברות אמיתיות.
@@ -47,7 +47,7 @@ export function WriteReviewForm({ businessId, businessName, currentUserName, ret
     return (
       <section id="write-review" className="rounded-lg border border-success-500/30 bg-success-50 p-6 text-center">
         <CheckCircle2 className="mx-auto mb-3 h-9 w-9 text-success-500" aria-hidden="true" />
-        <h2 className="mb-1.5 font-display text-lg font-bold text-ink-900">תודה על הביקורת</h2>
+        <h2 className="mb-1.5 font-display text-lg text-ink-900">תודה על הביקורת</h2>
         <p className="text-sm text-ink-600">
           היא ממתינה לבדיקה קצרה ותתפרסם בעמוד החברה ברגע שתאושר.
         </p>
@@ -87,7 +87,7 @@ export function WriteReviewForm({ businessId, businessName, currentUserName, ret
 
   return (
     <section id="write-review" className="rounded-lg border border-ink-200/70 bg-white p-5 sm:p-6">
-      <h2 className="mb-1.5 font-display text-lg font-bold text-ink-900">כתיבת ביקורת</h2>
+      <h2 className="mb-1.5 font-display text-lg text-ink-900">כתיבת ביקורת</h2>
       <p className="mb-5 text-sm text-ink-500">
         ספרו לאחרים איך הייתה החוויה שלכם עם {businessName}. הביקורת מתפרסמת אחרי בדיקה.
       </p>

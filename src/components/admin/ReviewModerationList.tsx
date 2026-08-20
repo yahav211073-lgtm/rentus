@@ -80,7 +80,7 @@ export function ReviewModerationList({ reviews }: { reviews: ModerationReview[] 
             )}
           </div>
 
-          {r.title && <h3 className="mb-1 font-display text-base font-bold text-ink-900">{r.title}</h3>}
+          {r.title && <h3 className="mb-1 text-base font-bold text-ink-900">{r.title}</h3>}
           {r.body && <p className="mb-4 whitespace-pre-line text-sm leading-relaxed text-ink-600">{r.body}</p>}
 
           <div className="flex flex-wrap gap-2">

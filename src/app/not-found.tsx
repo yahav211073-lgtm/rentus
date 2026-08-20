@@ -17,7 +17,7 @@ export default function NotFound() {
         <Compass className="h-7 w-7" aria-hidden="true" />
       </span>
 
-      <h1 className="mb-2 font-display text-2xl font-extrabold text-ink-900">
+      <h1 className="mb-2 font-display text-2xl text-ink-900">
         העמוד הזה לא קיים
       </h1>
       <p className="mb-6 text-base leading-relaxed text-ink-600">

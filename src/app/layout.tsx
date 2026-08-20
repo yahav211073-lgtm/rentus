@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Heebo, Inter } from "next/font/google";
+import { Heebo, Inter, Secular_One } from "next/font/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { AccessibilityToolbar } from "@/components/a11y/AccessibilityToolbar";
@@ -31,12 +31,43 @@ async function checkIsBusinessOwner(userId: string | undefined): Promise<boolean
 }
 
 /**
- * Heebo לעברית, Inter ללטינית.
+ * Heebo לגוף, Secular One לכותרות — נבחרו במדידה, לא בהתרשמות.
+ *
+ * המטרה הייתה להתקרב כמה שאפשר ל-bizspace.digital, שרץ על Ploni
+ * (גוף) ו-Anomalia UltraBold (כותרות). שתיהן משפחות מסחריות בתשלום
+ * ולכן אינן בפרויקט. במקומן נמדדו המטריקות של שתיהן מול כל הגופנים
+ * העבריים החופשיים, והושוו שתי תכונות שקובעות איך טקסט *נראה*
+ * בגודל נתון: גובה ה-x ורוחב האות העברית הממוצע, שניהם כאחוז מה-em.
+ *
+ *   Ploni Regular        גובה x 47.5%   רוחב ממוצע 52.0%
+ *   Heebo Regular        גובה x 52.8%   רוחב ממוצע 53.2%
+ *
+ *   Anomalia UltraBold   גובה x 55.0%   רוחב ממוצע 59.1%
+ *   Secular One          גובה x 51.5%   רוחב ממוצע 52.7%
+ *
+ * Heebo הוא הגרוטסק החופשי עם היחס הקרוב ביותר ל-Ploni, והוא גם
+ * מה ש-bizspace עצמו מגדיר בשרשרת הפולבאק שלו. Secular One הוא
+ * גופן התצוגה העברי החופשי היחיד שנושא את התפקיד של Anomalia —
+ * כבד, רחב ומיועד לכותרות ולא לטקסט רץ.
+ *
+ * הפער שנשאר בגובה ה-x מתוקן בסולם הטיפוגרפי ב-globals.css ולא כאן:
+ * הגדלים שם מוכפלים כך שהטקסט יתפוס בדיוק את אותו גובה אופטי כמו
+ * ברפרנס. ראו את ההסבר המלא ליד הסולם.
+ *
+ * ל-Secular One יש משקל אחד בלבד (400) והוא כבד מטבעו. h1/h2
+ * מוגדרים ל-400 ב-globals.css; כפיית 800 עליו מייצרת הדגשה
+ * סינתטית מרוחה.
  *
  * display: "swap" ולא "optional" — עדיף טקסט בגופן חלופי לרגע מאשר
- * טקסט בלתי נראה. subsets כולל hebrew, אחרת הדפדפן מוריד רק לטינית
- * וכל האתר נופל לגופן ברירת המחדל של המערכת.
+ * טקסט בלתי נראה. subsets כולל hebrew, אחרת הדפדפן מוריד רק לטינית.
  */
+const secular = Secular_One({
+  variable: "--font-secular",
+  subsets: ["hebrew", "latin"],
+  weight: ["400"],
+  display: "swap",
+});
+
 const heebo = Heebo({
   variable: "--font-heebo",
   subsets: ["hebrew", "latin"],
@@ -136,7 +167,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       dir="rtl"
       data-scroll-behavior="smooth"
       suppressHydrationWarning
-      className={`${heebo.variable} ${inter.variable}`}
+      className={`${heebo.variable} ${secular.variable} ${inter.variable}`}
       style={brandStyle}
     >
       <head>

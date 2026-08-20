@@ -89,7 +89,7 @@ export function SiteReviewForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-3.5 rounded-lg border border-ink-200/70 bg-white p-5 sm:p-6">
-      <h3 className="font-display text-base font-bold text-ink-900">כתיבת ביקורת על האתר</h3>
+      <h3 className=" text-base font-bold text-ink-900">כתיבת ביקורת על האתר</h3>
 
       <fieldset>
         <legend className="mb-1.5 block text-xs font-bold text-ink-600">

@@ -34,7 +34,7 @@ export default async function AdminAdsPage() {
 
   return (
     <div>
-      <h1 className="mb-1 font-display text-2xl font-extrabold text-ink-900">מודעות ובאנרים</h1>
+      <h1 className="mb-1 font-display text-2xl text-ink-900">מודעות ובאנרים</h1>
       <p className="mb-6 text-sm text-ink-500">
         התמונות מועלות מהמכשיר ונשמרות באחסון של האתר. אין יותר שדה כתובת חופשי — נתיב מקומי מהמחשב
         לא ניתן להצגה לגולשים.

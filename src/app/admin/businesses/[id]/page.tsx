@@ -71,7 +71,7 @@ export default async function AdminBusinessEditPage({ params }: { params: Params
       </Link>
 
       <div className="mb-6 flex flex-wrap items-center gap-3">
-        <h1 className="font-display text-2xl font-extrabold text-ink-900">{business.name}</h1>
+        <h1 className="font-display text-2xl text-ink-900">{business.name}</h1>
         {business.status === "published" && (
           <Link
             href={`/business/${business.slug}`}

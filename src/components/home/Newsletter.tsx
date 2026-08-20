@@ -62,7 +62,7 @@ export function Newsletter() {
                   <Mail className="h-3.5 w-3.5" />
                   ניוזלטר
                 </span>
-                <h2 className="mb-3 font-display text-3xl font-extrabold text-white sm:text-4xl">
+                <h2 className="mb-3 font-display text-3xl text-white sm:text-4xl">
                   החברות הכי מומלצות, פעם בשבוע
                 </h2>
                 <p className="max-w-lg text-md leading-relaxed text-white/65">

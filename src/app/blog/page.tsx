@@ -54,7 +54,7 @@ export default async function BlogIndexPage() {
                 )}
               </div>
               <div className="flex flex-1 flex-col gap-2.5 p-5">
-                <h2 className="font-display text-lg font-bold leading-snug text-ink-900 transition-colors group-hover:text-brand-700">
+                <h2 className="font-display text-lg leading-snug text-ink-900 transition-colors group-hover:text-brand-700">
                   {a.title}
                 </h2>
                 {a.excerpt && <p className="line-clamp-2 text-sm leading-relaxed text-ink-500">{a.excerpt}</p>}

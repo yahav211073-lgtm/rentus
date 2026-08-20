@@ -7,11 +7,13 @@ import { CheckCircle2, Send } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
 import { submitBusinessRequest } from "@/app/business/register/actions";
-import type { FlatCategory, SimpleCity } from "@/lib/repo/taxonomy";
+import { HoursFieldset } from "@/components/business/HoursFieldset";
+import type { FlatCategory, SimpleArea, SimpleCity } from "@/lib/repo/taxonomy";
 
 interface Props {
   categories: FlatCategory[];
   cities: SimpleCity[];
+  areas: SimpleArea[];
 }
 
 /**
@@ -22,7 +24,7 @@ interface Props {
  * accept="image/*" בלבד — כלומר כל קובץ, בכל גודל, נכנס לאחסון.
  * ולידציה בדפדפן היא נוחות; ולידציה בשרת היא ההגנה.
  */
-export function RegisterBusinessForm({ categories, cities }: Props) {
+export function RegisterBusinessForm({ categories, cities, areas }: Props) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [done, setDone] = useState(false);
@@ -32,7 +34,7 @@ export function RegisterBusinessForm({ categories, cities }: Props) {
     return (
       <section className="rounded-lg border border-success-500/30 bg-success-50 p-7 text-center">
         <CheckCircle2 className="mx-auto mb-3 h-11 w-11 text-success-500" aria-hidden="true" />
-        <h2 className="mb-1.5 font-display text-lg font-bold text-ink-900">הבקשה נשלחה</h2>
+        <h2 className="mb-1.5 font-display text-lg text-ink-900">הבקשה נשלחה</h2>
         <p className="mx-auto max-w-md text-sm leading-relaxed text-ink-600">
           הבקשה נכנסה לתור האישור של הצוות, בדרך כלל תוך יום עסקים אחד. תקבלו התראה באתר
           ברגע שתתקבל החלטה, ותוכלו לעקוב אחרי הסטטוס מ־
@@ -100,7 +102,19 @@ export function RegisterBusinessForm({ categories, cities }: Props) {
         </div>
       </div>
 
-      <Field id="reg-address" name="address" label="כתובת" placeholder="רחוב ומספר" />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="reg-area" className="mb-1.5 block text-xs font-bold text-ink-600">אזור שירות</label>
+          <select
+            id="reg-area" name="area"
+            className="h-11 w-full rounded-xs border border-ink-200 bg-white px-3.5 text-base outline-none focus:border-brand-400"
+          >
+            <option value="">בחרו אזור</option>
+            {areas.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+          </select>
+        </div>
+        <Field id="reg-address" name="address" label="כתובת" placeholder="רחוב ומספר" />
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <Field id="reg-phone" name="phone" label="טלפון" type="tel" inputMode="tel" placeholder="050-0000000" />
@@ -108,6 +122,8 @@ export function RegisterBusinessForm({ categories, cities }: Props) {
         <Field id="reg-email" name="email" label="אימייל" type="email" />
       </div>
       <p className="-mt-3 text-2xs text-ink-400">צריך טלפון או וואטסאפ אחד לפחות כדי שנוכל לחזור אליכם.</p>
+
+      <HoursFieldset />
 
       <div>
         <label htmlFor="reg-description" className="mb-1.5 block text-xs font-bold text-ink-600">תיאור החברה</label>

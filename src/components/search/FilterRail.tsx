@@ -206,7 +206,7 @@ export function FilterRail({ facets, total, categories, cities, children }: Prop
         <div className="sticky top-[calc(var(--spacing-header)+16px)] max-h-[calc(100vh-var(--spacing-header)-32px)] overflow-y-auto rounded-lg border border-ink-200/70 bg-white p-5">
           <div className="mb-5 flex items-center gap-2 border-b border-ink-100 pb-4">
             <SlidersHorizontal className="h-4.5 w-4.5 text-brand-700" />
-            <h2 className="text-sm font-bold text-ink-900">סינון תוצאות</h2>
+            <h2 className="text-sm text-ink-900">סינון תוצאות</h2>
             {activeCount > 0 && (
               <span className="ms-auto grid h-5 min-w-5 place-items-center rounded-full bg-brand-800 px-1.5 text-2xs font-bold text-white">
                 {activeCount}
@@ -250,7 +250,7 @@ export function FilterRail({ facets, total, categories, cities, children }: Prop
               className="fixed inset-x-0 bottom-0 z-[71] max-h-[86vh] overflow-hidden rounded-t-xl bg-white lg:hidden"
             >
               <div className="flex items-center justify-between border-b border-ink-100 p-4">
-                <h2 className="text-base font-bold text-ink-900">סינון תוצאות</h2>
+                <h2 className="text-base text-ink-900">סינון תוצאות</h2>
                 <button
                   type="button" onClick={() => setMobileOpen(false)}
                   aria-label="סגירת מסננים"
