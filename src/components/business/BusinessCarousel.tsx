@@ -97,7 +97,7 @@ export function BusinessCarousel({
   if (!isCarousel) {
     return (
       <div className={`grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 ${className ?? ""}`}>
-        {businesses.map((b) => <CompanyListCard key={b.id} business={b} />)}
+        {businesses.map((b) => <CompanyListCard key={b.id} business={b} variant="tile" />)}
       </div>
     );
   }
@@ -122,7 +122,7 @@ export function BusinessCarousel({
             data-card
             className="w-[72%] shrink-0 snap-start sm:w-[calc(47%-6px)] lg:w-[calc(31%-8px)] xl:w-[calc(23%-9px)]"
           >
-            <CompanyListCard business={b} />
+            <CompanyListCard business={b} variant="tile" />
           </div>
         ))}
       </div>

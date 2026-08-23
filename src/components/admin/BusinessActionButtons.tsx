@@ -14,26 +14,26 @@ export function ApproveRejectButtons({ businessId }: { businessId: string }) {
 
   if (rejecting) {
     return (
-      <div className="flex items-center gap-1.5">
+      <div className="flex w-full flex-wrap items-center gap-1.5">
         <input
           autoFocus
           value={reason}
           onChange={(e) => setReason(e.target.value)}
           placeholder="סיבת דחייה..."
-          className="h-8 w-36 rounded-xs border border-ink-200 px-2 text-xs outline-none focus:border-brand-400"
+          className="h-11 min-w-0 flex-1 rounded-xs border border-ink-200 px-2 text-base outline-none focus:border-brand-400 sm:flex-none sm:text-xs lg:h-8 lg:w-36"
         />
         <button
           type="button"
           disabled={pending}
           onClick={() => startTransition(async () => { await rejectBusiness(businessId, reason); })}
-          className="rounded-xs bg-danger-500 px-2.5 py-1.5 text-xs font-bold text-white hover:bg-danger-500/90 disabled:opacity-50"
+          className="min-h-11 rounded-xs bg-danger-500 px-3 text-xs font-bold text-white hover:bg-danger-500/90 disabled:opacity-50 lg:min-h-0 lg:py-1.5"
         >
           אישור דחייה
         </button>
         <button
           type="button"
           onClick={() => setRejecting(false)}
-          className="text-xs text-ink-400 hover:text-ink-700"
+          className="min-h-11 px-2 text-xs text-ink-400 hover:text-ink-700 lg:min-h-0"
         >
           ביטול
         </button>
@@ -42,12 +42,12 @@ export function ApproveRejectButtons({ businessId }: { businessId: string }) {
   }
 
   return (
-    <div className="flex items-center gap-1.5">
+    <div className="flex flex-wrap items-center gap-1.5">
       <button
         type="button"
         disabled={pending}
         onClick={() => startTransition(async () => { await approveBusiness(businessId); })}
-        className="inline-flex items-center gap-1 rounded-xs bg-success-500 px-2.5 py-1.5 text-xs font-bold text-white transition-colors hover:bg-success-500/90 disabled:opacity-50"
+        className="inline-flex min-h-11 items-center gap-1 rounded-xs bg-success-500 px-3 text-xs font-bold text-white transition-colors hover:bg-success-500/90 disabled:opacity-50 lg:min-h-0 lg:py-1.5"
       >
         <Check className="h-3.5 w-3.5" /> אישור
       </button>
@@ -55,7 +55,7 @@ export function ApproveRejectButtons({ businessId }: { businessId: string }) {
         type="button"
         disabled={pending}
         onClick={() => setRejecting(true)}
-        className="inline-flex items-center gap-1 rounded-xs border border-ink-200 px-2.5 py-1.5 text-xs font-bold text-ink-600 transition-colors hover:bg-ink-50 disabled:opacity-50"
+        className="inline-flex min-h-11 items-center gap-1 rounded-xs border border-ink-200 px-3 text-xs font-bold text-ink-600 transition-colors hover:bg-ink-50 disabled:opacity-50 lg:min-h-0 lg:py-1.5"
       >
         <X className="h-3.5 w-3.5" /> דחייה
       </button>
@@ -71,7 +71,7 @@ export function ArchiveToggleButton({ businessId, isArchived }: { businessId: st
       type="button"
       disabled={pending}
       onClick={() => startTransition(async () => { await setBusinessArchived(businessId, !isArchived); })}
-      className="inline-flex items-center gap-1 rounded-xs border border-ink-200 px-2.5 py-1.5 text-xs font-bold text-ink-600 transition-colors hover:bg-ink-50 disabled:opacity-50"
+      className="inline-flex min-h-11 items-center gap-1 rounded-xs border border-ink-200 px-3 text-xs font-bold text-ink-600 transition-colors hover:bg-ink-50 disabled:opacity-50 lg:min-h-0 lg:py-1.5"
     >
       {isArchived ? <ArchiveRestore className="h-3.5 w-3.5" /> : <Archive className="h-3.5 w-3.5" />}
       {isArchived ? "שחזור" : "העברה לארכיון"}
@@ -114,7 +114,7 @@ export function FeatureVerifyToggles({
               else setError(res.error ?? "הפעולה נכשלה.");
             })
           }
-          className={`inline-flex items-center gap-1 rounded-xs border px-2.5 py-1.5 text-xs font-bold transition-colors disabled:opacity-50 ${
+          className={`inline-flex min-h-11 items-center gap-1 rounded-xs border px-3 text-xs font-bold transition-colors disabled:opacity-50 lg:min-h-0 lg:py-1.5 ${
             featured
               ? "border-accent-500 bg-accent-500 text-white"
               : "border-ink-200 text-ink-500 hover:border-accent-300 hover:text-accent-700"
@@ -137,7 +137,7 @@ export function FeatureVerifyToggles({
               else setError(res.error ?? "הפעולה נכשלה.");
             })
           }
-          className={`inline-flex items-center gap-1 rounded-xs border px-2.5 py-1.5 text-xs font-bold transition-colors disabled:opacity-50 ${
+          className={`inline-flex min-h-11 items-center gap-1 rounded-xs border px-3 text-xs font-bold transition-colors disabled:opacity-50 lg:min-h-0 lg:py-1.5 ${
             verified
               ? "border-brand-700 bg-brand-700 text-white"
               : "border-ink-200 text-ink-500 hover:border-brand-300 hover:text-brand-700"
@@ -183,7 +183,7 @@ export function DeleteBusinessButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1 rounded-xs border border-danger-500/40 px-2.5 py-1.5 text-xs font-bold text-danger-700 transition-colors hover:bg-danger-50"
+        className="inline-flex min-h-11 items-center gap-1 rounded-xs border border-danger-500/40 px-3 text-xs font-bold text-danger-700 transition-colors hover:bg-danger-50 lg:min-h-0 lg:py-1.5"
       >
         <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
         מחיקה
@@ -196,12 +196,12 @@ export function DeleteBusinessButton({
       <span className="text-2xs leading-snug text-danger-700">
         מחיקה בלתי הפיכה. הקלידו <b>{businessName}</b> לאישור.
       </span>
-      <span className="inline-flex items-center gap-1.5">
+      <span className="inline-flex flex-wrap items-center gap-1.5">
         <input
           value={value}
           onChange={(e) => { setValue(e.target.value); setError(""); }}
           aria-label={`אישור מחיקת ${businessName}`}
-          className="h-8 w-40 rounded-xs border border-danger-500/40 px-2 text-xs outline-none focus:border-danger-500"
+          className="h-11 min-w-0 flex-1 rounded-xs border border-danger-500/40 px-2 text-base outline-none focus:border-danger-500 sm:flex-none sm:text-xs lg:h-8 lg:w-40"
         />
         <button
           type="button"
@@ -210,14 +210,14 @@ export function DeleteBusinessButton({
             const res = await deleteBusinessAdmin(businessId, value);
             if (!res.ok) setError(res.error);
           })}
-          className="rounded-xs bg-danger-500 px-2.5 py-1.5 text-xs font-bold text-white transition-colors hover:bg-danger-700 disabled:opacity-40"
+          className="min-h-11 rounded-xs bg-danger-500 px-3 text-xs font-bold text-white transition-colors hover:bg-danger-700 disabled:opacity-40 lg:min-h-0 lg:py-1.5"
         >
           מחק
         </button>
         <button
           type="button"
           onClick={() => { setOpen(false); setValue(""); setError(""); }}
-          className="rounded-xs px-2 py-1.5 text-xs font-bold text-ink-500 hover:text-ink-800"
+          className="min-h-11 rounded-xs px-2 text-xs font-bold text-ink-500 hover:text-ink-800 lg:min-h-0 lg:py-1.5"
         >
           ביטול
         </button>

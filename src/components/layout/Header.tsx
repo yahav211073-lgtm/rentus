@@ -9,7 +9,7 @@ import { ChevronDown, ImageOff, LogOut, Menu, Search, UserRound, X } from "lucid
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { TopUtilityBar } from "@/components/layout/TopUtilityBar";
 import { useScrolledPast } from "@/lib/hooks/browser-state";
-import { useModalLock } from "@/lib/hooks/modal";
+import { useDialogFocus, useModalLock } from "@/lib/hooks/modal";
 import { businessCountLabel, cn } from "@/lib/utils";
 import type { CurrentUser } from "@/lib/auth";
 import type { Category } from "@/types/domain";
@@ -103,7 +103,7 @@ export function Header({
           זולג מתחתיו בגלילה, וזו כל התחושה של הדפוס הזה. הרקע מתהדק
           בגלילה כי טקסט מעל תמונה בהירה דרך שכבה של 72% לא עומד
           בניגודיות. */}
-      <header className="fixed inset-x-0 top-0 z-50">
+      <header className="fixed inset-x-0 top-0 z-50 pt-[env(safe-area-inset-top,0px)]">
         <TopUtilityBar brandName={brandName} tagline={tagline} phone={phone} />
 
         <div className="px-3 pt-2 sm:px-5 sm:pt-3">
@@ -198,7 +198,7 @@ export function Header({
               <Link
                 href="/search"
                 aria-label="חיפוש"
-                className="grid h-10 w-10 place-items-center rounded-full text-ink-600 transition-colors hover:bg-ink-100 lg:hidden"
+                className="grid h-11 w-11 place-items-center rounded-full text-ink-600 transition-colors hover:bg-ink-100 lg:hidden"
               >
                 <Search className="h-[1.15rem] w-[1.15rem]" aria-hidden="true" />
               </Link>
@@ -264,7 +264,7 @@ export function Header({
                 onClick={() => setMobileOpen(true)}
                 aria-label="פתיחת תפריט"
                 aria-expanded={mobileOpen}
-                className="grid h-10 w-10 place-items-center rounded-full text-ink-700 transition-colors hover:bg-ink-100 lg:hidden"
+                className="grid h-11 w-11 place-items-center rounded-full text-ink-700 transition-colors hover:bg-ink-100 lg:hidden"
               >
                 <Menu className="h-[1.3rem] w-[1.3rem]" aria-hidden="true" />
               </button>
@@ -366,6 +366,8 @@ function MobileMenu({
   open, onClose, user, categories,
 }: { open: boolean; onClose: () => void; user: CurrentUser | null; categories: Category[] }) {
   const reduced = useReducedMotion();
+  const panelRef = useRef<HTMLDivElement>(null);
+  useDialogFocus(open, panelRef, onClose);
 
   return (
     <AnimatePresence>
@@ -385,14 +387,16 @@ function MobileMenu({
           />
 
           <motion.div
+            ref={panelRef}
             role="dialog"
             aria-modal="true"
             aria-label="תפריט ניווט"
+            tabIndex={-1}
             initial={{ x: reduced ? 0 : "100%", opacity: reduced ? 0 : 1 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: reduced ? 0 : "100%", opacity: reduced ? 0 : 1 }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="fixed inset-y-0 z-[85] flex w-[min(92vw,400px)] flex-col bg-white shadow-2xl lg:hidden"
+            className="fixed inset-y-0 z-[85] flex w-[min(92vw,400px)] flex-col bg-white pb-[env(safe-area-inset-bottom,0px)] pt-[env(safe-area-inset-top,0px)] shadow-2xl lg:hidden"
             style={{ insetInlineEnd: 0 }}
           >
             <div className="flex items-center justify-between border-b border-ink-100 p-4">
@@ -401,7 +405,8 @@ function MobileMenu({
                 type="button"
                 onClick={onClose}
                 aria-label="סגירת תפריט"
-                className="grid h-10 w-10 place-items-center rounded-xs text-ink-500 transition-colors hover:bg-ink-100"
+                data-dialog-autofocus
+                className="grid h-11 w-11 place-items-center rounded-xs text-ink-500 transition-colors hover:bg-ink-100"
               >
                 <X className="h-5 w-5" aria-hidden="true" />
               </button>

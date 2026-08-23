@@ -128,8 +128,18 @@ export default async function BusinessDashboardPage() {
     createdAt: n.created_at,
   }));
 
+  const totalLeads = ownerBusinesses.reduce((sum, business) => sum + business.leads.length, 0);
+  const publishedCount = ownerBusinesses.filter((business) => business.status === "published").length;
+  const unreadCount = notificationItems.filter((notification) => !notification.readAt).length;
+  const metrics = [
+    { label: "חברות", value: ownerBusinesses.length },
+    { label: "חברות פעילות", value: publishedCount },
+    { label: "פניות אחרונות", value: totalLeads },
+    { label: "עדכונים חדשים", value: unreadCount },
+  ];
+
   return (
-    <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+    <div className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-14">
       <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="mb-1 font-display text-2xl text-ink-900">
@@ -143,6 +153,17 @@ export default async function BusinessDashboardPage() {
       </div>
 
       <NotificationsPanel notifications={notificationItems} />
+
+      {ownerBusinesses.length > 0 && (
+        <dl className="mb-5 grid grid-cols-2 gap-3">
+          {metrics.map((metric) => (
+            <div key={metric.label} className="rounded-lg border border-ink-200/70 bg-white px-4 py-3.5">
+              <dd className="text-2xl font-bold tabular-nums text-brand-800">{metric.value}</dd>
+              <dt className="mt-0.5 text-xs font-semibold text-ink-500">{metric.label}</dt>
+            </div>
+          ))}
+        </dl>
+      )}
 
       {ownerBusinesses.length === 0 ? (
         <div className="rounded-lg border border-dashed border-ink-300 bg-white px-6 py-14 text-center">

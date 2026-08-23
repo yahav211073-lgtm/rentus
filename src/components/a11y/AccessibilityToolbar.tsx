@@ -161,13 +161,13 @@ export function AccessibilityToolbar() {
         className={cn(
           /* הכפתור מרחף מעל סרגל הניווט התחתון ולא עליו. bottom נגזר
              מהטוקן, כך שהוא יורד אוטומטית ל-20px בדסקטופ שבו אין סרגל. */
-          "fixed z-[90] grid h-13 w-13 place-items-center rounded-full",
+          "fixed z-[90] grid h-11 w-11 place-items-center rounded-full sm:h-13 sm:w-13",
           "bg-brand-800 text-white shadow-[0_10px_28px_-6px_rgba(11,59,117,0.6)]",
           "transition-transform duration-200 hover:scale-105 active:scale-95",
         )}
-        style={{ insetInlineStart: "1.25rem", bottom: "calc(var(--spacing-bottom-inset) + 1.25rem)" }}
+        style={{ insetInlineStart: "0.75rem", bottom: "calc(var(--spacing-bottom-inset) + 0.75rem)" }}
       >
-        <Accessibility className="h-6 w-6" strokeWidth={2.2} />
+        <Accessibility className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={2.2} />
         {activeCount > 0 && (
           <span className="absolute -top-1 grid h-5 w-5 place-items-center rounded-full bg-accent-400 text-2xs font-bold text-brand-950"
                 style={{ insetInlineEnd: "-0.25rem" }}>
@@ -188,7 +188,7 @@ export function AccessibilityToolbar() {
             exit={{ opacity: 0, y: reduced ? 0 : 12, scale: reduced ? 1 : 0.98 }}
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             className="fixed z-[91] max-h-[min(70vh,560px)] w-[min(92vw,340px)] overflow-y-auto overscroll-contain rounded-lg border border-ink-200 bg-white shadow-[0_28px_64px_-16px_rgba(11,59,117,0.35)]"
-            style={{ insetInlineStart: "1.25rem", bottom: "calc(var(--spacing-bottom-inset) + 5.25rem)" }}
+            style={{ insetInlineStart: "0.75rem", bottom: "calc(var(--spacing-bottom-inset) + 4.5rem)" }}
           >
             <div className="flex items-center justify-between border-b border-ink-100 bg-ink-50 px-4 py-3">
               <h2 className="text-sm text-ink-900">הגדרות נגישות</h2>

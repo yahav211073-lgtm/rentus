@@ -119,7 +119,7 @@ function LeadRow({ lead }: { lead: AdminLead }) {
               <a
                 href={`tel:${lead.phone}`}
                 aria-label={`חיוג ל${lead.name ?? "פנייה"}`}
-                className="grid h-9 w-9 place-items-center rounded-xs border border-ink-200 text-ink-500 transition-colors hover:border-brand-300 hover:text-brand-700"
+                className="grid h-11 w-11 place-items-center rounded-xs border border-ink-200 text-ink-500 transition-colors hover:border-brand-300 hover:text-brand-700"
               >
                 <Phone className="h-4 w-4" aria-hidden="true" />
               </a>
@@ -127,7 +127,7 @@ function LeadRow({ lead }: { lead: AdminLead }) {
                 href={`https://wa.me/${toWhatsAppNumber(lead.phone)}`}
                 target="_blank" rel="noopener noreferrer"
                 aria-label="פתיחת וואטסאפ"
-                className="grid h-9 w-9 place-items-center rounded-xs border border-ink-200 text-ink-500 transition-colors hover:border-[#25D366] hover:text-[#25D366]"
+                className="grid h-11 w-11 place-items-center rounded-xs border border-ink-200 text-ink-500 transition-colors hover:border-[#25D366] hover:text-[#25D366]"
               >
                 <WhatsAppIcon className="h-4 w-4" />
               </a>
@@ -138,7 +138,7 @@ function LeadRow({ lead }: { lead: AdminLead }) {
             onClick={() => setExpanded((v) => !v)}
             aria-expanded={expanded}
             aria-label={expanded ? "סגירת הפרטים" : "פתיחת הפרטים"}
-            className="grid h-9 w-9 place-items-center rounded-xs border border-ink-200 text-ink-500 transition-colors hover:border-brand-300 hover:text-brand-700"
+            className="grid h-11 w-11 place-items-center rounded-xs border border-ink-200 text-ink-500 transition-colors hover:border-brand-300 hover:text-brand-700"
           >
             <ChevronDown className={`h-4 w-4 transition-transform ${expanded ? "rotate-180" : ""}`} aria-hidden="true" />
           </button>
@@ -154,7 +154,7 @@ function LeadRow({ lead }: { lead: AdminLead }) {
               value={lead.status}
               disabled={pending}
               onChange={(e) => run(() => updateLeadStatus(lead.id, e.target.value))}
-              className="h-9 rounded-xs border border-ink-200 bg-white px-2 text-sm outline-none focus:border-brand-400"
+              className="h-11 rounded-xs border border-ink-200 bg-white px-2 text-base outline-none focus:border-brand-400"
             >
               {Object.entries(LEAD_STATUS_LABEL).map(([k, v]) => (
                 <option key={k} value={k}>{v}</option>
@@ -169,7 +169,7 @@ function LeadRow({ lead }: { lead: AdminLead }) {
                   run(() => deleteLead(lead.id));
                 }
               }}
-              className="ms-auto inline-flex h-9 items-center gap-1.5 rounded-xs px-2.5 text-xs font-bold text-ink-400 transition-colors hover:bg-danger-50 hover:text-danger-500"
+              className="ms-auto inline-flex h-11 items-center gap-1.5 rounded-xs px-2.5 text-xs font-bold text-ink-400 transition-colors hover:bg-danger-50 hover:text-danger-500"
             >
               <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
               מחיקה
@@ -193,7 +193,7 @@ function LeadRow({ lead }: { lead: AdminLead }) {
                 type="button"
                 disabled={pending || note === (lead.ownerNote ?? "")}
                 onClick={() => run(() => updateLeadNote(lead.id, note))}
-                className="h-9 shrink-0 self-start rounded-xs bg-brand-800 px-4 text-xs font-bold text-white transition-colors hover:bg-brand-700 disabled:opacity-40"
+                className="h-11 shrink-0 self-start rounded-xs bg-brand-800 px-4 text-xs font-bold text-white transition-colors hover:bg-brand-700 disabled:opacity-40"
               >
                 שמירה
               </button>

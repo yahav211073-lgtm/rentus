@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Mail, MapPin, Phone, Store } from "lucide-react";
+import { ChevronDown, Mail, MapPin, Phone, Store } from "lucide-react";
 import {
   FacebookIcon, InstagramIcon, TikTokIcon, WhatsAppIcon, YouTubeIcon,
 } from "@/components/ui/icons";
@@ -61,14 +61,12 @@ export async function Footer({ brandName, logoUrl }: { brandName: string; logoUr
       <div className="bg-dots pointer-events-none absolute inset-0 opacity-[0.35]" aria-hidden="true" />
 
       <div className="relative mx-auto max-w-[1480px] px-4 pb-8 pt-10 sm:px-6 sm:pb-10 sm:pt-16 lg:px-8">
-        {/* שלוש עמודות הקישורים יורדות לשתי עמודות במובייל ולא לאחת.
-            בעמודה אחת שלושת הבלוקים הם 24 שורות קישור בטור — כמעט
-            1,200px של פוטר, יותר מגובה מסך שלם, בשביל תוכן משני.
-            גוש המותג נשאר על שתי העמודות כי הלוגו והטקסט שלצידו
-            צריכים את הרוחב המלא. */}
-        <div className="grid grid-cols-2 gap-x-4 gap-y-7 sm:gap-x-6 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-10">
+        {/* בדסקטופ נשמרות שלוש עמודות הקישורים. במובייל אותו HTML
+            הופך לאקורדיונים סגורים, כך שהפוטר לא נהיה קיר של עשרות
+            קישורים ועדיין נשאר סמנטי וסריק בלי JavaScript. */}
+        <div className="grid grid-cols-1 gap-y-1 lg:grid-cols-[1.4fr_1fr_1fr_1fr] lg:gap-10">
           {/* מותג */}
-          <div className="col-span-2 lg:col-span-1">
+          <div className="mb-5 lg:col-span-1 lg:mb-0">
             <Link href="/" className="mb-5 inline-flex items-center gap-2.5">
               {logoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -116,7 +114,7 @@ export async function Footer({ brandName, logoUrl }: { brandName: string; logoUr
                   href={`https://wa.me/${toWhatsAppNumber(contact.whatsapp)}`}
                   target="_blank" rel="noopener noreferrer"
                   aria-label="וואטסאפ"
-                  className="grid h-10 w-10 place-items-center rounded-xs border border-white/12 bg-white/5 text-white/70 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#25D366]/50 hover:bg-white/10 hover:text-[#25D366]"
+                  className="grid h-11 w-11 place-items-center rounded-xs border border-white/12 bg-white/5 text-white/70 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#25D366]/50 hover:bg-white/10 hover:text-[#25D366] lg:h-10 lg:w-10"
                 >
                   <WhatsAppIcon className="h-4.5 w-4.5" />
                 </a>
@@ -130,7 +128,7 @@ export async function Footer({ brandName, logoUrl }: { brandName: string; logoUr
                   href={social[key]}
                   target="_blank" rel="noopener noreferrer"
                   aria-label={label}
-                  className="grid h-10 w-10 place-items-center rounded-xs border border-white/12 bg-white/5 text-white/70 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-400/50 hover:bg-white/10 hover:text-accent-400"
+                  className="grid h-11 w-11 place-items-center rounded-xs border border-white/12 bg-white/5 text-white/70 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent-400/50 hover:bg-white/10 hover:text-accent-400 lg:h-10 lg:w-10"
                 >
                   <Icon className="h-4.5 w-4.5" />
                 </a>
@@ -155,15 +153,21 @@ export async function Footer({ brandName, logoUrl }: { brandName: string; logoUr
               <FooterLink key={l.href} href={l.href}>{l.label}</FooterLink>
             ))}
           </FooterColumn>
+
+          <div className="lg:hidden">
+            <FooterColumn title="מידע">
+              {LEGAL_LINKS.map((l) => (
+                <FooterLink key={l.href} href={l.href}>{l.label}</FooterLink>
+              ))}
+            </FooterColumn>
+          </div>
         </div>
 
-        <div className="mt-8 flex flex-col gap-3 border-t border-white/10 pt-5 sm:mt-12 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:pt-6">
-          <p className="text-xs text-white/45">
+        <div className="mt-7 flex flex-col gap-3 border-t border-white/10 pt-5 lg:mt-12 lg:flex-row lg:items-center lg:justify-between lg:gap-4 lg:pt-6">
+          <p className="ps-14 text-xs text-white/45 lg:ps-0">
             © {new Date().getFullYear()} {brandName}. כל הזכויות שמורות.
           </p>
-          {/* ריפוד בצד ההתחלה במובייל: כפתור הנגישות הצף יושב שם
-              בפינה, ובלי הריפוד הוא חופף את הקישור הראשון בשורה. */}
-          <ul className="flex flex-wrap gap-x-5 gap-y-2 ps-16 text-xs sm:ps-0">
+          <ul className="hidden flex-wrap gap-x-5 gap-y-2 text-xs lg:flex">
             {LEGAL_LINKS.map((l) => (
               <li key={l.href}>
                 <Link href={l.href} className="text-white/55 transition-colors hover:text-white">
@@ -180,10 +184,16 @@ export async function Footer({ brandName, logoUrl }: { brandName: string; logoUr
 
 function FooterColumn({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div>
-      <h2 className="mb-2.5 text-sm uppercase tracking-wide text-white sm:mb-4">{title}</h2>
-      <ul className="space-y-1.5 sm:space-y-2.5">{children}</ul>
-    </div>
+    <details className="footer-details group border-t border-white/10 lg:border-0">
+      <summary className="flex min-h-12 cursor-pointer items-center justify-between gap-3 py-3 text-sm font-bold text-white lg:min-h-0 lg:cursor-default lg:py-0 lg:uppercase lg:tracking-wide">
+        {title}
+        <ChevronDown
+          className="h-4 w-4 text-white/55 transition-transform duration-150 group-open:rotate-180 lg:hidden"
+          aria-hidden="true"
+        />
+      </summary>
+      <ul className="footer-details-content space-y-1.5 pb-3 lg:mt-4 lg:space-y-2.5 lg:pb-0">{children}</ul>
+    </details>
   );
 }
 
@@ -192,7 +202,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
     <li>
       <Link
         href={href}
-        className="inline-block text-xs text-white/60 transition-all duration-200 hover:translate-x-[-3px] hover:text-white sm:text-sm"
+        className="flex min-h-11 items-center text-xs text-white/60 transition-all duration-200 hover:translate-x-[-3px] hover:text-white sm:text-sm lg:inline-block lg:min-h-0"
       >
         {children}
       </Link>

@@ -57,8 +57,10 @@ export function BenefitsStrip({ banner }: { banner?: Banner }) {
             ))}
           </div>
 
-          {/* במסכים צרים המודעה מוסתרת כדי לא להכפיל את גובה הרצועה. */}
-          <div className="order-first hidden bg-brand-800 lg:block">
+          {/* המודעה מוצגת בכל הרוחבים: משבצת קומפקטית שלא מכפילה
+              משמעותית את גובה הרצועה, ולא נעלמת מתחת ל-lg כמו
+              שהייתה קודם — משבצת שלא רואים היא לא "מיקום למודעה". */}
+          <div className="order-first bg-brand-800">
             <AdSlot banner={banner} variant="compact" className="h-full rounded-none" />
           </div>
         </div>

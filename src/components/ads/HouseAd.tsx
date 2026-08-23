@@ -29,18 +29,19 @@ export function HouseAd({
       data-house-ad={variant}
       className={cn(
         "group relative flex items-center justify-center overflow-hidden rounded-lg bg-brand-800 text-center text-white transition-colors duration-200 hover:bg-brand-700 active:scale-[0.99]",
-        /* במובייל כל הווריאנטים אופקיים.
-           הריבוע (240px) והרחב (168px) תוכננו לעמודת צד ולרצועת
-           רוחב בדסקטופ. במובייל הם נמתחים לרוחב מלא, כלומר
-           מלבן כמעט ריק בגובה רבע מסך — בשביל שטח שעדיין לא נמכר.
-           אותה הודעה בדיוק בפריסה אופקית היא 96px. */
+        /* קומפקטי נשאר רצועה אופקית קצרה בכל הרוחבים — היא תוכננה
+           לגובה שורת ה-BenefitsStrip. הריבוע/הרחב הופכים לריבוע
+           אמיתי (aspect-square) במובייל, כדי לתפוס בדיוק את אותו
+           שטח שבאנר אמיתי (BannerCard) יתפוס כשיוחלף פנימה — בלי
+           קפיצת layout ברגע שמנהל מעלה קריאייטיב. מ-sm ומעלה חוזרים
+           לגובה הקבוע שתוכנן לעמודת צד/רצועת רוחב בדסקטופ. */
         compact
           ? "min-h-[84px] flex-row gap-3 px-4 py-3 text-start"
           : cn(
-              "min-h-[96px] flex-row gap-3 px-4 py-3 text-start",
+              "aspect-square flex-col gap-3 px-6 py-8 text-center",
               wide
-                ? "sm:min-h-[168px] sm:flex-col sm:gap-3 sm:px-7 sm:py-7 sm:text-center"
-                : "sm:min-h-[240px] sm:flex-col sm:gap-3 sm:px-6 sm:py-8 sm:text-center",
+                ? "sm:aspect-auto sm:min-h-[168px] sm:px-7 sm:py-7"
+                : "sm:aspect-auto sm:min-h-[240px] sm:px-6 sm:py-8",
             ),
         className,
       )}
@@ -60,11 +61,11 @@ export function HouseAd({
         <Megaphone className={compact ? "h-4 w-4" : "h-4 w-4 sm:h-5 sm:w-5"} strokeWidth={2} aria-hidden="true" />
       </span>
 
-      <span className="relative min-w-0 flex-1 sm:flex-none">
+      <span className={cn("relative min-w-0", compact ? "flex-1" : "flex-none")}>
         <span className={cn("block font-display font-extrabold leading-tight", compact ? "text-sm" : "text-sm sm:text-xl")}>
           יש לכם מודעה לפרסם?
         </span>
-        <span className={cn("mt-1 text-sm leading-snug text-white/70", compact ? "hidden" : "hidden sm:block")}>
+        <span className={cn("mt-1 text-sm leading-snug text-white/70", compact && "hidden")}>
           השטח הזה יכול להיות שלכם — מול גולשים שכבר מחפשים ציוד להשכרה
         </span>
       </span>

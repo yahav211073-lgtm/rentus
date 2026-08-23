@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import {
   ArrowRight, Briefcase, FileText, LayoutDashboard, LayoutGrid, LogOut, Megaphone,
   Menu, MessageCircle, MessageSquareQuote, Settings, Star, Users, X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useDialogFocus, useModalLock } from "@/lib/hooks/modal";
 
 /**
  * מעטפת התצוגה של הניהול.
@@ -46,6 +47,7 @@ export function AdminShell({
 }: { children: React.ReactNode; userName: string; role: string }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const drawerRef = useRef<HTMLDivElement>(null);
 
   // סגירת המגירה במעבר עמוד, בזמן הרינדור ולא ב-effect — אחרת היא
   // נשארת פתוחה לפריים אחד מעל העמוד החדש.
@@ -55,10 +57,8 @@ export function AdminShell({
     setOpen(false);
   }
 
-  useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [open]);
+  useModalLock(open);
+  useDialogFocus(open, drawerRef, () => setOpen(false));
 
   const nav = (
     <nav aria-label="ניווט ניהול">
@@ -71,7 +71,7 @@ export function AdminShell({
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex items-center gap-2.5 rounded-xs px-3 py-2.5 text-sm font-semibold transition-colors",
+                  "flex min-h-11 items-center gap-2.5 rounded-xs px-3 py-2.5 text-sm font-semibold transition-colors",
                   active
                     ? "bg-brand-800 text-white"
                     : "text-ink-600 hover:bg-brand-50 hover:text-brand-800",
@@ -99,14 +99,14 @@ export function AdminShell({
           onClick={() => setOpen(true)}
           aria-label="פתיחת תפריט ניהול"
           aria-expanded={open}
-          className="grid h-10 w-10 place-items-center rounded-xs text-ink-700 transition-colors hover:bg-ink-100"
+          className="grid h-11 w-11 place-items-center rounded-xs text-ink-700 transition-colors hover:bg-ink-100"
         >
           <Menu className="h-5 w-5" aria-hidden="true" />
         </button>
         <span className="font-display text-base font-extrabold text-brand-900">ניהול</span>
         <Link
           href="/"
-          className="grid h-10 w-10 place-items-center rounded-xs text-ink-500 transition-colors hover:bg-ink-100"
+          className="grid h-11 w-11 place-items-center rounded-xs text-ink-500 transition-colors hover:bg-ink-100"
           aria-label="חזרה לאתר"
         >
           <ArrowRight className="h-5 w-5" aria-hidden="true" />
@@ -156,10 +156,12 @@ export function AdminShell({
               className="fixed inset-0 z-50 bg-brand-950/50 lg:hidden"
             />
             <div
+              ref={drawerRef}
               role="dialog"
               aria-modal="true"
               aria-label="תפריט ניהול"
-              className="fixed inset-y-0 z-[51] flex w-[min(85vw,300px)] flex-col bg-white shadow-2xl lg:hidden"
+              tabIndex={-1}
+              className="fixed inset-y-0 z-[51] flex w-[min(85vw,300px)] flex-col bg-white pb-[env(safe-area-inset-bottom,0px)] pt-[env(safe-area-inset-top,0px)] shadow-2xl lg:hidden"
               style={{ insetInlineStart: 0 }}
             >
               <div className="flex items-center justify-between border-b border-ink-100 p-4">
@@ -171,7 +173,8 @@ export function AdminShell({
                   type="button"
                   onClick={() => setOpen(false)}
                   aria-label="סגירת התפריט"
-                  className="grid h-9 w-9 shrink-0 place-items-center rounded-xs text-ink-500 hover:bg-ink-100"
+                  data-dialog-autofocus
+                  className="grid h-11 w-11 shrink-0 place-items-center rounded-xs text-ink-500 hover:bg-ink-100"
                 >
                   <X className="h-5 w-5" aria-hidden="true" />
                 </button>
@@ -180,7 +183,7 @@ export function AdminShell({
               <form action="/api/auth/signout" method="post" className="border-t border-ink-100 p-3">
                 <button
                   type="submit"
-                  className="flex w-full items-center gap-2 rounded-xs px-3 py-2.5 text-sm font-semibold text-ink-600 hover:bg-danger-50 hover:text-danger-500"
+                  className="flex min-h-11 w-full items-center gap-2 rounded-xs px-3 py-2.5 text-sm font-semibold text-ink-600 hover:bg-danger-50 hover:text-danger-500"
                 >
                   <LogOut className="h-4 w-4" aria-hidden="true" />
                   התנתקות

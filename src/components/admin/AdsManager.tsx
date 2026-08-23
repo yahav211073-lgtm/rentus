@@ -106,32 +106,37 @@ export function AdsManager({
             העלו תמונת באנר כדי להתחיל. באנר נשמר כבוי עד שתסמנו אותו כפעיל.
           </EmptyState>
         ) : (
-          <ul className="mt-5 divide-y divide-ink-100">
+          <ul className="mt-5 space-y-3 sm:space-y-0 sm:divide-y sm:divide-ink-100">
             {banners.map((b) => (
-              <li key={b.id} className="flex flex-wrap items-center gap-4 py-3">
-                <div className="h-14 w-20 shrink-0 overflow-hidden rounded-sm border border-ink-200 bg-ink-50">
-                  {b.assetUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={b.assetUrl} alt="" className="h-full w-full object-cover" />
-                  ) : (
-                    <span className="grid h-full w-full place-items-center text-ink-300">
-                      <ImageOff className="h-4 w-4" aria-hidden="true" />
-                    </span>
-                  )}
+              <li
+                key={b.id}
+                className="flex flex-col gap-3 rounded-lg border border-ink-200/70 bg-white p-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 sm:rounded-none sm:border-0 sm:p-0 sm:py-3"
+              >
+                <div className="flex items-center gap-3 sm:contents">
+                  <div className="h-14 w-20 shrink-0 overflow-hidden rounded-sm border border-ink-200 bg-ink-50">
+                    {b.assetUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={b.assetUrl} alt="" className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="grid h-full w-full place-items-center text-ink-300">
+                        <ImageOff className="h-4 w-4" aria-hidden="true" />
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-bold text-ink-800">{b.title}</p>
+                    <p className="truncate text-xs text-ink-400">
+                      {placementLabel(b.placementKey)}
+                      {b.href ? ` · ${b.href}` : " · ללא קישור"}
+                    </p>
+                    {!b.assetUrl && (
+                      <p className="text-2xs font-semibold text-warning-700">חסרה תמונה — לא ניתן להפעיל</p>
+                    )}
+                  </div>
                 </div>
 
-                <div className="min-w-0 flex-1">
-                  <p className="truncate font-bold text-ink-800">{b.title}</p>
-                  <p className="truncate text-xs text-ink-400">
-                    {placementLabel(b.placementKey)}
-                    {b.href ? ` · ${b.href}` : " · ללא קישור"}
-                  </p>
-                  {!b.assetUrl && (
-                    <p className="text-2xs font-semibold text-warning-700">חסרה תמונה — לא ניתן להפעיל</p>
-                  )}
-                </div>
-
-                <div className="flex shrink-0 items-center gap-3">
+                <div className="flex shrink-0 items-center justify-between gap-3 border-t border-ink-100 pt-3 sm:justify-start sm:border-0 sm:pt-0">
                   <label className="flex items-center gap-1.5 text-xs font-semibold text-ink-600">
                     <input
                       type="checkbox"
@@ -142,23 +147,25 @@ export function AdsManager({
                     />
                     פעיל
                   </label>
-                  <button
-                    type="button"
-                    onClick={() => { setCreating(false); setEditing(b); }}
-                    aria-label={`עריכת ${b.title}`}
-                    className="grid h-9 w-9 place-items-center rounded-xs border border-ink-200 text-ink-500 transition-colors hover:border-brand-300 hover:text-brand-700"
-                  >
-                    <Pencil className="h-4 w-4" aria-hidden="true" />
-                  </button>
-                  <button
-                    type="button"
-                    disabled={pending}
-                    onClick={() => { if (confirm(`למחוק את "${b.title}"?`)) run(() => deleteBanner(b.id)); }}
-                    aria-label={`מחיקת ${b.title}`}
-                    className="grid h-9 w-9 place-items-center rounded-xs text-ink-400 transition-colors hover:bg-danger-50 hover:text-danger-500"
-                  >
-                    <Trash2 className="h-4 w-4" aria-hidden="true" />
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => { setCreating(false); setEditing(b); }}
+                      aria-label={`עריכת ${b.title}`}
+                      className="grid h-11 w-11 place-items-center rounded-xs border border-ink-200 text-ink-500 transition-colors hover:border-brand-300 hover:text-brand-700 sm:h-9 sm:w-9"
+                    >
+                      <Pencil className="h-4 w-4" aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={pending}
+                      onClick={() => { if (confirm(`למחוק את "${b.title}"?`)) run(() => deleteBanner(b.id)); }}
+                      aria-label={`מחיקת ${b.title}`}
+                      className="grid h-11 w-11 place-items-center rounded-xs text-ink-400 transition-colors hover:bg-danger-50 hover:text-danger-500 sm:h-9 sm:w-9"
+                    >
+                      <Trash2 className="h-4 w-4" aria-hidden="true" />
+                    </button>
+                  </div>
                 </div>
               </li>
             ))}

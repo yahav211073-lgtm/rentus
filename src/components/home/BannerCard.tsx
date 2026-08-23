@@ -56,7 +56,7 @@ export function BannerCard({
   const content = (
     <div
       ref={ref}
-      className={`group relative h-full overflow-hidden rounded-lg ${compact ? "min-h-[84px]" : "min-h-[280px]"}`}
+      className={`group relative h-full overflow-hidden rounded-lg ${compact ? "min-h-[84px]" : "aspect-square sm:aspect-auto sm:min-h-[280px]"}`}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img

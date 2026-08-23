@@ -1,8 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Globe, Heart, MapPin, Phone, Sparkles } from "lucide-react";
+import { ArrowLeft, Globe, Heart, MapPin, Phone, Sparkles } from "lucide-react";
 import { InstagramIcon, WazeIcon, WhatsAppIcon } from "@/components/ui/icons";
-import { toWhatsAppNumber, formatCompact } from "@/lib/utils";
+import { toWhatsAppNumber, formatCompact, cn } from "@/lib/utils";
 import type { BusinessCard as BusinessCardType } from "@/types/domain";
 
 /**
@@ -28,11 +28,20 @@ import type { BusinessCard as BusinessCardType } from "@/types/domain";
  *
  * הקישור הראשי הוא שכבת ::after על כל הכרטיס; הפעולות יושבות מעליו
  * ב-z-index, כך שאין קינון קישורים לא חוקי.
+ *
+ * variant="tile" כופה את פריסת ה-sm (תמונה 2:1 במלוא הרוחב, טקסט
+ * ממורכז) גם מתחת ל-sm. משמש בקרוסלות נגררות (BusinessCarousel) שבהן
+ * כרטיס אחד בולט על המסך — שם הרפרנס מבקש כרטיס "כמו בדסקטופ", לא
+ * את הרצועה האופקית הקומפקטית. רשימות רגילות (כמו /search) משאירות
+ * ברירת מחדל "list" בכוונה: הפריסה האופקית שם החלטה מכוונת ובדוקה.
  */
-export function CompanyListCard({ business: b }: { business: BusinessCardType }) {
+export function CompanyListCard({
+  business: b, variant = "list",
+}: { business: BusinessCardType; variant?: "list" | "tile" }) {
   const href = `/business/${b.slug}`;
   const social = b.social ?? {};
   const isPremium = b.isFeatured || b.isSponsored || b.tier === "enterprise";
+  const tile = variant === "tile";
 
   const wazeHref = b.latitude != null && b.longitude != null
     ? `https://waze.com/ul?ll=${b.latitude},${b.longitude}&navigate=yes`
@@ -52,7 +61,10 @@ export function CompanyListCard({ business: b }: { business: BusinessCardType })
       זו לא "גרסה מוקטנת" אלא הפריסה שמתאימה לפרופורציה: במסך צר יש
       עודף רוחב וחוסר גובה, ולכן התמונה עוברת לצד.
     */
-    <article className="group relative flex h-full min-h-[7.25rem] flex-row overflow-hidden sm:min-h-0 rounded-lg border border-brand-100/80 bg-[#edf3f9] shadow-[0_2px_8px_rgba(12,29,64,0.06)] transition-[box-shadow,transform,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-[0_14px_28px_-18px_rgba(12,29,64,0.28)] sm:flex-col">
+    <article className={cn(
+      "group relative flex h-full flex-row overflow-hidden rounded-lg border border-brand-100/80 bg-[#edf3f9] shadow-[0_2px_8px_rgba(12,29,64,0.06)] transition-[box-shadow,transform,border-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-[0_14px_28px_-18px_rgba(12,29,64,0.28)] sm:min-h-0 sm:flex-col",
+      tile ? "min-h-0 flex-col" : "min-h-[7.25rem]",
+    )}>
 
       {/* ---------- תמונת נושא ---------- */}
       {/* בלי aspect-ratio במובייל.
@@ -60,7 +72,10 @@ export function CompanyListCard({ business: b }: { business: BusinessCardType })
           נגזר מהרוחב, והרוחב נמתח לגובה השורה — והכרטיס קרס לגובה
           אפס. כאן הגובה מגיע מ-min-h של הכרטיס ומהתוכן, והתמונה רק
           נמתחת אליו. מ-sm הכרטיס אנכי ואז 2:1 חוקי לגמרי. */}
-      <div className="relative w-[38%] max-w-[128px] shrink-0 self-stretch overflow-hidden bg-ink-100 sm:aspect-[2/1] sm:w-full sm:max-w-none sm:self-auto">
+      <div className={cn(
+        "relative shrink-0 overflow-hidden bg-ink-100 sm:aspect-[2/1] sm:w-full sm:max-w-none sm:self-auto",
+        tile ? "aspect-[2/1] w-full max-w-none self-auto" : "w-[38%] max-w-[128px] self-stretch",
+      )}>
         {b.coverUrl ? (
           <Image
             src={b.coverUrl}
@@ -88,10 +103,13 @@ export function CompanyListCard({ business: b }: { business: BusinessCardType })
         <Link
           href="/login?next=/search"
           aria-label={`הוספת ${b.name} למועדפים`}
-          /* מוסתר במובייל: התמונה שם רחבה 122px, ועיגול מועדפים
-             ותג פרימיום יחד כיסו אותה כמעט לגמרי. המועדפים הוא
-             פעולה משנית שקיימת גם בעמוד העסק עצמו. */
-          className="absolute top-2 z-10 hidden h-8 w-8 place-items-center rounded-full bg-brand-950/25 text-white backdrop-blur-sm transition-colors hover:bg-white hover:text-danger-500 sm:grid"
+          /* מוסתר בכרטיס list במובייל: התמונה שם רחבה 122px, ועיגול
+             מועדפים ותג פרימיום יחד כיסו אותה כמעט לגמרי. בכרטיס
+             tile התמונה במלוא הרוחב, כמו בדסקטופ, ויש לו מקום. */
+          className={cn(
+            "absolute top-2 z-10 h-8 w-8 place-items-center rounded-full bg-brand-950/25 text-white backdrop-blur-sm transition-colors hover:bg-white hover:text-danger-500 sm:grid",
+            tile ? "grid" : "hidden",
+          )}
           style={{ insetInlineStart: "0.5rem" }}
         >
           <Heart className="h-4.5 w-4.5" strokeWidth={2.2} aria-hidden="true" />
@@ -109,7 +127,10 @@ export function CompanyListCard({ business: b }: { business: BusinessCardType })
       </div>
 
       {/* ---------- גוף ---------- */}
-      <div className="flex min-w-0 flex-1 flex-col items-start px-3 pb-2 pt-2 text-start sm:items-center sm:pb-2.5 sm:pt-2.5 sm:text-center">
+      <div className={cn(
+        "flex min-w-0 flex-1 flex-col items-start px-3 pb-2 pt-2 text-start sm:items-center sm:pb-2.5 sm:pt-2.5 sm:text-center",
+        tile && "items-center pb-2.5 pt-2.5 text-center",
+      )}>
         <h3 className="line-clamp-1 text-md font-bold leading-tight text-ink-900">
           <Link href={href} className="after:absolute after:inset-0 after:content-['']">
             {b.name}
@@ -117,18 +138,21 @@ export function CompanyListCard({ business: b }: { business: BusinessCardType })
         </h3>
 
         {b.tagline && (
-          <p className="mt-0.5 line-clamp-2 text-2xs leading-snug text-ink-500 sm:mt-1 sm:line-clamp-1 sm:text-xs">{b.tagline}</p>
+          <p className={cn(
+            "mt-0.5 line-clamp-2 text-2xs leading-snug text-ink-500 sm:mt-1 sm:line-clamp-1 sm:text-xs",
+            tile && "mt-1 line-clamp-1 text-xs",
+          )}>{b.tagline}</p>
         )}
 
         {b.city && (
-          <p className="mt-1 inline-flex items-center gap-1 text-xs text-ink-500 sm:mt-1.5">
+          <p className={cn("mt-1 inline-flex items-center gap-1 text-xs text-ink-500 sm:mt-1.5", tile && "mt-1.5")}>
             {b.city.name}
             <MapPin className="h-3.5 w-3.5 shrink-0 text-danger-500" strokeWidth={2} aria-hidden="true" />
           </p>
         )}
 
         {b.reviewCount > 0 && (
-          <p className="mt-1 inline-flex items-center gap-1.5 sm:mt-1.5">
+          <p className={cn("mt-1 inline-flex items-center gap-1.5 sm:mt-1.5", tile && "mt-1.5")}>
             <span className="text-2xs text-ink-500 tabular-nums">({formatCompact(b.reviewCount)})</span>
             <span className="inline-flex gap-0.5" aria-hidden="true">
               {Array.from({ length: 5 }, (_, i) => (
@@ -145,32 +169,40 @@ export function CompanyListCard({ business: b }: { business: BusinessCardType })
         )}
 
         {/* ---------- רשתות ---------- */}
-        <div className="mt-auto flex flex-wrap items-center justify-start gap-1.5 pt-2 sm:justify-center sm:pt-2.5">
-          {b.website && (
-            <Social href={b.website} label="אתר החברה" bg="#1E3A5F" external>
-              <Globe className="h-3.5 w-3.5" strokeWidth={2} />
-            </Social>
+        <div className={cn("mt-auto flex w-full items-center justify-between gap-2 pt-2 sm:justify-center sm:pt-2.5", tile && "justify-center pt-2.5")}>
+          {!tile && (
+            <span className="inline-flex shrink-0 items-center gap-1 text-xs font-bold text-brand-700 sm:hidden">
+              לפרופיל
+              <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
+            </span>
           )}
-          {wazeHref && (
-            <Social href={wazeHref} label="ניווט ב-Waze" bg="#33CCFF" external>
-              <WazeIcon className="h-3.5 w-3.5" />
-            </Social>
-          )}
-          {social.instagram && (
-            <Social href={social.instagram} label="אינסטגרם" bg="linear-gradient(45deg,#F58529,#DD2A7B,#8134AF)" external>
-              <InstagramIcon className="h-3.5 w-3.5" />
-            </Social>
-          )}
-          {b.whatsapp && (
-            <Social href={`https://wa.me/${toWhatsAppNumber(b.whatsapp)}`} label="וואטסאפ" bg="#25D366" external>
-              <WhatsAppIcon className="h-3.5 w-3.5" />
-            </Social>
-          )}
-          {b.phone && (
-            <Social href={`tel:${b.phone}`} label={`חיוג ל-${b.name}`} bg="#1D6FE0">
-              <Phone className="h-3.5 w-3.5" strokeWidth={2.2} />
-            </Social>
-          )}
+          <div className={cn("flex flex-wrap items-center justify-end gap-1.5 sm:justify-center", tile && "justify-center")}>
+            {b.website && (
+              <Social href={b.website} label="אתר החברה" bg="#1E3A5F" external secondaryOnMobile={!tile}>
+                <Globe className="h-3.5 w-3.5" strokeWidth={2} />
+              </Social>
+            )}
+            {wazeHref && (
+              <Social href={wazeHref} label="ניווט ב-Waze" bg="#33CCFF" external secondaryOnMobile={!tile}>
+                <WazeIcon className="h-3.5 w-3.5" />
+              </Social>
+            )}
+            {social.instagram && (
+              <Social href={social.instagram} label="אינסטגרם" bg="linear-gradient(45deg,#F58529,#DD2A7B,#8134AF)" external secondaryOnMobile={!tile}>
+                <InstagramIcon className="h-3.5 w-3.5" />
+              </Social>
+            )}
+            {b.whatsapp && (
+              <Social href={`https://wa.me/${toWhatsAppNumber(b.whatsapp)}`} label="וואטסאפ" bg="#25D366" external>
+                <WhatsAppIcon className="h-4 w-4 sm:h-3.5 sm:w-3.5" />
+              </Social>
+            )}
+            {b.phone && (
+              <Social href={`tel:${b.phone}`} label={`חיוג ל-${b.name}`} bg="#1D6FE0">
+                <Phone className="h-4 w-4 sm:h-3.5 sm:w-3.5" strokeWidth={2.2} />
+              </Social>
+            )}
+          </div>
         </div>
       </div>
     </article>
@@ -179,8 +211,15 @@ export function CompanyListCard({ business: b }: { business: BusinessCardType })
 
 /** עיגול רשת. z-10 כדי לשבת מעל שכבת הקישור של הכרטיס כולו. */
 function Social({
-  href, label, bg, external, children,
-}: { href: string; label: string; bg: string; external?: boolean; children: React.ReactNode }) {
+  href, label, bg, external, secondaryOnMobile, children,
+}: {
+  href: string;
+  label: string;
+  bg: string;
+  external?: boolean;
+  secondaryOnMobile?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <a
       href={href}
@@ -189,7 +228,7 @@ function Social({
       target={external ? "_blank" : undefined}
       rel={external ? "noopener noreferrer" : undefined}
       style={{ background: bg }}
-      className="relative z-10 grid h-7 w-7 place-items-center rounded-full text-white shadow-[0_2px_6px_rgba(12,29,64,0.18)] transition-transform duration-200 hover:-translate-y-0.5 active:scale-95"
+      className={`relative z-10 h-11 w-11 place-items-center rounded-full text-white shadow-[0_2px_6px_rgba(12,29,64,0.18)] transition-transform duration-150 active:scale-95 sm:h-7 sm:w-7 ${secondaryOnMobile ? "hidden sm:grid" : "grid"}`}
     >
       {children}
     </a>

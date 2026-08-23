@@ -66,7 +66,7 @@ export function OwnerBusinessCard({
   }
 
   return (
-    <section className="rounded-lg border border-ink-200/70 bg-white p-6">
+    <section className="rounded-lg border border-ink-200/70 bg-white p-4 sm:p-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="mb-1 flex items-center gap-2">

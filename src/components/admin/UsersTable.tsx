@@ -47,6 +47,23 @@ export function UsersTable({ users, currentUserId }: { users: UserRow[]; current
     });
   }
 
+  function changeRole(user: UserRow, next: string) {
+    if (STAFF.has(next) && !STAFF.has(user.role)) {
+      if (!confirm(
+        `להפוך את ${user.fullName ?? user.email} למנהל? תהיה לו גישה מלאה למערכת הניהול.`,
+      )) return;
+    }
+    run(() => updateUserRole(user.id, next), user.id);
+  }
+
+  function removeUser(user: UserRow) {
+    if (confirm(
+      `למחוק לצמיתות את החשבון של ${user.fullName ?? user.email}? הפעולה אינה הפיכה.`,
+    )) {
+      run(() => deleteUserAccount(user.id));
+    }
+  }
+
   return (
     <div className="space-y-3">
       {error && (
@@ -55,7 +72,67 @@ export function UsersTable({ users, currentUserId }: { users: UserRow[]; current
         </p>
       )}
 
-      <div className="overflow-x-auto rounded-lg border border-ink-200/70 bg-white">
+      {/* מובייל: כל משתמש הוא יחידת החלטה אחת. השם, הזהות, התפקיד
+          והמחיקה נשארים יחד במקום לדרוש גלילה אופקית בין עמודות. */}
+      <ul className="space-y-3 md:hidden" aria-label="רשימת משתמשים">
+        {users.map((u) => {
+          const isMe = u.id === currentUserId;
+          return (
+            <li
+              key={u.id}
+              className={`rounded-lg border border-ink-200/70 bg-white p-4 ${saved === u.id ? "bg-success-50/60" : ""}`}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="flex flex-wrap items-center gap-1.5 font-bold text-ink-900">
+                    {STAFF.has(u.role) && (
+                      <ShieldCheck className="h-4 w-4 text-brand-600" aria-label="חבר צוות" />
+                    )}
+                    {u.fullName ?? "ללא שם"}
+                    {isMe && <span className="text-2xs font-normal text-ink-400">(אתם)</span>}
+                  </p>
+                  <p className="mt-1 break-all text-xs text-ink-500" dir="ltr">{u.email ?? "—"}</p>
+                </div>
+                {u.businessCount > 0 && (
+                  <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-brand-50 px-2 py-1 text-2xs font-bold text-brand-700">
+                    <Store className="h-3 w-3" aria-hidden="true" />
+                    {u.businessCount > 1 ? `${u.businessCount} עסקים` : "בעל עסק"}
+                  </span>
+                )}
+              </div>
+
+              <p className="mt-3 text-2xs text-ink-400">נרשם {formatRelative(u.createdAt)}</p>
+
+              <div className="mt-3 flex items-end gap-2 border-t border-ink-100 pt-3">
+                <label className="min-w-0 flex-1 text-xs font-bold text-ink-600">
+                  תפקיד
+                  <select
+                    value={u.role}
+                    disabled={pending || isMe}
+                    onChange={(e) => changeRole(u, e.target.value)}
+                    className="mt-1 h-11 w-full rounded-xs border border-ink-200 bg-white px-3 text-base outline-none focus:border-brand-400 disabled:bg-ink-50 disabled:text-ink-400"
+                  >
+                    {ROLES.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
+                  </select>
+                </label>
+                {!isMe && (
+                  <button
+                    type="button"
+                    disabled={pending}
+                    onClick={() => removeUser(u)}
+                    aria-label={`מחיקת החשבון של ${u.fullName ?? u.email}`}
+                    className="grid h-11 w-11 shrink-0 place-items-center rounded-xs border border-danger-500/20 text-danger-500 transition-colors active:bg-danger-50 disabled:opacity-50"
+                  >
+                    <Trash2 className="h-4.5 w-4.5" aria-hidden="true" />
+                  </button>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+
+      <div className="hidden overflow-x-auto rounded-lg border border-ink-200/70 bg-white md:block">
         <table className="w-full min-w-[640px] text-sm">
           <caption className="sr-only">רשימת המשתמשים הרשומים והתפקידים שלהם</caption>
           <thead className="border-b border-ink-100 bg-ink-50 text-xs text-ink-500">
@@ -102,17 +179,7 @@ export function UsersTable({ users, currentUserId }: { users: UserRow[]; current
                       value={u.role}
                       disabled={pending || isMe}
                       aria-label={`תפקיד של ${u.fullName ?? u.email}`}
-                      onChange={(e) => {
-                        const next = e.target.value;
-                        if (STAFF.has(next) && !STAFF.has(u.role)) {
-                          if (!confirm(
-                            `להפוך את ${u.fullName ?? u.email} למנהל? תהיה לו גישה מלאה למערכת הניהול.`,
-                          )) {
-                            return;
-                          }
-                        }
-                        run(() => updateUserRole(u.id, next), u.id);
-                      }}
+                      onChange={(e) => changeRole(u, e.target.value)}
                       className="h-9 rounded-xs border border-ink-200 bg-white px-2 text-sm outline-none focus:border-brand-400 disabled:bg-ink-50 disabled:text-ink-400"
                     >
                       {ROLES.map((r) => <option key={r.value} value={r.value}>{r.label}</option>)}
@@ -123,13 +190,7 @@ export function UsersTable({ users, currentUserId }: { users: UserRow[]; current
                       <button
                         type="button"
                         disabled={pending}
-                        onClick={() => {
-                          if (confirm(
-                            `למחוק לצמיתות את החשבון של ${u.fullName ?? u.email}? הפעולה אינה הפיכה.`,
-                          )) {
-                            run(() => deleteUserAccount(u.id));
-                          }
-                        }}
+                        onClick={() => removeUser(u)}
                         aria-label={`מחיקת החשבון של ${u.fullName ?? u.email}`}
                         className="grid h-8 w-8 place-items-center rounded-xs text-ink-400 transition-colors hover:bg-danger-50 hover:text-danger-500 disabled:opacity-50"
                       >

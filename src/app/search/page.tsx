@@ -3,7 +3,7 @@ import Link from "next/link";
 import { SearchX } from "lucide-react";
 import { parseSearchParams, searchBusinesses, PAGE_SIZE } from "@/lib/repo/search";
 import { SearchBar } from "@/components/search/SearchBar";
-import { FilterRail } from "@/components/search/FilterRail";
+import { ActiveFilterChips, FilterRail } from "@/components/search/FilterRail";
 import { SortSelect } from "@/components/search/SortSelect";
 import { CompanyListCard } from "@/components/business/CompanyListCard";
 import { RevealItem, RevealStagger } from "@/components/motion/Reveal";
@@ -91,6 +91,8 @@ export default async function SearchPage({ searchParams }: { searchParams: Searc
               </p>
               <SortSelect />
             </div>
+
+            <ActiveFilterChips categories={categories} cities={cities} />
 
             {result.items.length === 0 ? (
               <EmptyState query={filters.q} categories={categories} />

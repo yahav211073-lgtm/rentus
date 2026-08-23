@@ -223,7 +223,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Footer brandName={brand.name} logoUrl={brand.logoUrl} />
         <div aria-hidden="true" style={{ height: "var(--spacing-tabbar)" }} />
 
-        <MobileTabBar isLoggedIn={Boolean(user)} />
+        <MobileTabBar isLoggedIn={Boolean(user)} userRole={user?.role} />
 
         <AccessibilityToolbar />
         <ServiceWorkerRegister />

@@ -104,17 +104,29 @@ export default async function AdminBusinessesPage({
     for (const r of areaRows ?? []) areaIds.add(r.business_id);
   }
 
+  const rows = (businesses ?? []).map((business) => {
+    const statusMeta = STATUS_LABEL[business.status as BusinessStatus];
+    const owner = business.owner as unknown as
+      { full_name: string | null; email: string | null; phone: string | null } | null;
+    const missing = missingVerificationFields({
+      ...business,
+      business_service_areas: areaIds.has(business.id) ? [{}] : [],
+    });
+    return { business, statusMeta, owner, missing };
+  });
+
   return (
     <div>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl text-ink-900">ניהול עסקים</h1>
-        <div className="flex flex-wrap items-center gap-2">
-          <form className="flex gap-2">
+        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+          <form className="min-w-0 flex-1 sm:flex-none">
             <input type="hidden" name="status" value={status} />
             <input
               type="search" name="q" defaultValue={q}
               placeholder="חיפוש לפי שם עסק או שם בעלים..."
-              className="h-10 w-64 rounded-sm border border-ink-200 px-3 text-sm outline-none focus:border-brand-400"
+              aria-label="חיפוש עסקים"
+              className="h-11 w-full rounded-sm border border-ink-200 px-3 text-base outline-none focus:border-brand-400 sm:h-10 sm:w-64 sm:text-sm"
             />
           </form>
           <ButtonLink href="/admin/businesses/new" variant="accent" size="md" icon={<Plus className="h-4 w-4" />}>
@@ -123,12 +135,12 @@ export default async function AdminBusinessesPage({
         </div>
       </div>
 
-      <div className="mb-5 flex gap-1 border-b border-ink-200">
+      <div className="no-scrollbar -mx-4 mb-5 flex gap-1 overflow-x-auto border-b border-ink-200 px-4 sm:mx-0 sm:px-0">
         {TABS.map((t) => (
           <Link
             key={t.key}
             href={`/admin/businesses?status=${t.key}`}
-            className={`border-b-2 px-4 py-2.5 text-sm font-bold transition-colors ${
+            className={`shrink-0 border-b-2 px-4 py-2.5 text-sm font-bold transition-colors ${
               status === t.key
                 ? "border-brand-700 text-brand-800"
                 : "border-transparent text-ink-400 hover:text-ink-700"
@@ -145,98 +157,152 @@ export default async function AdminBusinessesPage({
         </div>
       )}
 
-      <div className="overflow-hidden rounded-lg border border-ink-200/70 bg-white">
-        <table className="w-full text-sm">
-          <thead className="border-b border-ink-100 bg-ink-50 text-start text-xs text-ink-500">
-            <tr>
-              <th className="px-4 py-3 text-start font-bold">שם</th>
-              <th className="px-4 py-3 text-start font-bold">בעל העסק</th>
-              <th className="px-4 py-3 text-start font-bold">עיר</th>
-              <th className="px-4 py-3 text-start font-bold">טלפון</th>
-              <th className="px-4 py-3 text-start font-bold">סטטוס</th>
-              <th className="px-4 py-3 text-start font-bold">קידום ואימות</th>
-              <th className="px-4 py-3 text-start font-bold">פעולות</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-ink-100">
-            {(businesses ?? []).map((b) => {
-              const s = STATUS_LABEL[b.status as BusinessStatus];
-              const owner = b.owner as unknown as
-                { full_name: string | null; email: string | null; phone: string | null } | null;
-              const missing = missingVerificationFields({
-                ...b,
-                business_service_areas: areaIds.has(b.id) ? [{}] : [],
-              });
-              return (
-                <tr key={b.id}>
-                  <td className="px-4 py-3">
-                    <Link href={`/admin/businesses/${b.id}`} className="font-bold text-ink-800 hover:text-brand-700">
+      {rows.length === 0 ? (
+        <div className="rounded-lg border border-dashed border-ink-300 bg-white px-5 py-12 text-center text-sm text-ink-400">
+          {status === "featured"
+            ? "עדיין לא סומנה אף חברה כמומלצת. סמנו חברות בטאב \"פורסמו\"."
+            : "אין עסקים בסטטוס הזה."}
+        </div>
+      ) : (
+        <>
+          {/* במובייל כל עסק הופך לכרטיס פעולה. הנתונים שהמנהל צריך
+              להחלטה נשארים גלויים, והפעולות אינן עמודה שביעית מחוץ
+              למסך. */}
+          <ul className="space-y-3 lg:hidden" aria-label="רשימת עסקים">
+            {rows.map(({ business: b, statusMeta: s, owner, missing }) => (
+              <li key={b.id} className="rounded-lg border border-ink-200/70 bg-white p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <Link href={`/admin/businesses/${b.id}`} className="block truncate text-base font-bold text-ink-900">
                       {b.name}
                     </Link>
-                  </td>
-                  <td className="px-4 py-3">
-                    {/* עסק בלי owner_id הוא עסק שהמנהל הזין ידנית. זה מצב
-                        תקין לחלוטין ולא חסר — הוא לא מונע פרסום ולא מונע
-                        אימות. התווית נייטרלית בכוונה: "לא משויך לחשבון"
-                        נקרא כתקלה שצריך לתקן, וזו לא תקלה. */}
-                    {owner ? (
-                      <span className="flex flex-col">
-                        <span className="font-semibold text-ink-800">{owner.full_name ?? "—"}</span>
-                        <span className="text-2xs text-ink-400" dir="ltr">{owner.email ?? owner.phone ?? ""}</span>
-                      </span>
-                    ) : (
-                      <span className="text-2xs text-ink-400">נוסף מהניהול</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 text-ink-500">{(b.city as unknown as { name: string } | null)?.name ?? "—"}</td>
-                  <td className="px-4 py-3 text-ink-500">{b.phone ?? "—"}</td>
-                  <td className="px-4 py-3">
-                    <Badge variant={s.variant}>{s.label}</Badge>
-                    {/* מה חסר לעסק כדי להיות מאומת — מוצג ליד הסטטוס
-                        ולא מוסתר מאחורי כפתור, כי זו רשימת המשימות
-                        בפועל של המנהל מול העסקים החלקיים. */}
-                    {missing.length > 0 && (
-                      <span className="mt-1 block text-2xs text-ink-400">
-                        חסר: {missing.join(", ")}
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <FeatureVerifyToggles
-                      businessId={b.id}
-                      isFeatured={Boolean(b.is_featured)}
-                      isVerified={Boolean(b.is_verified)}
-                    />
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="flex flex-wrap items-start gap-1.5">
-                      {b.status === "pending" ? (
-                        <ApproveRejectButtons businessId={b.id} />
+                    <p className="mt-1 text-xs text-ink-500">
+                      {(b.city as unknown as { name: string } | null)?.name ?? "ללא עיר"}
+                      {b.phone && <span dir="ltr"> · {b.phone}</span>}
+                    </p>
+                  </div>
+                  <Badge variant={s.variant}>{s.label}</Badge>
+                </div>
+
+                <div className="mt-3 rounded-sm bg-ink-50 px-3 py-2.5">
+                  {owner ? (
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-ink-700">{owner.full_name ?? "ללא שם בעלים"}</p>
+                      <p className="mt-0.5 break-all text-2xs text-ink-400" dir="ltr">
+                        {owner.email ?? owner.phone ?? ""}
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-ink-400">נוסף מהניהול</p>
+                  )}
+                </div>
+
+                {missing.length > 0 && (
+                  <p className="mt-2 text-2xs leading-relaxed text-ink-500">חסר לאימות: {missing.join(", ")}</p>
+                )}
+
+                <div className="mt-3 space-y-3 border-t border-ink-100 pt-3">
+                  <FeatureVerifyToggles
+                    businessId={b.id}
+                    isFeatured={Boolean(b.is_featured)}
+                    isVerified={Boolean(b.is_verified)}
+                  />
+                  <BusinessRowActions
+                    businessId={b.id}
+                    status={b.status as BusinessStatus}
+                    businessName={b.name}
+                    isAdmin={isAdmin}
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <div className="hidden overflow-hidden rounded-lg border border-ink-200/70 bg-white lg:block">
+            <table className="w-full text-sm">
+              <thead className="border-b border-ink-100 bg-ink-50 text-start text-xs text-ink-500">
+                <tr>
+                  <th className="px-4 py-3 text-start font-bold">שם</th>
+                  <th className="px-4 py-3 text-start font-bold">בעל העסק</th>
+                  <th className="px-4 py-3 text-start font-bold">עיר</th>
+                  <th className="px-4 py-3 text-start font-bold">טלפון</th>
+                  <th className="px-4 py-3 text-start font-bold">סטטוס</th>
+                  <th className="px-4 py-3 text-start font-bold">קידום ואימות</th>
+                  <th className="px-4 py-3 text-start font-bold">פעולות</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-ink-100">
+                {rows.map(({ business: b, statusMeta: s, owner, missing }) => (
+                  <tr key={b.id}>
+                    <td className="px-4 py-3">
+                      <Link href={`/admin/businesses/${b.id}`} className="font-bold text-ink-800 hover:text-brand-700">
+                        {b.name}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3">
+                      {owner ? (
+                        <span className="flex flex-col">
+                          <span className="font-semibold text-ink-800">{owner.full_name ?? "—"}</span>
+                          <span className="text-2xs text-ink-400" dir="ltr">{owner.email ?? owner.phone ?? ""}</span>
+                        </span>
                       ) : (
-                        <ArchiveToggleButton businessId={b.id} isArchived={b.status === "archived"} />
+                        <span className="text-2xs text-ink-400">נוסף מהניהול</span>
                       )}
-                      <DeleteBusinessButton
+                    </td>
+                    <td className="px-4 py-3 text-ink-500">{(b.city as unknown as { name: string } | null)?.name ?? "—"}</td>
+                    <td className="px-4 py-3 text-ink-500">{b.phone ?? "—"}</td>
+                    <td className="px-4 py-3">
+                      <Badge variant={s.variant}>{s.label}</Badge>
+                      {missing.length > 0 && (
+                        <span className="mt-1 block text-2xs text-ink-400">חסר: {missing.join(", ")}</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      <FeatureVerifyToggles
                         businessId={b.id}
+                        isFeatured={Boolean(b.is_featured)}
+                        isVerified={Boolean(b.is_verified)}
+                      />
+                    </td>
+                    <td className="px-4 py-3">
+                      <BusinessRowActions
+                        businessId={b.id}
+                        status={b.status as BusinessStatus}
                         businessName={b.name}
                         isAdmin={isAdmin}
                       />
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
-            {(businesses ?? []).length === 0 && (
-              <tr>
-                <td colSpan={7} className="px-4 py-10 text-center text-ink-400">
-                  {status === "featured"
-                    ? "עדיין לא סומנה אף חברה כמומלצת. סמנו חברות בטאב \"פורסמו\"."
-                    : "אין עסקים בסטטוס הזה."}
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
     </div>
+  );
+}
+
+function BusinessRowActions({
+  businessId, status, businessName, isAdmin,
+}: {
+  businessId: string;
+  status: BusinessStatus;
+  businessName: string;
+  isAdmin: boolean;
+}) {
+  return (
+    <span className="flex flex-wrap items-start gap-1.5">
+      {status === "pending" ? (
+        <ApproveRejectButtons businessId={businessId} />
+      ) : (
+        <ArchiveToggleButton businessId={businessId} isArchived={status === "archived"} />
+      )}
+      <DeleteBusinessButton
+        businessId={businessId}
+        businessName={businessName}
+        isAdmin={isAdmin}
+      />
+    </span>
   );
 }

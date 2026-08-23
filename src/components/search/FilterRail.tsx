@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, useTransition } from "react";
+import { useCallback, useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { BadgeCheck, RotateCcw, SlidersHorizontal, Star, X } from "lucide-react";
@@ -8,7 +8,7 @@ import type { SearchResult } from "@/types/domain";
 import { seedTags } from "@/data/seed";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
-import { useModalLock } from "@/lib/hooks/modal";
+import { useDialogFocus, useModalLock } from "@/lib/hooks/modal";
 import type { FlatCategory, SimpleCity } from "@/lib/repo/taxonomy";
 
 /**
@@ -49,7 +49,9 @@ export function FilterRail({ facets, total, categories, cities, children }: Prop
   const params = useSearchParams();
   const [isPending, startTransition] = useTransition();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const sheetRef = useRef<HTMLDivElement>(null);
   useModalLock(mobileOpen);
+  useDialogFocus(mobileOpen, sheetRef, () => setMobileOpen(false));
 
   /** כותב ערך ל-URL. null מוחק את הפרמטר. תמיד מאפס לעמוד 1. */
   const setParam = useCallback((key: string, value: string | null) => {
@@ -229,7 +231,7 @@ export function FilterRail({ facets, total, categories, cities, children }: Prop
         type="button"
         onClick={() => setMobileOpen(true)}
         data-floating-ui
-        className="fixed z-[72] inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-brand-800 px-5 py-3 text-sm font-bold text-white shadow-[0_10px_28px_-6px_rgba(11,59,117,0.6)] transition-transform active:scale-95 lg:hidden"
+        className="fixed z-[72] inline-flex min-h-11 -translate-x-1/2 items-center gap-2 rounded-full bg-brand-800 px-5 py-3 text-sm font-bold text-white shadow-[0_10px_28px_-6px_rgba(11,59,117,0.6)] transition-transform active:scale-95 lg:hidden"
         /* left פיזי ולא insetInlineStart: ב-RTL הקיצור מתמפה ל-right,
            ואילו translateX(-50%) הוא חסר-כיוון תמיד — הצירוף שלהם
            הזיז את הגלולה חצי-רוחב שמאלה מהמרכז במקום למרכז. */
@@ -254,7 +256,9 @@ export function FilterRail({ facets, total, categories, cities, children }: Prop
               aria-hidden="true"
             />
             <motion.div
+              ref={sheetRef}
               role="dialog" aria-modal="true" aria-label="מסנני חיפוש"
+              tabIndex={-1}
               initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 32, stiffness: 320 }}
               className="fixed inset-x-0 bottom-0 z-[81] max-h-[86vh] overflow-hidden rounded-t-xl bg-white pb-[env(safe-area-inset-bottom,0px)] lg:hidden"
@@ -264,7 +268,8 @@ export function FilterRail({ facets, total, categories, cities, children }: Prop
                 <button
                   type="button" onClick={() => setMobileOpen(false)}
                   aria-label="סגירת מסננים"
-                  className="grid h-9 w-9 place-items-center rounded-full text-ink-500 hover:bg-ink-100"
+                  data-dialog-autofocus
+                  className="grid h-11 w-11 place-items-center rounded-full text-ink-500 hover:bg-ink-100"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -280,6 +285,114 @@ export function FilterRail({ facets, total, categories, cities, children }: Prop
         )}
       </AnimatePresence>
     </>
+  );
+}
+
+/**
+ * תקציר המסננים הפעילים שמופיע מעל התוצאות במובייל.
+ *
+ * במגירה סגורה אי אפשר היה לדעת למה מתקבלות שלוש תוצאות בלבד.
+ * ה־chips משאירים את הסיבה גלויה ומאפשרים להסיר מסנן בנגיעה אחת,
+ * בלי לפתוח שוב את כל ה־sheet.
+ */
+export function ActiveFilterChips({
+  categories, cities,
+}: { categories: FlatCategory[]; cities: SimpleCity[] }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const params = useSearchParams();
+  const [pending, startTransition] = useTransition();
+
+  const listValues = (key: string) => params.get(key)?.split(",").filter(Boolean) ?? [];
+  const chips: { key: string; value: string; label: string }[] = [];
+  const category = params.get("category");
+  const city = params.get("city");
+  const rating = params.get("minRating");
+
+  if (category) {
+    chips.push({
+      key: "category",
+      value: category,
+      label: categories.find((item) => item.slug === category)?.name ?? category,
+    });
+  }
+  if (city) {
+    chips.push({
+      key: "city",
+      value: city,
+      label: cities.find((item) => item.slug === city)?.name ?? city,
+    });
+  }
+  if (rating) chips.push({ key: "minRating", value: rating, label: `דירוג ${rating}+` });
+  for (const value of listValues("price")) {
+    chips.push({
+      key: "price",
+      value,
+      label: PRICE_OPTIONS.find((item) => String(item.value) === value)?.label ?? value,
+    });
+  }
+  for (const value of listValues("tags")) {
+    chips.push({
+      key: "tags",
+      value,
+      label: seedTags.find((item) => item.slug === value)?.name ?? value,
+    });
+  }
+  if (params.get("verified") === "1") {
+    chips.push({ key: "verified", value: "1", label: "מאומתות בלבד" });
+  }
+
+  if (chips.length === 0) return null;
+
+  function navigate(next: URLSearchParams) {
+    next.delete("page");
+    const query = next.toString();
+    startTransition(() => router.push(`${pathname}${query ? `?${query}` : ""}`, { scroll: false }));
+  }
+
+  function remove(key: string, value: string) {
+    const next = new URLSearchParams(params.toString());
+    if (key === "price" || key === "tags") {
+      const remaining = listValues(key).filter((item) => item !== value);
+      if (remaining.length) next.set(key, remaining.join(","));
+      else next.delete(key);
+    } else {
+      next.delete(key);
+    }
+    navigate(next);
+  }
+
+  function clear() {
+    const next = new URLSearchParams();
+    const query = params.get("q");
+    if (query) next.set("q", query);
+    navigate(next);
+  }
+
+  return (
+    <div className={cn("mb-4 lg:hidden", pending && "opacity-60")} aria-label="מסננים פעילים">
+      <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-2 overflow-x-auto px-4 pb-1">
+        {chips.map((chip) => (
+          <button
+            key={`${chip.key}-${chip.value}`}
+            type="button"
+            onClick={() => remove(chip.key, chip.value)}
+            aria-label={`הסרת המסנן ${chip.label}`}
+            className="inline-flex h-11 shrink-0 snap-start items-center gap-2 rounded-full border border-brand-200 bg-white px-3.5 text-xs font-bold text-brand-800 shadow-xs transition-colors active:bg-brand-50"
+          >
+            {chip.label}
+            <X className="h-3.5 w-3.5" aria-hidden="true" />
+          </button>
+        ))}
+        <button
+          type="button"
+          onClick={clear}
+          className="h-11 shrink-0 snap-start px-2 text-xs font-bold text-ink-500"
+        >
+          ניקוי הכול
+        </button>
+      </div>
+    </div>
   );
 }
 

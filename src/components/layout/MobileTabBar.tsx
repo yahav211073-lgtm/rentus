@@ -31,13 +31,27 @@ const ITEMS = [
   { href: "/login", label: "אזור אישי", Icon: UserRound },
 ] as const;
 
-export function MobileTabBar({ isLoggedIn }: { isLoggedIn: boolean }) {
+const STAFF_ROLES = new Set(["admin", "moderator", "editor"]);
+
+export function MobileTabBar({
+  isLoggedIn, userRole,
+}: { isLoggedIn: boolean; userRole?: string }) {
   const pathname = usePathname();
 
   if (pathname.startsWith("/admin")) return null;
 
-  const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname.startsWith(href);
+  const isActive = (href: string) => {
+    if (href === "/") return pathname === "/";
+    if (href === "/categories") {
+      return pathname.startsWith("/categories") || pathname.startsWith("/category/");
+    }
+    if (href === "/login") {
+      return pathname.startsWith("/login")
+        || pathname.startsWith("/signup")
+        || pathname.startsWith("/business/dashboard");
+    }
+    return pathname.startsWith(href);
+  };
 
   return (
     <nav
@@ -52,12 +66,22 @@ export function MobileTabBar({ isLoggedIn }: { isLoggedIn: boolean }) {
       <ul className="mx-auto flex h-[58px] max-w-md items-stretch justify-between px-1">
         {ITEMS.map(({ href, label, Icon, ...rest }) => {
           const primary = "primary" in rest && rest.primary;
-          const target = href === "/login" && isLoggedIn ? "/business/dashboard" : href;
+          const target = href === "/login" && isLoggedIn
+            ? (userRole && STAFF_ROLES.has(userRole) ? "/admin" : "/business/dashboard")
+            : href;
           const active = isActive(href);
 
           if (primary) {
             return (
-              <li key={href} className="flex flex-1 items-center justify-center">
+              <li
+                key={href}
+                /* תפר זכוכית — לא קו הפרדה שטוח, אלא שני גבולות בהירים
+                   עדינים (border-white/70) שמסגרים את הכפתור המורם,
+                   עם shadow-inner-t (הטוקן הקיים לקו-אור) שנותן את
+                   התחושה של "אור שנתפס בזכוכית". border-s/e ולא
+                   border-x כדי שהתפר יישאר נכון גם ב-RTL. */
+                className="relative flex flex-1 items-center justify-center border-s border-e border-white/70 bg-white/30 shadow-[var(--shadow-inner-t)]"
+              >
                 <Link
                   href={target}
                   aria-label={label}

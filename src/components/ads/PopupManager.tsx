@@ -8,7 +8,7 @@ import type { PopupBanner, PopupLayout } from "@/types/domain";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { detectDevice, isWithinSchedule, matchesTargeting } from "@/lib/ads/targeting";
 import { cn } from "@/lib/utils";
-import { useModalLock } from "@/lib/hooks/modal";
+import { useDialogFocus, useModalLock } from "@/lib/hooks/modal";
 
 /**
  * מנוע הפופאפים.
@@ -220,7 +220,7 @@ const LAYOUTS: Record<PopupLayout, {
   modal: {
     wrapper: "inset-0 grid place-items-center p-4",
     panel: "w-full max-w-lg rounded-xl",
-    from: { opacity: 0, scale: 0.94, y: 24 },
+    from: { opacity: 0, scale: 0.96, y: 16 },
     backdrop: true,
   },
   fullscreen: {
@@ -258,20 +258,14 @@ function PopupView({
   const layout = LAYOUTS[p.layout];
   const panelRef = useRef<HTMLDivElement>(null);
   const isBar = p.layout === "bottom_bar";
+  const hasContent = Boolean(
+    p.heading || p.body || (p.ctaLabel && p.ctaHref) || p.secondaryLabel,
+  );
 
   /* פופאפ עם כיסוי הוא מודאל לכל דבר: נועל את גלילת הרקע ומוריד
      מהמסך את הכפתורים הצפים, שאחרת מרחפים מעליו. */
   useModalLock(layout.backdrop);
-
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onDismiss("close"); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onDismiss]);
-
-  useEffect(() => {
-    panelRef.current?.focus();
-  }, []);
+  useDialogFocus(true, panelRef, () => onDismiss("close"));
 
   return (
     <>
@@ -280,7 +274,7 @@ function PopupView({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.24 }}
+          transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
           onClick={() => onDismiss("close")}
           className="fixed inset-0 z-[100] bg-brand-950/55 backdrop-blur-sm"
           aria-hidden="true"
@@ -297,7 +291,7 @@ function PopupView({
           initial={reduced ? { opacity: 0 } : layout.from}
           animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
           exit={reduced ? { opacity: 0 } : layout.from}
-          transition={{ duration: reduced ? 0.01 : 0.4, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: reduced ? 0.01 : 0.24, ease: [0.23, 1, 0.32, 1] }}
           className={cn(
             "pointer-events-auto relative overflow-hidden bg-white shadow-[0_32px_80px_-20px_rgba(5,25,47,0.55)]",
             layout.panel,
@@ -307,7 +301,8 @@ function PopupView({
             type="button"
             onClick={() => onDismiss("close")}
             aria-label="סגירה"
-            className="absolute top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-white/85 text-ink-600 shadow-sm backdrop-blur-sm transition-colors hover:bg-white hover:text-ink-900"
+            data-dialog-autofocus
+            className="absolute top-3 z-10 grid h-11 w-11 place-items-center rounded-full bg-white/85 text-ink-600 shadow-sm backdrop-blur-sm transition-colors hover:bg-white hover:text-ink-900"
             style={{ insetInlineEnd: "0.75rem" }}
           >
             <X className="h-4.5 w-4.5" />
@@ -324,7 +319,7 @@ function PopupView({
               </div>
             )}
 
-            <div className={cn(isBar ? "flex flex-1 items-center gap-5" : "p-4 sm:p-6")}>
+            {hasContent && <div className={cn(isBar ? "flex flex-1 items-center gap-5" : "p-4 sm:p-6")}>
               <div className={cn(isBar && "flex-1")}>
                 {p.heading && (
                   <h2
@@ -366,7 +361,7 @@ function PopupView({
                   </Button>
                 )}
               </div>
-            </div>
+            </div>}
           </div>
         </motion.div>
       </div>

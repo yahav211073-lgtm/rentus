@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { ImageOff, Pencil, Plus, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { ImageUploadField } from "@/components/admin/ImageUploadField";
+import { cn } from "@/lib/utils";
 import {
   createCategory, createCity, deleteCategory, deleteCity, toggleCategoryActive, updateCategory,
 } from "@/app/admin/categories/actions";
@@ -50,30 +51,35 @@ export function CategoryManager({
 
     return (
       <li key={row.id} className={nested ? "" : "border-t border-ink-100 first:border-t-0"}>
-        <div className={`flex flex-wrap items-center gap-3 py-2.5 ${nested ? "ps-4" : ""}`}>
-          <div className="h-10 w-14 shrink-0 overflow-hidden rounded-sm border border-ink-200 bg-ink-50">
-            {row.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={row.imageUrl} alt="" className="h-full w-full object-cover" />
-            ) : (
-              <span className="grid h-full w-full place-items-center text-ink-300">
-                <ImageOff className="h-3.5 w-3.5" aria-hidden="true" />
+        <div className={cn(
+          "flex flex-col gap-2.5 rounded-lg border border-ink-200/70 bg-white p-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0 sm:py-2.5",
+          nested && "sm:ps-4",
+        )}>
+          <div className="flex items-center gap-3 sm:contents">
+            <div className="h-10 w-14 shrink-0 overflow-hidden rounded-sm border border-ink-200 bg-ink-50">
+              {row.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={row.imageUrl} alt="" className="h-full w-full object-cover" />
+              ) : (
+                <span className="grid h-full w-full place-items-center text-ink-300">
+                  <ImageOff className="h-3.5 w-3.5" aria-hidden="true" />
+                </span>
+              )}
+            </div>
+
+            <div className="min-w-0 flex-1">
+              <span className={`block truncate ${nested ? "text-sm text-ink-600" : "font-bold text-ink-800"}`}>
+                {row.name}
               </span>
-            )}
+              <span className="text-2xs text-ink-400">
+                {row.businessCount} עסקים
+                {!row.imageUrl && " · חסרה תמונה"}
+                {!row.isActive && " · מוסתרת מהאתר"}
+              </span>
+            </div>
           </div>
 
-          <div className="min-w-0 flex-1">
-            <span className={`block truncate ${nested ? "text-sm text-ink-600" : "font-bold text-ink-800"}`}>
-              {row.name}
-            </span>
-            <span className="text-2xs text-ink-400">
-              {row.businessCount} עסקים
-              {!row.imageUrl && " · חסרה תמונה"}
-              {!row.isActive && " · מוסתרת מהאתר"}
-            </span>
-          </div>
-
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 items-center justify-between gap-2 border-t border-ink-100 pt-2.5 sm:justify-start sm:border-0 sm:pt-0">
             <label className="flex items-center gap-1.5 text-2xs font-semibold text-ink-500">
               <input
                 type="checkbox"
@@ -84,26 +90,28 @@ export function CategoryManager({
               />
               מוצגת
             </label>
-            <button
-              type="button"
-              onClick={() => setEditingId(editing ? null : row.id)}
-              aria-label={`עריכת ${row.name}`}
-              aria-expanded={editing}
-              className="grid h-8 w-8 place-items-center rounded-xs border border-ink-200 text-ink-500 transition-colors hover:border-brand-300 hover:text-brand-700"
-            >
-              <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              disabled={pending}
-              onClick={() => {
-                if (confirm(`למחוק את "${row.name}"?`)) run(() => deleteCategory(row.id));
-              }}
-              aria-label={`מחיקת ${row.name}`}
-              className="grid h-8 w-8 place-items-center rounded-xs text-ink-400 transition-colors hover:bg-danger-50 hover:text-danger-500"
-            >
-              <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setEditingId(editing ? null : row.id)}
+                aria-label={`עריכת ${row.name}`}
+                aria-expanded={editing}
+                className="grid h-11 w-11 place-items-center rounded-xs border border-ink-200 text-ink-500 transition-colors hover:border-brand-300 hover:text-brand-700 sm:h-8 sm:w-8"
+              >
+                <Pencil className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => {
+                  if (confirm(`למחוק את "${row.name}"?`)) run(() => deleteCategory(row.id));
+                }}
+                aria-label={`מחיקת ${row.name}`}
+                className="grid h-11 w-11 place-items-center rounded-xs text-ink-400 transition-colors hover:bg-danger-50 hover:text-danger-500 sm:h-8 sm:w-8"
+              >
+                <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -247,7 +255,7 @@ export function CategoryManager({
                     if (confirm(`למחוק את ${c.name}?`)) run(() => deleteCity(c.id));
                   }}
                   aria-label={`מחיקת ${c.name}`}
-                  className="text-ink-300 transition-colors hover:text-danger-500"
+                  className="grid h-11 w-11 place-items-center rounded-xs text-ink-300 transition-colors hover:bg-danger-50 hover:text-danger-500 sm:h-8 sm:w-8"
                 >
                   <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                 </button>

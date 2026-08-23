@@ -152,13 +152,20 @@
   --duration-normal: 260ms;
   --duration-slow:   420ms;
   --duration-slower: 700ms;
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 
   /* --- פריסה --------------------------------------------------------------
      גובה הכותרת הקבועה. הניווט הוא סרגל-גלולה צף, ולכן החישוב הוא:
      רצועת שירות כהה 36 + ריווח עליון 12 + גובה הגלולה 66 + נשימה 2.
      מוסתרת מתחת ל-sm, ולכן ה-@media למטה מוריד את 36 ומקטין ל-62.
      כל אלמנט sticky/fixed חדש חייב offset של הטוקן הזה.                     */
-  --spacing-header: 116px;
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --spacing-header: calc(116px + var(--safe-area-top));
+  --spacing-mobile-gutter: 1rem;
+  --spacing-section-mobile: 2rem;
+  --size-touch: 44px;
+  --radius-sheet: 18px;
   --container-page: 1280px;
   --container-wide: 1480px;
 
@@ -195,7 +202,7 @@
 }
 
 @media (max-width: 639px) {
-  :root { --spacing-header: 68px; }  /* 8 ריפוד עליון + 52 גובה הגלולה + 8 נשימה */
+  :root { --spacing-header: calc(68px + var(--safe-area-top)); }  /* 8 ריפוד עליון + 52 גובה הגלולה + 8 נשימה */
 }
 
 /* הסרגל התחתון קיים רק מתחת ל-lg. מעליו הטוקן חוזר לאפס, כך שריפודים
@@ -451,6 +458,20 @@ html[data-cursor="big"], html[data-cursor="big"] * {
 
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* אקורדיוני הפוטר נשארים HTML סמנטי יחיד בשני המצבים. במובייל
+     details מספק disclosure נגיש ללא JavaScript; בדסקטופ התוכן
+     מוצג תמיד וה-summary מתפקד ככותרת לא-אינטראקטיבית. */
+  .footer-details > summary { list-style: none; }
+  .footer-details > summary::-webkit-details-marker { display: none; }
+
+  @media (min-width: 1024px) {
+    .footer-details > summary {
+      pointer-events: none;
+      cursor: default;
+    }
+    .footer-details:not([open]) > .footer-details-content { display: block; }
+  }
 
   .bg-dots {
     background-image: radial-gradient(rgb(12 29 64 / 0.09) 1px, transparent 1px);
