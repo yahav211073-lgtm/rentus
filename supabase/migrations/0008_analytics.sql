@@ -54,7 +54,9 @@ create table if not exists public.trending_searches (
   period_start date,
   period_end   date,
   is_active    boolean not null default true
-);
+);םחכחחמחךמעגכ /  
+0ע ׳וכקר יכ =-/ ק9׳-0
+כו
 
 
 -- ============================================================================

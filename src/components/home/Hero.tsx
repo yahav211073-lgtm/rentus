@@ -23,7 +23,7 @@ import type { SimpleCity } from "@/lib/repo/taxonomy";
  */
 
 const TRUST = [
-  { Icon: BadgeCheck,  label: "אלפי חברות" },
+  { Icon: BadgeCheck,  label: "עשרות חברות" },
   { Icon: ShieldCheck, label: "מחירים משתלמים" },
   { Icon: Truck,       label: "שירות בפריסה ארצית" },
   { Icon: Star,        label: "ציוד מבוטח" },

@@ -6,7 +6,7 @@ const BENEFITS = [
   { Icon: Heart,  label: "חינם וללא התחייבות", sub: "השירות למשתמשים בחינם" },
   { Icon: Search, label: "פנייה ישירה",        sub: "טלפון או וואטסאפ" },
   { Icon: Scale,  label: "השוואת מחירים",       sub: "חוסכים זמן וכסף" },
-  { Icon: MapPin, label: "אלפי חברות",          sub: "בכל רחבי הארץ" },
+  { Icon: MapPin, label: "עשרות חברות",          sub: "בכל רחבי הארץ" },
 ];
 
 /**
